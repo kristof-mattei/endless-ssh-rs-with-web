@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM rust:1.80.1@sha256:29fe4376919e25b7587a1063d7b521d9db735fc137d3cf30ae41eb326d209471 AS builder
+FROM --platform=$BUILDPLATFORM rust:1.80.1@sha256:29fe4376919e25b7587a1063d7b521d9db735fc137d3cf30ae41eb326d209471 AS rust_builder
 
 ARG TARGET=x86_64-unknown-linux-musl
 ARG APPLICATION_NAME
@@ -44,6 +44,24 @@ COPY . .
 # --release not needed, it is implied with install
 RUN --mount=type=cache,id=rust-full-build,target=/build/${APPLICATION_NAME}/target \
     cargo install --path . --target ${TARGET} --root /output
+
+# ----
+FROM node:21.7.3-alpine3.19@sha256:1e13649e44d505d5410164f5b7325e4ff1ae551e87e6e4f17d74f6b9b0affbff AS typescript_builder
+
+# The following block
+# creates an empty app, and we copy in package.json and packge-lock.json as they represent our dependencies
+# This allows us to copy in the source in a different layer which in turn allows us to leverage Docker's layer caching
+# That means that if our dependencies don't change rebuilding is much faster
+WORKDIR /build
+COPY package.json package-lock.json vite.config.ts tsconfig.json ./
+
+RUN --mount=type=cache,id=npm-dependencies,target=/root/.npm \
+    npm ci --include=dev
+
+# now we copy in the rest
+COPY front-end ./front-end/
+
+RUN npm run build
 
 FROM alpine:3.20.2@sha256:0a4eaa0eecf5f8c050e5bba433f58c052be7587ee8af3e8b3910ef9ab5fbe9f5
 
