@@ -247,6 +247,7 @@ export default tseslint.config(
             "@typescript-eslint/no-empty-object-type": ["error"],
             "@typescript-eslint/no-explicit-any": ["error", { fixToUnknown: true, ignoreRestArgs: false }],
             "@typescript-eslint/no-extraneous-class": ["error"],
+            "@typescript-eslint/no-magic-numbers": ["off"],
             "@typescript-eslint/no-shadow": ["error"],
             "@typescript-eslint/no-unused-expressions": [
                 "error",
