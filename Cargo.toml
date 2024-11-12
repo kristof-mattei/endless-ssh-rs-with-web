@@ -71,7 +71,7 @@ reverse-proxy-service = { git = "https://github.com/manorom/reverse-proxy-servic
     "axum",
 ] }
 socketioxide = { version = "0.15.1", features = ["tracing"] }
-serde = { version = "1.0.214", features = ["derive"] }
+serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.132"
 url = { version = "2.5.3", features = ["serde"] }
 # console-subscriber = "0.2.0"
