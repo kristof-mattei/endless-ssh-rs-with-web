@@ -64,8 +64,8 @@ tokio-util = "0.7.12"
 tower = "0.5.1"
 tower-http = { version = "0.6.2", features = ["cors", "fs", "trace"] }
 tracing = "0.1.41"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
-tracing-error = "0.2.0"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+tracing-error = "0.2.1"
 rand = "0.8.5"
 reverse-proxy-service = { git = "https://github.com/manorom/reverse-proxy-service", rev = "fda8bf28b4c602bdcf5f941b584e3e4940a1491e", features = [
     "axum",
