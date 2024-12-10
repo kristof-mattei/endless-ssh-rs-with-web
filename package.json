@@ -60,7 +60,7 @@
         "@stylistic/eslint-plugin-ts": "2.12.0",
         "@types/eslint": "9.6.1",
         "@types/node": "22.10.1",
-        "@types/react": "18.3.14",
+        "@types/react": "18.3.15",
         "@types/react-dom": "18.3.3",
         "@types/semver": "7.5.8",
         "@vitejs/plugin-react": "4.3.4",
