@@ -74,7 +74,7 @@
         "eslint-plugin-perfectionist": "4.6.0",
         "eslint-plugin-prettier": "5.2.1",
         "eslint-plugin-promise": "7.2.1",
-        "eslint-plugin-react": "7.37.3",
+        "eslint-plugin-react": "7.37.4",
         "eslint-plugin-react-hook-form": "0.3.0",
         "eslint-plugin-react-hooks": "5.1.0",
         "eslint-plugin-react-refresh": "0.4.18",
