@@ -59,8 +59,8 @@
         "@types/react-dom": "19.0.3",
         "@types/semver": "7.5.8",
         "@vitejs/plugin-react": "4.3.4",
-        "@vitest/coverage-v8": "3.0.0-beta.4",
-        "@vitest/ui": "3.0.0-beta.4",
+        "@vitest/coverage-v8": "3.0.0",
+        "@vitest/ui": "3.0.0",
         "autoprefixer": "10.4.20",
         "bootstrap": "5.3.3",
         "dependency-cruiser": "16.9.0",
@@ -92,7 +92,7 @@
         "vite-plugin-checker": "0.8.0",
         "vite-plugin-svgr": "4.3.0",
         "vite-tsconfig-paths": "5.1.4",
-        "vitest": "3.0.0-beta.4"
+        "vitest": "3.0.0"
     },
     "overrides": {}
 }
