@@ -15,8 +15,7 @@
         "format": "prettier --write .",
         "deps:ci": "depcruise --config dependency-cruiser.config.mjs --output-type err front-end/src",
         "deps:graph": "depcruise --config dependency-cruiser.config.mjs --output-type dot front-end/src | dot -T svg > dependency-graph.svg",
-        "deps:report": "depcruise --config dependency-cruiser.config.mjs --output-type err-html --output-to dependency-report.html front-end/src",
-        "prepare": "husky"
+        "deps:report": "depcruise --config dependency-cruiser.config.mjs --output-type err-html --output-to dependency-report.html front-end/src"
     },
     "engines": {
         "node": ">=22.13.1",
@@ -80,7 +79,6 @@
         "eslint-plugin-react-hooks": "5.1.0",
         "eslint-plugin-react-refresh": "0.4.18",
         "eslint-plugin-unicorn": "56.0.1",
-        "husky": "9.1.7",
         "nock": "13.5.6",
         "prettier": "3.4.2",
         "sass": "1.83.4",
