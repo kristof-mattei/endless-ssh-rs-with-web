@@ -82,7 +82,7 @@
         "nock": "14.0.0",
         "prettier": "3.4.2",
         "sass": "1.83.4",
-        "semver": "7.6.3",
+        "semver": "7.7.0",
         "serialize-error": "12.0.0",
         "tailwindcss": "4.0.1",
         "typescript": "5.7.3",
