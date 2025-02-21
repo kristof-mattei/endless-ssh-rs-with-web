@@ -3,7 +3,7 @@ use std::net::SocketAddr;
 
 use axum::Router;
 use tokio_util::sync::CancellationToken;
-use tracing::{event, Level};
+use tracing::{Level, event};
 
 pub(crate) async fn server_forever(bind_to: SocketAddr, router: Router, token: CancellationToken) {
     event!(Level::INFO, ?bind_to, "Trying to bind");

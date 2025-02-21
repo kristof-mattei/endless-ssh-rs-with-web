@@ -5,13 +5,13 @@ use time::OffsetDateTime;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::mpsc::Sender;
 use tokio::sync::{RwLock, Semaphore, TryAcquireError};
-use tracing::{event, Level};
+use tracing::{Level, event};
 
+use crate::SIZE_IN_BYTES;
 use crate::client::Client;
 use crate::config::{BindFamily, Config};
 use crate::ffi_wrapper::set_receive_buffer_size;
 use crate::statistics::Statistics;
-use crate::SIZE_IN_BYTES;
 
 struct Listener<'c> {
     config: &'c Config,

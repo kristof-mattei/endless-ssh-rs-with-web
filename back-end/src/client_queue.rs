@@ -5,7 +5,7 @@ use tokio::net::TcpStream;
 use tokio::sync::mpsc::{Receiver, Sender};
 use tokio::sync::{RwLock, Semaphore};
 use tokio::time::sleep;
-use tracing::{event, Level};
+use tracing::{Level, event};
 
 use crate::client::Client;
 use crate::config::Config;
