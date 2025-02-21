@@ -16,33 +16,32 @@ mod traits;
 mod utils;
 
 use std::env;
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 use std::time::Duration;
 
 use client::Client;
 use client_queue::process_clients_forever;
 use dotenvy::dotenv;
-use events::{database_listen_forever, ClientEvent};
+use events::{ClientEvent, database_listen_forever};
 use listener::listen_forever;
-use once_cell::sync::Lazy;
 use server::server_forever;
 use tokio::net::TcpStream;
 use tokio::sync;
 use tokio::sync::{RwLock, Semaphore};
 use tokio::time::timeout;
 use tokio_util::sync::CancellationToken;
-use tracing::{event, Level};
+use tracing::{Level, event};
+use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::EnvFilter;
 
 use crate::cli::parse_cli;
 use crate::statistics::Statistics;
 
 const SIZE_IN_BYTES: usize = 1;
 
-static BROADCAST_CHANNEL: Lazy<sync::broadcast::Sender<ClientEvent>> =
-    Lazy::new(|| sync::broadcast::channel(100).0);
+static BROADCAST_CHANNEL: LazyLock<sync::broadcast::Sender<ClientEvent>> =
+    LazyLock::new(|| sync::broadcast::channel(100).0);
 
 fn main() -> Result<(), color_eyre::Report> {
     // set up .env, if it fails, user didn't provide any
