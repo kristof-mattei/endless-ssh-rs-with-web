@@ -42,7 +42,7 @@ path = "back-end/tests/integration_tests.rs"
 
 [dependencies]
 axum = { version = "0.8.1" }
-clap = { version = "4.5.30", features = ["cargo"] }
+clap = { version = "4.5.31", features = ["cargo"] }
 color-eyre = { git = "https://github.com/eyre-rs/eyre", rev = "c4ee249f7c51dc6452e8704ae8d117d90d6eeebc" }
 dotenvy = "0.15.7"
 libc = "0.2.170"
