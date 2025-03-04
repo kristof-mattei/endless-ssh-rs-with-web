@@ -132,6 +132,11 @@ jobs:
 
           cargo --version
 
+      - name: Install rustfmt
+        shell: bash
+        run: |
+          rustup component add rustfmt
+
       - name: Check formatting
         shell: bash
         run: |
@@ -184,6 +189,7 @@ jobs:
 
       - name: Get binstall
         shell: bash
+        working-directory: /tmp
         run: |
           archive="cargo-binstall-x86_64-unknown-linux-musl.tgz"
           wget "https://github.com/cargo-bins/cargo-binstall/releases/latest/download/${archive}"
