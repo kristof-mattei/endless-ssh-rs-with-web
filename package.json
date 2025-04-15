@@ -55,7 +55,7 @@
     "@tailwindcss/vite": "4.1.4",
     "@types/eslint": "9.6.1",
     "@types/node": "22.14.1",
-    "@types/react": "19.1.1",
+    "@types/react": "19.1.2",
     "@types/react-dom": "19.1.2",
     "@types/semver": "7.7.0",
     "@vitejs/plugin-react": "4.3.4",
