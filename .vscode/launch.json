@@ -41,8 +41,8 @@
                 "RUST_BACKTRACE": "full",
                 "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE"
             },
-            "internalConsoleOptions": "openOnSessionStart",
-            "terminal": "console"
+            "internalConsoleOptions": "neverOpen",
+            "terminal": "integrated"
         },
         {
             "type": "lldb",
@@ -61,8 +61,8 @@
                 "RUST_BACKTRACE": "full",
                 "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE"
             },
-            "internalConsoleOptions": "openOnSessionStart",
-            "terminal": "console"
+            "internalConsoleOptions": "neverOpen",
+            "terminal": "integrated"
         },
         {
             "type": "lldb",
