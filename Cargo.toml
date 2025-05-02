@@ -46,15 +46,15 @@ path = "back-end/tests/integration_tests.rs"
 [dependencies]
 axum = { version = "0.8.4" }
 clap = { version = "4.5.37", features = ["cargo"] }
-color-eyre = { git = "https://github.com/eyre-rs/eyre", rev = "c4ee249f7c51dc6452e8704ae8d117d90d6eeebc" }
+color-eyre = "0.6.4"
 dotenvy = "0.15.7"
 libc = "0.2.172"
 mockall = "0.13.1"
 mockall_double = "0.3.1"
 rand = "0.9.1"
-tracing = "0.1.41"
-tracing-error = "0.2.1"
-tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+socketioxide = { version = "0.16.2", features = ["tracing"] }
 time = { version = "0.3.41", features = ["formatting"] }
 tokio = { version = "1.44.2", features = [
     "macros",
@@ -67,9 +67,9 @@ tokio = { version = "1.44.2", features = [
 tokio-util = "0.7.15"
 tower = "0.5.2"
 tower-http = { version = "0.6.2", features = ["cors", "fs", "trace"] }
-socketioxide = { version = "0.16.2", features = ["tracing"] }
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
+tracing = "0.1.41"
+tracing-error = "0.2.1"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 url = { version = "2.5.3", features = ["serde"] }
 
 # OpenSSL for musl
