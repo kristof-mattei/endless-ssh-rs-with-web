@@ -9,7 +9,11 @@
             "request": "launch",
             "name": "Debug executable 'endless-ssh-rs'",
             "cargo": {
-                "args": ["build", "--bin=endless-ssh-rs", "--package=endless-ssh-rs"],
+                "args": [
+                    "build",
+                    "--bin=endless-ssh-rs",
+                    "--package=endless-ssh-rs"
+                ],
                 "filter": {
                     "name": "endless-ssh-rs",
                     "kind": "bin"
@@ -29,7 +33,11 @@
             "request": "launch",
             "name": "Debug executable 'endless-ssh-rs' wrong-params",
             "cargo": {
-                "args": ["build", "--bin=endless-ssh-rs", "--package=endless-ssh-rs"],
+                "args": [
+                    "build",
+                    "--bin=endless-ssh-rs",
+                    "--package=endless-ssh-rs"
+                ],
                 "filter": {
                     "name": "endless-ssh-rs",
                     "kind": "bin"
@@ -49,7 +57,11 @@
             "request": "launch",
             "name": "Debug executable 'endless-ssh-rs' help",
             "cargo": {
-                "args": ["build", "--bin=endless-ssh-rs", "--package=endless-ssh-rs"],
+                "args": [
+                    "build",
+                    "--bin=endless-ssh-rs",
+                    "--package=endless-ssh-rs"
+                ],
                 "filter": {
                     "name": "endless-ssh-rs",
                     "kind": "bin"
@@ -69,7 +81,12 @@
             "request": "launch",
             "name": "Debug unit tests in executable 'endless-ssh-rs'",
             "cargo": {
-                "args": ["test", "--no-run", "--bin=endless-ssh-rs", "--package=endless-ssh-rs"],
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=endless-ssh-rs",
+                    "--package=endless-ssh-rs"
+                ],
                 "filter": {
                     "name": "endless-ssh-rs",
                     "kind": "bin"
@@ -89,7 +106,12 @@
             "request": "launch",
             "name": "Debug integration test 'integration_tests'",
             "cargo": {
-                "args": ["test", "--no-run", "--test=integration_tests", "--package=endless-ssh-rs"],
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=integration_tests",
+                    "--package=endless-ssh-rs"
+                ],
                 "filter": {
                     "name": "integration_tests",
                     "kind": "test"
