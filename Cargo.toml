@@ -50,7 +50,7 @@ path = "back-end/tests/integration_tests.rs"
 [dependencies]
 axum = { version = "0.8.4" }
 clap = { version = "4.5.39", features = ["cargo"] }
-color-eyre = "0.6.4"
+color-eyre = "0.6.5"
 dotenvy = "0.15.7"
 libc = "0.2.172"
 mockall = "0.13.1"
