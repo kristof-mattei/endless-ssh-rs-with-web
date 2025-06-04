@@ -12,7 +12,7 @@ keywords = ["random"]
 repository = "https://github.com/kristof-mattei/endless-ssh-rs"
 
 [[bin]]
-name = "endless-ssh-rs"
+name = "endless-ssh-rs-with-web"
 path = "back-end/src/main.rs"
 
 [lints.clippy]
