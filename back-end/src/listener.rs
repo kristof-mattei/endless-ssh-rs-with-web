@@ -1,6 +1,7 @@
 use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 use std::sync::Arc;
 
+use color_eyre::eyre;
 use time::OffsetDateTime;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::mpsc::Sender;
@@ -49,7 +50,7 @@ pub(crate) async fn listen_forever(
 }
 
 impl<'c> Listener<'c> {
-    pub(crate) async fn bind(config: &'c Config) -> Result<Self, color_eyre::Report> {
+    pub(crate) async fn bind(config: &'c Config) -> Result<Self, eyre::Report> {
         let sa = match config.bind_family {
             BindFamily::Ipv4 => {
                 SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, config.port.get()))
@@ -75,7 +76,7 @@ impl<'c> Listener<'c> {
         client_sender: &Sender<Client<TcpStream>>,
         semaphore: &Semaphore,
         statistics: &RwLock<Statistics>,
-    ) -> Result<(), color_eyre::Report> {
+    ) -> Result<(), eyre::Report> {
         let accept = self.listener.accept().await;
 
         {
@@ -124,7 +125,7 @@ impl<'c> Listener<'c> {
                             event!(Level::WARN, ?addr, "Queue full, not accepting new client");
                         },
                         Err(error @ TryAcquireError::Closed) => {
-                            return Err(color_eyre::Report::new(error)
+                            return Err(eyre::Report::new(error)
                                 .wrap_err("Queue gone, not accepting new client"));
                         },
                     }
@@ -156,7 +157,7 @@ impl<'c> Listener<'c> {
                 },
                 _ => {
                     return Err(
-                        color_eyre::Report::new(error).wrap_err("Unable to accept new connection")
+                        eyre::Report::new(error).wrap_err("Unable to accept new connection")
                     );
                 },
             },

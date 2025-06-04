@@ -1,3 +1,4 @@
+use color_eyre::eyre;
 use tokio::task::JoinHandle;
 
 pub mod env;
@@ -13,10 +14,10 @@ pub mod env;
 /// when either the join failed, or the inner task failed
 pub(crate) async fn flatten_handle<T, E>(
     handle: JoinHandle<Result<T, E>>,
-) -> Result<T, color_eyre::Report>
+) -> Result<T, eyre::Report>
 where
     E: 'static + Sync + Send,
-    color_eyre::Report: From<E>,
+    eyre::Report: From<E>,
 {
     match handle.await {
         Ok(Ok(result)) => Ok(result),

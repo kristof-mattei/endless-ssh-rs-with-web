@@ -47,10 +47,15 @@ non_ascii_idents = { level = "deny", priority = 127 }
 name = "endless-ssh-rs"
 path = "back-end/tests/integration_tests.rs"
 
+[features]
+default = []
+tokio-console = ["dep:console-subscriber"]
+
 [dependencies]
 axum = { version = "0.8.4" }
 clap = { version = "4.5.39", features = ["cargo"] }
 color-eyre = "0.6.5"
+console-subscriber = { version = "0.4.1", optional = true }
 dotenvy = "0.15.7"
 libc = "0.2.172"
 mockall = "0.13.1"
