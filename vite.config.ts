@@ -1,4 +1,4 @@
-import path from "node:path";
+import nodePath from "node:path";
 
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
@@ -10,29 +10,27 @@ import svgr from "vite-plugin-svgr";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 import { coverageConfigDefaults, defineConfig } from "vitest/config";
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-    const environment = loadEnv(mode, process.cwd());
+    const environment = loadEnv(mode, process.cwd(), "");
     const port = Number.parseInt(environment["VITE_PORT"] ?? "");
 
     const config: UserConfig = {
         appType: "spa",
-
         build: {
+            minify: false,
+            target: "esnext",
             emptyOutDir: true,
+            sourcemap: true,
             outDir: "../../dist",
             rollupOptions: {
                 output: {},
             },
-            sourcemap: true,
         },
         resolve: {
             alias: {
-                "@/": path.resolve("src/"),
-                "~bootstrap": path.resolve(import.meta.dirname, "node_modules/bootstrap"),
+                "@/": nodePath.resolve("src/"),
             },
         },
-
         plugins: [
             svgr(),
             react(),
@@ -40,16 +38,19 @@ export default defineConfig(({ mode }) => {
             checker({ typescript: true }),
             tailwindcss(),
             codecovVitePlugin({
-                enableBundleAnalysis: environment["CODECOV_TOKEN"] !== undefined,
+                enableBundleAnalysis: environment["GITHUB_ACTIONS"] === "true",
                 bundleName: "endless-ssh-rs-front-end",
-                uploadToken: environment["CODECOV_TOKEN"] ?? "",
+                oidc: {
+                    useGitHubOIDC: true,
+                },
+                telemetry: false,
             }),
         ],
         optimizeDeps: {
-            exclude: ["src/entrypoints/index.ts"],
+            noDiscovery: true,
+            // exclude: ["src/entrypoints/index.ts"],
         },
         root: "front-end/src",
-
         server: {
             port: Number.isNaN(port) ? 4000 : port,
             host: true,
@@ -60,7 +61,7 @@ export default defineConfig(({ mode }) => {
             },
             cors: true,
             proxy: {
-                "/api": {
+                "/socket.io": {
                     target: "http://localhost:3000",
                     changeOrigin: true,
                     secure: false,
@@ -83,6 +84,7 @@ export default defineConfig(({ mode }) => {
             outputFile: {
                 junit: "../../reports/vitest/test-report.xml",
             },
+            restoreMocks: true,
             setupFiles: ["./test.setup.ts"],
         },
     };
