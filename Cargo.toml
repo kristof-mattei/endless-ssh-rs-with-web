@@ -1,6 +1,5 @@
 [package]
-name = "endless-ssh-rs"
-# don't change this, it's updated before an actual build by update-version.sh
+name = "endless-ssh-rs-with-web"
 version = "0.0.0-development"
 edition = "2024"
 rust-version = "1.88.0"
@@ -55,6 +54,7 @@ tokio-console = ["dep:console-subscriber"]
 
 [dependencies]
 axum = { version = "0.8.4" }
+axum-proxy = { version = "0.5.1", features = ["axum"] }
 clap = { version = "4.5.40", features = ["cargo"] }
 color-eyre = "0.6.5"
 console-subscriber = { version = "0.4.1", optional = true }
@@ -75,7 +75,7 @@ tokio = { version = "1.46.1", features = [
     "signal",
     "time",
 ] }
-tokio-util = "0.7.15"
+tokio-util = { version = "0.7.15", features = ["rt"] }
 tower = "0.5.2"
 tower-http = { version = "0.6.6", features = ["cors", "fs", "trace"] }
 tracing = "0.1.41"

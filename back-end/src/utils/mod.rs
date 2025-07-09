@@ -1,9 +1,10 @@
+pub mod env;
+pub mod url;
+
 use color_eyre::eyre;
+use tokio::signal::unix::{SignalKind, signal};
 use tokio::task::JoinHandle;
 
-pub mod env;
-
-#[expect(dead_code)]
 /// Use this when you have a `JoinHandle<Result<T, E>>`
 /// and you want to use it with `tokio::try_join!`
 /// when the task completes with an `Result::Err`
@@ -12,6 +13,10 @@ pub mod env;
 /// `Result::Ok(T)` when both the join-handle AND
 /// the result of the inner function are `Result::Ok`, and `Result::Err`
 /// when either the join failed, or the inner task failed
+/// # Errors
+/// * When there is an issue executing the task
+/// * When the task itself failed
+#[expect(dead_code)]
 pub(crate) async fn flatten_handle<T, E>(
     handle: JoinHandle<Result<T, E>>,
 ) -> Result<T, eyre::Report>
@@ -24,4 +29,12 @@ where
         Ok(Err(err)) => Err(err.into()),
         Err(err) => Err(err.into()),
     }
+}
+
+/// Waits forever for a sigterm
+/// # Errors
+/// When the handler can not be registered
+pub(crate) async fn wait_for_sigterm() -> Result<(), std::io::Error> {
+    signal(SignalKind::terminate())?.recv().await;
+    Ok(())
 }
