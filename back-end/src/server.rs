@@ -1,33 +1,30 @@
-use std::future::IntoFuture;
 use std::net::SocketAddr;
 
 use axum::Router;
+use color_eyre::eyre::{self, Context};
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
-pub(crate) async fn server_forever(bind_to: SocketAddr, router: Router, token: CancellationToken) {
+/// Set up server on socket, with a router, and a cancellation token for graceful shutdown
+///
+/// # Errors
+/// * Couldn't bind to address
+/// * Server failure
+pub(crate) async fn setup_server(
+    bind_to: SocketAddr,
+    router: Router,
+    token: CancellationToken,
+) -> Result<(), eyre::Report> {
     event!(Level::INFO, ?bind_to, "Trying to bind");
 
-    let listener = match tokio::net::TcpListener::bind(bind_to).await {
-        Ok(listener) => listener,
-        Err(err) => {
-            event!(Level::ERROR, ?err, "Failed to bind server to port");
-            return;
-        },
-    };
+    let listener = tokio::net::TcpListener::bind(bind_to)
+        .await
+        .wrap_err("Failed to bind Webserver to port")?;
 
-    event!(Level::INFO, ?bind_to, "Server bound successfully");
+    event!(Level::INFO, ?bind_to, "Webserver bound successfully");
 
-    let server = axum::serve(listener, router)
+    axum::serve(listener, router)
         .with_graceful_shutdown(token.cancelled_owned())
-        .into_future();
-
-    match server.await {
-        Ok(()) => {
-            event!(Level::INFO, "Server shut down gracefully");
-        },
-        Err(err) => {
-            event!(Level::ERROR, ?err, "Server died");
-        },
-    }
+        .await
+        .map_err(Into::into)
 }

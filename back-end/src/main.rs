@@ -7,38 +7,45 @@ mod ffi_wrapper;
 mod helpers;
 mod line;
 mod listener;
+mod router;
 mod sender;
 mod server;
 mod signal_handlers;
+mod state;
+mod states;
 mod statistics;
 mod timeout;
 mod traits;
 mod utils;
 
-use std::env::{self, VarError};
 use std::sync::{Arc, LazyLock};
 use std::time::Duration;
+use std::{
+    env::{self, VarError},
+    net::SocketAddr,
+};
 
-use client::Client;
-use client_queue::process_clients_forever;
 use color_eyre::config::HookBuilder;
 use color_eyre::eyre;
 use dotenvy::dotenv;
-use events::{ClientEvent, database_listen_forever};
-use listener::listen_forever;
-use server::server_forever;
 use tokio::net::TcpStream;
-use tokio::sync;
 use tokio::sync::{RwLock, Semaphore};
 use tokio::time::timeout;
+use tokio::{signal, sync};
 use tokio_util::sync::CancellationToken;
+use tokio_util::task::TaskTracker;
 use tracing::{Level, event};
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::{EnvFilter, Layer};
 
-use crate::cli::parse_cli;
+use crate::client_queue::process_clients_forever;
+use crate::events::{ClientEvent, database_listen_forever};
+use crate::listener::listen_forever;
+use crate::server::setup_server;
 use crate::statistics::Statistics;
+use crate::{cli::parse_cli, router::build_router};
+use crate::{client::Client, state::ApplicationState};
 
 const SIZE_IN_BYTES: usize = 1;
 
@@ -60,11 +67,6 @@ async fn start_tasks() -> Result<(), eyre::Report> {
 
     config.log();
 
-    let bind_to = ([0, 0, 0, 0], 3000).into();
-
-    // TODO
-    let router = axum::Router::new();
-
     // clients channel
     let (client_sender, client_receiver) =
         tokio::sync::mpsc::channel::<Client<TcpStream>>(config.max_clients.into());
@@ -72,17 +74,33 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     // available slots semaphore
     let semaphore = Arc::new(Semaphore::new(config.max_clients.into()));
 
+    let application_state = ApplicationState::new(states::config::Config {});
+
     // this channel is used to communicate between
     // tasks and this function, in the case that a task fails, they'll send a message on the shutdown channel
     // after which we'll gracefully terminate other services
     let token = CancellationToken::new();
 
-    let mut tasks = tokio::task::JoinSet::new();
+    let tasks = TaskTracker::new();
 
     {
+        let bind_to = SocketAddr::from(([0, 0, 0, 0], 3000));
+        let router = build_router(application_state);
+
         let token = token.clone();
 
-        tasks.spawn(server_forever(bind_to, router, token.clone()));
+        tasks.spawn(async move {
+            let _guard = token.clone().drop_guard();
+
+            match setup_server(bind_to, router, token).await {
+                Err(err) => {
+                    event!(Level::ERROR, ?err, "Webserver died");
+                },
+                Ok(()) => {
+                    event!(Level::INFO, "Webserver shut down gracefully");
+                },
+            }
+        });
     }
 
     {
@@ -127,14 +145,21 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     // * a message on the shutdown channel, sent either by the server task or
     // another task when they complete (which means they failed)
     tokio::select! {
-        _ = signal_handlers::wait_for_sigint() => {
-            // we completed because ...
-            event!(Level::WARN, message = "CTRL+C detected, stopping all tasks");
+        r = utils::wait_for_sigterm() => {
+            if let Err(err) = r {
+                event!(Level::ERROR, ?err, "Failed to register SIGERM handler, aborting");
+            } else {
+                // we completed because ...
+                event!(Level::WARN, "Sigterm detected, stopping all tasks");
+            }
         },
-        _ = tasks.join_next() => {},
-        _ = signal_handlers::wait_for_sigterm() => {
-            // we completed because ...
-            event!(Level::WARN, message = "Sigterm detected, stopping all tasks");
+        r = signal::ctrl_c() => {
+            if let Err(err) = r {
+                event!(Level::ERROR, ?err, "Failed to register CTRL+C handler, aborting");
+            } else {
+                // we completed because ...
+                event!(Level::WARN, "CTRL+C detected, stopping all tasks");
+            }
         },
         () = token.cancelled() => {
             event!(Level::WARN, "Underlying task stopped, stopping all others tasks");
@@ -144,9 +169,11 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     // backup, in case we forgot a dropguard somewhere
     token.cancel();
 
+    tasks.close();
+
     // wait for the task that holds the server to exit gracefully
     // it listens to shutdown_send
-    if timeout(Duration::from_millis(10000), tasks.shutdown())
+    if timeout(Duration::from_millis(10000), tasks.wait())
         .await
         .is_err()
     {
