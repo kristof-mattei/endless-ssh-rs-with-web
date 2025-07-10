@@ -106,9 +106,9 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     {
         tasks.spawn(listen_forever(
             client_sender.clone(),
-            semaphore.clone(),
-            config.clone(),
-            statistics.clone(),
+            Arc::clone(&semaphore),
+            Arc::clone(&config),
+            Arc::clone(&statistics),
         ));
     }
 
@@ -117,14 +117,14 @@ async fn start_tasks() -> Result<(), eyre::Report> {
         tasks.spawn(process_clients_forever(
             client_sender.clone(),
             client_receiver,
-            semaphore.clone(),
-            config.clone(),
-            statistics.clone(),
+            Arc::clone(&semaphore),
+            Arc::clone(&config),
+            Arc::clone(&statistics),
         ));
     }
 
     {
-        let statistics = statistics.clone();
+        let statistics = Arc::clone(&statistics);
 
         tasks.spawn(async move {
             while let Some(()) = signal_handlers::wait_for_sigusr1().await {
