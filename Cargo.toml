@@ -5,10 +5,11 @@ edition = "2024"
 rust-version = "1.88.0"
 authors = ["Kristof Mattei"]
 description = "endless-ssh-rs in Rust"
-license-file = "LICENSE"
+license = "MIT"
 categories = ["fun"]
 keywords = ["random"]
 repository = "https://github.com/kristof-mattei/endless-ssh-rs"
+include = ["src/**", "/LICENSE", "/LICENSE-*"]
 
 [[bin]]
 name = "endless-ssh-rs-with-web"
@@ -51,7 +52,7 @@ let_underscore_drop = { level = "deny", priority = 127 }
 non_ascii_idents = { level = "deny", priority = 127 }
 
 [[test]]
-name = "endless-ssh-rs"
+name = "endless-ssh-rs-with-web"
 path = "back-end/tests/integration_tests.rs"
 
 [features]
@@ -75,8 +76,6 @@ socketioxide = { version = "0.17.2", features = ["tracing"] }
 time = { version = "0.3.41", features = ["formatting"] }
 tokio = { version = "1.46.1", features = [
     "macros",
-    "io-util",
-    "io-std",
     "rt-multi-thread",
     "signal",
     "time",

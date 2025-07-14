@@ -11,7 +11,7 @@ path = "CHANGELOG.md"
 authors = [{ signature = "Kristof Mattei", username = "kristof-mattei" }]
 template = "remote"
 remote = "github.com"
-repository = "magwords"
+repository = "endless-ssh-rs-with-web"
 owner = "kristof-mattei"
 
 [bump_profiles]
