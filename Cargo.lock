@@ -537,8 +537,6 @@ dependencies = [
  "mockall",
  "mockall_double",
  "rand 0.9.1",
- "serde",
- "serde_json",
  "socketioxide",
  "time",
  "tokio",
