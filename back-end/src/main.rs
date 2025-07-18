@@ -18,12 +18,10 @@ mod timeout;
 mod traits;
 mod utils;
 
+use std::env::{self, VarError};
+use std::net::SocketAddr;
 use std::sync::{Arc, LazyLock};
 use std::time::Duration;
-use std::{
-    env::{self, VarError},
-    net::SocketAddr,
-};
 
 use color_eyre::config::HookBuilder;
 use color_eyre::eyre;
@@ -35,17 +33,19 @@ use tokio::{signal, sync};
 use tokio_util::sync::CancellationToken;
 use tokio_util::task::TaskTracker;
 use tracing::{Level, event};
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::{EnvFilter, Layer};
+use tracing_subscriber::layer::SubscriberExt as _;
+use tracing_subscriber::util::SubscriberInitExt as _;
+use tracing_subscriber::{EnvFilter, Layer as _};
 
+use crate::cli::parse_cli;
+use crate::client::Client;
 use crate::client_queue::process_clients_forever;
 use crate::events::{ClientEvent, database_listen_forever};
 use crate::listener::listen_forever;
+use crate::router::build_router;
 use crate::server::setup_server;
+use crate::state::ApplicationState;
 use crate::statistics::Statistics;
-use crate::{cli::parse_cli, router::build_router};
-use crate::{client::Client, state::ApplicationState};
 
 const SIZE_IN_BYTES: usize = 1;
 
@@ -128,7 +128,7 @@ async fn start_tasks() -> Result<(), eyre::Report> {
 
         tasks.spawn(async move {
             while let Some(()) = signal_handlers::wait_for_sigusr1().await {
-                statistics.read().await.log_totals::<()>(&[]);
+                statistics.read().await.log_totals::<(), _>(&[]);
             }
         });
     }
@@ -144,7 +144,12 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     // * ctrl + c (SIGINT)
     // * a message on the shutdown channel, sent either by the server task or
     // another task when they complete (which means they failed)
-    tokio::select! {
+    #[expect(
+        clippy::pattern_type_mismatch,
+        reason = "Can't seem to fix this with tokio macro matching"
+    )]
+    {
+        tokio::select! {
         r = utils::wait_for_sigterm() => {
             if let Err(err) = r {
                 event!(Level::ERROR, ?err, "Failed to register SIGERM handler, aborting");
@@ -164,7 +169,8 @@ async fn start_tasks() -> Result<(), eyre::Report> {
         () = token.cancelled() => {
             event!(Level::WARN, "Underlying task stopped, stopping all others tasks");
         },
-    };
+        };
+    }
 
     // backup, in case we forgot a dropguard somewhere
     token.cancel();
@@ -181,7 +187,7 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     }
 
     {
-        (statistics.read().await).log_totals::<()>(&[]);
+        (statistics.read().await).log_totals::<(), _>(&[]);
     }
 
     event!(Level::INFO, "Goodbye");

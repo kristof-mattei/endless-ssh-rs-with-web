@@ -12,7 +12,7 @@ use crate::config::Config;
 use crate::sender;
 use crate::statistics::Statistics;
 
-pub(crate) async fn process_clients_forever(
+pub async fn process_clients_forever(
     client_sender: Sender<Client<TcpStream>>,
     mut client_receiver: Receiver<Client<TcpStream>>,
     semaphore: Arc<Semaphore>,

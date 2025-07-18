@@ -1,6 +1,6 @@
 use crate::BROADCAST_CHANNEL;
 
-pub(crate) async fn database_listen_forever() {
+pub async fn database_listen_forever() {
     let receiver = &mut BROADCAST_CHANNEL.subscribe();
 
     loop {
@@ -13,4 +13,4 @@ pub(crate) async fn database_listen_forever() {
 }
 
 #[derive(Clone)]
-pub(crate) enum ClientEvent {}
+pub enum ClientEvent {}
