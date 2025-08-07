@@ -22,11 +22,11 @@ pub async fn process_clients_forever(
     event!(Level::INFO, message = "Processing clients");
 
     while let Some(client) = client_receiver.recv().await {
-        if let Some(client) = process_client(client, &semaphore, &config, &statistics).await {
-            if (client_sender.send(client).await).is_err() {
-                event!(Level::ERROR, "Client sender gone");
-                break;
-            }
+        if let Some(client) = process_client(client, &semaphore, &config, &statistics).await
+            && (client_sender.send(client).await).is_err()
+        {
+            event!(Level::ERROR, "Client sender gone");
+            break;
         }
     }
 
