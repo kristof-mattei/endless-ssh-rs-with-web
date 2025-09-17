@@ -23,7 +23,7 @@
             "cwd": "${workspaceFolder}",
             "env": {
                 "RUST_BACKTRACE": "1",
-                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE"
+                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE,tower_http::trace=TRACE"
             },
             "internalConsoleOptions": "neverOpen",
             "terminal": "integrated"
@@ -46,8 +46,8 @@
             "args": ["wrong-params"],
             "cwd": "${workspaceFolder}",
             "env": {
-                "RUST_BACKTRACE": "full",
-                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE"
+                "RUST_BACKTRACE": "1",
+                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE,tower_http::trace=TRACE"
             },
             "internalConsoleOptions": "neverOpen",
             "terminal": "integrated"
@@ -70,8 +70,8 @@
             "args": ["-h"],
             "cwd": "${workspaceFolder}",
             "env": {
-                "RUST_BACKTRACE": "full",
-                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE"
+                "RUST_BACKTRACE": "1",
+                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE,tower_http::trace=TRACE"
             },
             "internalConsoleOptions": "neverOpen",
             "terminal": "integrated"
@@ -96,7 +96,7 @@
             "cwd": "${workspaceFolder}",
             "env": {
                 "RUST_BACKTRACE": "1",
-                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE"
+                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE,tower_http::trace=TRACE"
             },
             "internalConsoleOptions": "neverOpen",
             "terminal": "integrated"
@@ -121,7 +121,7 @@
             "cwd": "${workspaceFolder}",
             "env": {
                 "RUST_BACKTRACE": "1",
-                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE"
+                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs=TRACE,tower_http::trace=TRACE"
             },
             "internalConsoleOptions": "neverOpen",
             "terminal": "integrated"
