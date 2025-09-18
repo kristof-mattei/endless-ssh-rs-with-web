@@ -28,9 +28,9 @@ use color_eyre::config::HookBuilder;
 use color_eyre::eyre;
 use dotenvy::dotenv;
 use tokio::net::TcpStream;
+use tokio::sync;
 use tokio::sync::{RwLock, Semaphore};
 use tokio::time::timeout;
-use tokio::{signal, sync};
 use tokio_util::sync::CancellationToken;
 use tokio_util::task::TaskTracker;
 use tracing::{Level, event};
@@ -128,7 +128,7 @@ async fn start_tasks() -> Result<(), eyre::Report> {
         let statistics = Arc::clone(&statistics);
 
         tasks.spawn(async move {
-            while let Some(()) = signal_handlers::wait_for_sigusr1().await {
+            while let Ok(()) = signal_handlers::wait_for_sigusr1().await {
                 statistics.read().await.log_totals::<(), _>(&[]);
             }
         });
@@ -145,23 +145,18 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     // * ctrl + c (SIGINT)
     // * a message on the shutdown channel, sent either by the server task or
     // another task when they complete (which means they failed)
-    #[expect(
-        clippy::pattern_type_mismatch,
-        reason = "Can't seem to fix this with tokio macro matching"
-    )]
-    {
-        tokio::select! {
-        r = utils::wait_for_sigterm() => {
-            if let Err(err) = r {
-                event!(Level::ERROR, ?err, "Failed to register SIGERM handler, aborting");
+    tokio::select! {
+        result = signal_handlers::wait_for_sigterm() => {
+            if let Err(error) = result {
+                event!(Level::ERROR, ?error, "Failed to register SIGERM handler, aborting");
             } else {
                 // we completed because ...
                 event!(Level::WARN, "Sigterm detected, stopping all tasks");
             }
         },
-        r = signal::ctrl_c() => {
-            if let Err(err) = r {
-                event!(Level::ERROR, ?err, "Failed to register CTRL+C handler, aborting");
+        result = signal_handlers::wait_for_sigint() => {
+            if let Err(error) = result {
+                event!(Level::ERROR, ?error, "Failed to register CTRL+C handler, aborting");
             } else {
                 // we completed because ...
                 event!(Level::WARN, "CTRL+C detected, stopping all tasks");
@@ -170,7 +165,6 @@ async fn start_tasks() -> Result<(), eyre::Report> {
         () = token.cancelled() => {
             event!(Level::WARN, "Underlying task stopped, stopping all others tasks");
         },
-        };
     }
 
     // backup, in case we forgot a dropguard somewhere
