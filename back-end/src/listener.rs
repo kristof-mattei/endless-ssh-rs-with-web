@@ -6,6 +6,7 @@ use time::OffsetDateTime;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::mpsc::Sender;
 use tokio::sync::{RwLock, Semaphore, TryAcquireError};
+use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
 use crate::SIZE_IN_BYTES;
@@ -20,31 +21,39 @@ struct Listener<'c> {
 }
 
 pub async fn listen_forever(
+    config: Arc<Config>,
+    token: CancellationToken,
     client_sender: tokio::sync::mpsc::Sender<Client<TcpStream>>,
     semaphore: Arc<Semaphore>,
-    config: Arc<Config>,
     statistics: Arc<RwLock<Statistics>>,
 ) {
+    let _guard = token.clone().drop_guard();
+
+    // listen forever, accept new clients
     let listener = match Listener::bind(&config).await {
-        Ok(listener) => listener,
+        Ok(l) => l,
         Err(error) => {
             event!(Level::ERROR, ?error);
             return;
         },
     };
 
-    event!(Level::INFO, message = "Bound and listening!", listener=?listener.listener.local_addr());
+    event!(Level::INFO, message = "Bound and listening!", listener=?listener.listener);
 
-    // listen forever, accept new clients
     loop {
-        if let Err(error) = listener
-            .accept(&client_sender, &semaphore, &statistics)
-            .await
-        {
-            // TODO properly log errors
-            event!(Level::ERROR, ?error);
+        tokio::select! {
+            biased;
+            () = token.cancelled() => {
+                break;
+            },
+            result = listener.accept(&client_sender, &semaphore, &statistics) => {
+                if let Err(error) = result {
+                    event!(Level::ERROR, ?error);
 
-            break;
+                    // TODO properly log errors
+                    break;
+                }
+            },
         }
     }
 }
