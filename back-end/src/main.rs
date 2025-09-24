@@ -106,9 +106,10 @@ async fn start_tasks() -> Result<(), eyre::Report> {
 
     {
         tasks.spawn(listen_forever(
+            Arc::clone(&config),
+            token.clone(),
             client_sender.clone(),
             Arc::clone(&semaphore),
-            Arc::clone(&config),
             Arc::clone(&statistics),
         ));
     }
@@ -116,18 +117,22 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     {
         // listen to new connection channel, convert into client, push to client channel
         tasks.spawn(process_clients_forever(
+            Arc::clone(&config),
+            token.clone(),
             client_sender.clone(),
             client_receiver,
             Arc::clone(&semaphore),
-            Arc::clone(&config),
             Arc::clone(&statistics),
         ));
     }
 
     {
+        let token = token.clone();
         let statistics = Arc::clone(&statistics);
 
         tasks.spawn(async move {
+            let _guard = token.clone().drop_guard();
+
             while let Ok(()) = signal_handlers::wait_for_sigusr1().await {
                 statistics.read().await.log_totals::<(), _>(&[]);
             }

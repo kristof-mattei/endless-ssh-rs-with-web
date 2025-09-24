@@ -1,6 +1,6 @@
+use ::rand::distr::uniform::{SampleRange, SampleUniform};
 use mockall::automock;
 use rand::Rng as _;
-use rand::distr::uniform::{SampleRange, SampleUniform};
 use rand::rngs::ThreadRng;
 
 #[automock]
