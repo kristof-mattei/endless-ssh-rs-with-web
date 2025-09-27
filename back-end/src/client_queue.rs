@@ -15,20 +15,20 @@ use crate::statistics::Statistics;
 
 pub async fn process_clients_forever(
     config: Arc<Config>,
-    token: CancellationToken,
+    cancellation_token: CancellationToken,
     client_sender: Sender<Client<TcpStream>>,
     mut client_receiver: Receiver<Client<TcpStream>>,
     semaphore: Arc<Semaphore>,
     statistics: Arc<RwLock<Statistics>>,
 ) {
-    let _guard = token.clone().drop_guard();
+    let _guard = cancellation_token.clone().drop_guard();
 
     event!(Level::INFO, message = "Processing clients");
 
     loop {
         tokio::select! {
             biased;
-            () = token.cancelled() => {
+            () = cancellation_token.cancelled() => {
                 break;
             },
             received_client = client_receiver.recv() => {

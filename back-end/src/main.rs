@@ -80,7 +80,7 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     // this channel is used to communicate between
     // tasks and this function, in the case that a task fails, they'll send a message on the shutdown channel
     // after which we'll gracefully terminate other services
-    let token = CancellationToken::new();
+    let cancellation_token = CancellationToken::new();
 
     let tasks = TaskTracker::new();
 
@@ -88,12 +88,12 @@ async fn start_tasks() -> Result<(), eyre::Report> {
         let bind_to = SocketAddr::from(([0, 0, 0, 0], 3000));
         let router = build_router(application_state);
 
-        let token = token.clone();
+        let cancellation_token = cancellation_token.clone();
 
         tasks.spawn(async move {
-            let _guard = token.clone().drop_guard();
+            let _guard = cancellation_token.clone().drop_guard();
 
-            match setup_server(bind_to, router, token).await {
+            match setup_server(bind_to, router, cancellation_token).await {
                 Err(err) => {
                     event!(Level::ERROR, ?err, "Webserver died");
                 },
@@ -107,7 +107,7 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     {
         tasks.spawn(listen_forever(
             Arc::clone(&config),
-            token.clone(),
+            cancellation_token.clone(),
             client_sender.clone(),
             Arc::clone(&semaphore),
             Arc::clone(&statistics),
@@ -118,7 +118,7 @@ async fn start_tasks() -> Result<(), eyre::Report> {
         // listen to new connection channel, convert into client, push to client channel
         tasks.spawn(process_clients_forever(
             Arc::clone(&config),
-            token.clone(),
+            cancellation_token.clone(),
             client_sender.clone(),
             client_receiver,
             Arc::clone(&semaphore),
@@ -127,11 +127,11 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     }
 
     {
-        let token = token.clone();
+        let cancellation_token = cancellation_token.clone();
         let statistics = Arc::clone(&statistics);
 
         tasks.spawn(async move {
-            let _guard = token.clone().drop_guard();
+            let _guard = cancellation_token.clone().drop_guard();
 
             while let Ok(()) = signal_handlers::wait_for_sigusr1().await {
                 statistics.read().await.log_totals::<(), _>(&[]);
@@ -167,13 +167,13 @@ async fn start_tasks() -> Result<(), eyre::Report> {
                 event!(Level::WARN, "CTRL+C detected, stopping all tasks");
             }
         },
-        () = token.cancelled() => {
+        () = cancellation_token.cancelled() => {
             event!(Level::WARN, "Underlying task stopped, stopping all others tasks");
         },
     }
 
     // backup, in case we forgot a dropguard somewhere
-    token.cancel();
+    cancellation_token.cancel();
 
     tasks.close();
 
