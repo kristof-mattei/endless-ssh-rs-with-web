@@ -3,12 +3,9 @@ use std::sync::Arc;
 
 use color_eyre::eyre;
 use time::OffsetDateTime;
+use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::mpsc::UnboundedSender;
-use tokio::sync::{RwLock, Semaphore};
-use tokio::{
-    net::{TcpListener, TcpStream},
-    sync::TryAcquireError,
-};
+use tokio::sync::{RwLock, Semaphore, TryAcquireError};
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 

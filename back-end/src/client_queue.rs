@@ -31,16 +31,24 @@ pub async fn process_clients_forever(
                 break;
             },
             received_client = client_receiver.recv() => {
-                if let Some(client) = received_client {
-                    if let Some(client) = process_client(client, &config, &statistics).await
-                        && client_sender.send(client).is_err() {
-                            event!(Level::ERROR, "Client sender gone");
-                            break;
-                        }
-                } else {
+                let Some(client) = received_client else {
                     event!(Level::ERROR, "Client receiver gone");
+
                     break;
-                }
+                };
+
+                let Some(client) = process_client(client, &config, &statistics).await else {
+                    event!(Level::INFO, "Client gone");
+
+                    break;
+                };
+
+
+                let Ok(()) = client_sender.send(client) else {
+                    event!(Level::ERROR, "Client sender gone");
+
+                    break;
+                };
             },
         }
     }
