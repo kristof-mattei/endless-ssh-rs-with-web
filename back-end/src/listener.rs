@@ -22,12 +22,12 @@ struct Listener<'c> {
 
 pub async fn listen_forever(
     config: Arc<Config>,
-    token: CancellationToken,
+    cancellation_token: CancellationToken,
     client_sender: tokio::sync::mpsc::Sender<Client<TcpStream>>,
     semaphore: Arc<Semaphore>,
     statistics: Arc<RwLock<Statistics>>,
 ) {
-    let _guard = token.clone().drop_guard();
+    let _guard = cancellation_token.clone().drop_guard();
 
     // listen forever, accept new clients
     let listener = match Listener::bind(&config).await {
@@ -43,7 +43,7 @@ pub async fn listen_forever(
     loop {
         tokio::select! {
             biased;
-            () = token.cancelled() => {
+            () = cancellation_token.cancelled() => {
                 break;
             },
             result = listener.accept(&client_sender, &semaphore, &statistics) => {

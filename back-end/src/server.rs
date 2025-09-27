@@ -13,7 +13,7 @@ use tracing::{Level, event};
 pub async fn setup_server(
     bind_to: SocketAddr,
     router: Router,
-    token: CancellationToken,
+    cancellation_token: CancellationToken,
 ) -> Result<(), eyre::Report> {
     event!(Level::INFO, ?bind_to, "Trying to bind");
 
@@ -24,7 +24,7 @@ pub async fn setup_server(
     event!(Level::INFO, ?bind_to, "Webserver bound successfully");
 
     axum::serve(listener, router)
-        .with_graceful_shutdown(token.cancelled_owned())
+        .with_graceful_shutdown(cancellation_token.cancelled_owned())
         .await
         .map_err(Into::into)
 }
