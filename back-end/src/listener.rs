@@ -3,9 +3,12 @@ use std::sync::Arc;
 
 use color_eyre::eyre;
 use time::OffsetDateTime;
-use tokio::net::{TcpListener, TcpStream};
-use tokio::sync::mpsc::Sender;
-use tokio::sync::{RwLock, Semaphore, TryAcquireError};
+use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::{RwLock, Semaphore};
+use tokio::{
+    net::{TcpListener, TcpStream},
+    sync::TryAcquireError,
+};
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
@@ -23,7 +26,7 @@ struct Listener<'c> {
 pub async fn listen_forever(
     config: Arc<Config>,
     cancellation_token: CancellationToken,
-    client_sender: tokio::sync::mpsc::Sender<Client<TcpStream>>,
+    client_sender: tokio::sync::mpsc::UnboundedSender<Client<TcpStream>>,
     semaphore: Arc<Semaphore>,
     statistics: Arc<RwLock<Statistics>>,
 ) {
@@ -46,7 +49,7 @@ pub async fn listen_forever(
             () = cancellation_token.cancelled() => {
                 break;
             },
-            result = listener.accept(&client_sender, &semaphore, &statistics) => {
+            result = listener.accept(&client_sender, Arc::clone(&semaphore), &statistics) => {
                 if let Err(error) = result {
                     event!(Level::ERROR, ?error);
 
@@ -82,8 +85,8 @@ impl<'c> Listener<'c> {
 
     pub async fn accept(
         &self,
-        client_sender: &Sender<Client<TcpStream>>,
-        semaphore: &Semaphore,
+        client_sender: &UnboundedSender<Client<TcpStream>>,
+        semaphore: Arc<Semaphore>,
         statistics: &RwLock<Statistics>,
     ) -> Result<(), eyre::Report> {
         let accept = self.listener.accept().await;
@@ -106,18 +109,17 @@ impl<'c> Listener<'c> {
                 } else {
                     // we do try_acquire because either we can add the client or we cannot
                     // no in-between, no sense in waiting
-                    match semaphore.try_acquire() {
+                    match Arc::clone(&semaphore).try_acquire_owned() {
                         Ok(permit) => {
                             let client = Client::new(
                                 socket,
                                 addr,
                                 OffsetDateTime::now_utc() + self.config.delay,
+                                permit,
                             );
 
                             // we have a permit, we can send it on the queue
-                            client_sender.send(client).await?;
-
-                            permit.forget();
+                            client_sender.send(client)?;
 
                             let current_clients =
                                 self.config.max_clients.get() - semaphore.available_permits();

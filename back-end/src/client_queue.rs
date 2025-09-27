@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use time::OffsetDateTime;
 use tokio::net::TcpStream;
-use tokio::sync::mpsc::{Receiver, Sender};
-use tokio::sync::{RwLock, Semaphore};
+use tokio::sync::RwLock;
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::time::sleep;
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
@@ -16,9 +16,8 @@ use crate::statistics::Statistics;
 pub async fn process_clients_forever(
     config: Arc<Config>,
     cancellation_token: CancellationToken,
-    client_sender: Sender<Client<TcpStream>>,
-    mut client_receiver: Receiver<Client<TcpStream>>,
-    semaphore: Arc<Semaphore>,
+    client_sender: UnboundedSender<Client<TcpStream>>,
+    mut client_receiver: UnboundedReceiver<Client<TcpStream>>,
     statistics: Arc<RwLock<Statistics>>,
 ) {
     let _guard = cancellation_token.clone().drop_guard();
@@ -33,8 +32,8 @@ pub async fn process_clients_forever(
             },
             received_client = client_receiver.recv() => {
                 if let Some(client) = received_client {
-                    if let Some(client) = process_client(client, &semaphore, &config, &statistics).await
-                        && (client_sender.send(client).await).is_err() {
+                    if let Some(client) = process_client(client, &config, &statistics).await
+                        && client_sender.send(client).is_err() {
                             event!(Level::ERROR, "Client sender gone");
                             break;
                         }
@@ -49,7 +48,6 @@ pub async fn process_clients_forever(
 
 async fn process_client<S>(
     mut client: Client<S>,
-    semaphore: &Semaphore,
     config: &Config,
     statistics: &RwLock<Statistics>,
 ) -> Option<Client<S>>
@@ -61,7 +59,7 @@ where
     if client.send_next > now {
         let until_ready = (client.send_next - now)
             .try_into()
-            .expect("send_next is larger than now, so duration should be positive");
+            .expect("`send_next` is larger than `now`, so duration should be positive");
 
         event!(Level::TRACE, addr = ?client.addr, ?until_ready, "Scheduled client");
 
@@ -69,6 +67,7 @@ where
     }
 
     {
+        // TODO channel
         let mut guard = statistics.write().await;
         guard.processed_clients += 1;
     }
@@ -82,6 +81,7 @@ where
         client.time_spent += config.delay;
 
         {
+            // TODO channel
             let mut guard = statistics.write().await;
             guard.bytes_sent += bytes_sent;
             guard.time_spent += config.delay;
@@ -94,16 +94,16 @@ where
         Some(client)
     } else {
         {
+            // TODO channel
             let mut guard = statistics.write().await;
             guard.lost_clients += 1;
         }
 
-        // client gone, add back 1 permit
-        semaphore.add_permits(1);
-
         event!(Level::TRACE, ?client, "Client gone");
 
-        // can't process, don't return. Client will be dropped, connections terminated by libc::close
+        // can't process, don't return to queue.
+        // Client will be dropped, connections terminated by libc::close
+        // and permit will be returned
         None
     }
 }

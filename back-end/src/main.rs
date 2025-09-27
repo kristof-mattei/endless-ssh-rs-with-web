@@ -70,7 +70,7 @@ async fn start_tasks() -> Result<(), eyre::Report> {
 
     // clients channel
     let (client_sender, client_receiver) =
-        tokio::sync::mpsc::channel::<Client<TcpStream>>(config.max_clients.into());
+        tokio::sync::mpsc::unbounded_channel::<Client<TcpStream>>();
 
     // available slots semaphore
     let semaphore = Arc::new(Semaphore::new(config.max_clients.into()));
@@ -121,7 +121,6 @@ async fn start_tasks() -> Result<(), eyre::Report> {
             cancellation_token.clone(),
             client_sender.clone(),
             client_receiver,
-            Arc::clone(&semaphore),
             Arc::clone(&statistics),
         ));
     }
