@@ -38,7 +38,7 @@ pub async fn listen_forever(
         },
     };
 
-    event!(Level::INFO, message = "Bound and listening!", listener=?listener.listener);
+    event!(Level::INFO, listener = ?listener.listener, "Bound and listening!");
 
     loop {
         tokio::select! {
