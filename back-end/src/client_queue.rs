@@ -23,7 +23,7 @@ pub async fn process_clients_forever(
 ) {
     let _guard = cancellation_token.clone().drop_guard();
 
-    event!(Level::INFO, message = "Processing clients");
+    event!(Level::INFO, "Processing clients");
 
     loop {
         tokio::select! {
@@ -63,7 +63,7 @@ where
             .try_into()
             .expect("send_next is larger than now, so duration should be positive");
 
-        event!(Level::TRACE, message = "Scheduled client", addr=?client.addr, ?until_ready);
+        event!(Level::TRACE, addr = ?client.addr, ?until_ready, "Scheduled client");
 
         sleep(until_ready).await;
     }
@@ -73,7 +73,7 @@ where
         guard.processed_clients += 1;
     }
 
-    event!(Level::DEBUG, message = "Processing client", addr=?client.addr);
+    event!(Level::DEBUG, addr = ?client.addr, "Processing client");
 
     if let Ok(bytes_sent) =
         sender::sendline(&mut client.tcp_stream, config.max_line_length.into()).await
@@ -101,7 +101,7 @@ where
         // client gone, add back 1 permit
         semaphore.add_permits(1);
 
-        event!(Level::TRACE, message = "Client gone", ?client);
+        event!(Level::TRACE, ?client, "Client gone");
 
         // can't process, don't return. Client will be dropped, connections terminated by libc::close
         None
