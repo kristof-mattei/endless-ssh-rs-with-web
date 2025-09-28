@@ -1,3 +1,5 @@
+/.local
+
 /coverage
 /dist
 /node_modules
