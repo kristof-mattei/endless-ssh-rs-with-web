@@ -23,6 +23,9 @@ services:
       - postgres-network
     volumes:
       - ${PWD}/.local/pgadmin-data/:/var/lib/pgadmin/
+    post_start:
+      - command: chown --recursive 5050:0 /var/lib/pgadmin/
+        user: root
 
 networks:
   postgres-network:
