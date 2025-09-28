@@ -53,6 +53,7 @@ const SIZE_IN_BYTES: usize = 1;
 static BROADCAST_CHANNEL: LazyLock<sync::broadcast::Sender<ClientEvent>> =
     LazyLock::new(|| sync::broadcast::channel(100).0);
 
+#[expect(clippy::too_many_lines, reason = "Main invocation")]
 async fn start_tasks() -> Result<(), eyre::Report> {
     let statistics = Arc::new(RwLock::new(Statistics::new()));
 
