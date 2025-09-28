@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:latest@sha256:feff5b24fedd610975a1f5e743c51a4b360437f4dc3a11acf740dcd708f413f6
+    ports:
+      - 15432:5432
+    env_file:
+      - .env
+    networks:
+      - postgres-network
+    volumes:
+      - ${PWD}/.local/db-data/:/var/lib/postgresql/
+      # - ${PWD}/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  pgadmin:
+    image: dpage/pgadmin4:latest@sha256:d115bcd737940a6cfb61a54439d50de8b850e0782e2363102c9fa761f4022f49
+    ports:
+      - 15433:80
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    networks:
+      - postgres-network
+    volumes:
+      - ${PWD}/.local/pgadmin-data/:/var/lib/pgadmin/
+
+networks:
+  postgres-network:
+    driver: bridge
