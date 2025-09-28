@@ -53,6 +53,7 @@ const SIZE_IN_BYTES: usize = 1;
 static BROADCAST_CHANNEL: LazyLock<sync::broadcast::Sender<ClientEvent>> =
     LazyLock::new(|| sync::broadcast::channel(100).0);
 
+#[expect(clippy::too_many_lines, reason = "Main invocation")]
 async fn start_tasks() -> Result<(), eyre::Report> {
     let statistics = Arc::new(RwLock::new(Statistics::new()));
 
@@ -76,6 +77,22 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     let semaphore = Arc::new(Semaphore::new(config.max_clients.into()));
 
     let application_state = ApplicationState::new(states::config::Config {});
+
+    let name = env!("CARGO_PKG_NAME");
+    let version = env!("CARGO_PKG_VERSION");
+
+    event!(
+        Level::INFO,
+        "{} v{} - built for {}-{}",
+        name,
+        version,
+        std::env::var("TARGETARCH")
+            .as_deref()
+            .unwrap_or("unknown-arch"),
+        std::env::var("TARGETVARIANT")
+            .as_deref()
+            .unwrap_or("base variant")
+    );
 
     // this channel is used to communicate between
     // tasks and this function, in the case that a task fails, they'll send a message on the shutdown channel
