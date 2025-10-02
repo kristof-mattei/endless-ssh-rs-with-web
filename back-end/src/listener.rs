@@ -5,7 +5,7 @@ use color_eyre::eyre;
 use time::OffsetDateTime;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::mpsc::UnboundedSender;
-use tokio::sync::{RwLock, Semaphore, TryAcquireError};
+use tokio::sync::{Semaphore, TryAcquireError};
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
@@ -13,19 +13,19 @@ use crate::SIZE_IN_BYTES;
 use crate::client::Client;
 use crate::config::{BindFamily, Config};
 use crate::ffi_wrapper::set_receive_buffer_size;
-use crate::statistics::Statistics;
+use crate::statistics::StatisticsMessage;
 
 struct Listener<'c> {
     config: &'c Config,
     listener: TcpListener,
 }
 
-pub async fn listen_forever(
+pub async fn listen_for_new_connections(
     config: Arc<Config>,
     cancellation_token: CancellationToken,
     client_sender: tokio::sync::mpsc::UnboundedSender<Client<TcpStream>>,
     semaphore: Arc<Semaphore>,
-    statistics: Arc<RwLock<Statistics>>,
+    statistics_sender: UnboundedSender<StatisticsMessage>,
 ) {
     let _guard = cancellation_token.clone().drop_guard();
 
@@ -46,7 +46,7 @@ pub async fn listen_forever(
             () = cancellation_token.cancelled() => {
                 break;
             },
-            result = listener.accept(&client_sender, Arc::clone(&semaphore), &statistics) => {
+            result = listener.accept(&client_sender, Arc::clone(&semaphore), &statistics_sender) => {
                 if let Err(error) = result {
                     event!(Level::ERROR, ?error);
 
@@ -84,13 +84,14 @@ impl<'c> Listener<'c> {
         &self,
         client_sender: &UnboundedSender<Client<TcpStream>>,
         semaphore: Arc<Semaphore>,
-        statistics: &RwLock<Statistics>,
+        statistics_sender: &UnboundedSender<StatisticsMessage>,
     ) -> Result<(), eyre::Report> {
         let accept = self.listener.accept().await;
 
         {
-            let mut guard = statistics.write().await;
-            guard.connects += 1;
+            statistics_sender
+                .send(StatisticsMessage::NewClient)
+                .expect("Channel should always exist");
         }
 
         match accept {
