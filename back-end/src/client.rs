@@ -77,7 +77,7 @@ impl<S> Drop for Client<S> {
 
         // no need to shut down the stream, it happens when it is dropped
 
-        // Technically this client's permit permit isn't available until AFTER this function has ended
+        // Technically this client's permit isn't available until AFTER this function has ended
         let available_slots = self.permit.semaphore().available_permits() + 1;
 
         event!(Level::INFO, available_slots);
