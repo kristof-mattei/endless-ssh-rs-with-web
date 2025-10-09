@@ -47,6 +47,7 @@ use crate::router::build_router;
 use crate::server::setup_server;
 use crate::state::ApplicationState;
 use crate::statistics::{Statistics, statistics_sigusr1_handler};
+use crate::utils::flatten_handle;
 
 type StdDuration = std::time::Duration;
 
@@ -285,10 +286,18 @@ fn main() -> Result<(), eyre::Report> {
     let config = get_config()?;
 
     // initialize the runtime
-    let rt = tokio::runtime::Runtime::new().unwrap();
+    let result: Result<(), eyre::Report> = tokio::runtime::Builder::new_multi_thread()
+        .enable_io()
+        .enable_time()
+        .build()
+        .expect("Failed building the Runtime")
+        .block_on(async {
+            // explicitly launch everything in a spawned task
+            // see https://docs.rs/tokio/latest/tokio/attr.main.html#non-worker-async-function
+            let handle = tokio::task::spawn(start_tasks(config));
 
-    // start service
-    let result: Result<(), eyre::Report> = rt.block_on(start_tasks(config));
+            flatten_handle(handle).await
+        });
 
     result
 }
