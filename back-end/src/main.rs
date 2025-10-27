@@ -49,6 +49,9 @@ use crate::state::ApplicationState;
 use crate::statistics::{Statistics, statistics_sigusr1_handler};
 use crate::utils::flatten_handle;
 
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 type StdDuration = std::time::Duration;
 
 const SIZE_IN_BYTES: usize = 1;
