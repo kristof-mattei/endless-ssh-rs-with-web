@@ -94,7 +94,7 @@ fn print_header() {
 }
 
 /// starts all the tasks, such as the web server, the key refresh, ...
-/// ensures all tasks are gracefully shutdown in case of error, ctrl+c or sigterm
+/// ensures all tasks are gracefully shutdown in case of error, ctrl-c or `SIGTERM`
 #[expect(clippy::too_many_lines, reason = "Task setup")]
 async fn start_tasks(config: Arc<Config>) -> Result<(), eyre::Report> {
     print_header();
