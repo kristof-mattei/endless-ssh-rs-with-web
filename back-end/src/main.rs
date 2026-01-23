@@ -93,10 +93,12 @@ fn print_header() {
     );
 }
 
-/// starts all the tasks, such as the web server, the key refresh, ...
-/// ensures all tasks are gracefully shutdown in case of error, ctrl-c or `SIGTERM`
+/// Starts all the tasks, such as the web server, the key refresh, and
+/// ensures all tasks are gracefully shutdown in case of error, ctrl-c or `SIGTERM`.
 #[expect(clippy::too_many_lines, reason = "Task setup")]
-async fn start_tasks(config: Arc<Config>) -> Result<(), eyre::Report> {
+async fn start_tasks() -> Result<(), eyre::Report> {
+    let config = get_config()?;
+
     print_header();
 
     // this channel is used to communicate between
@@ -288,8 +290,6 @@ fn main() -> Result<(), eyre::Report> {
 
     init_tracing()?;
 
-    let config = get_config()?;
-
     // initialize the runtime
     let result: Result<(), eyre::Report> = tokio::runtime::Builder::new_multi_thread()
         .enable_io()
@@ -299,7 +299,7 @@ fn main() -> Result<(), eyre::Report> {
         .block_on(async {
             // explicitly launch everything in a spawned task
             // see https://docs.rs/tokio/latest/tokio/attr.main.html#non-worker-async-function
-            let handle = tokio::task::spawn(start_tasks(config));
+            let handle = tokio::task::spawn(start_tasks());
 
             flatten_handle(handle).await
         });
