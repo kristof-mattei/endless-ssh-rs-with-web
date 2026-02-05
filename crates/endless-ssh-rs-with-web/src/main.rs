@@ -132,8 +132,8 @@ async fn start_tasks() -> Result<(), eyre::Report> {
             let _guard = cancellation_token.clone().drop_guard();
 
             match setup_server(bind_to, router, cancellation_token).await {
-                Err(err) => {
-                    event!(Level::ERROR, ?err, "Webserver died");
+                Err(error) => {
+                    event!(Level::ERROR, ?error, "Webserver died");
                 },
                 Ok(()) => {
                     event!(Level::INFO, "Webserver shut down gracefully");
