@@ -7,7 +7,7 @@ where
     E: Debug,
 {
     match *t {
-        Ok(ref t) => write!(f, "{}", t),
-        Err(ref e) => write!(f, "{:?}", e),
+        Ok(ref value) => write!(f, "{}", value),
+        Err(ref error) => write!(f, "{:?}", error),
     }
 }

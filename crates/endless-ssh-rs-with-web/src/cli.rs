@@ -186,6 +186,7 @@ mod tests {
     use std::num::{NonZeroU16, NonZeroUsize};
 
     use color_eyre::eyre;
+    use pretty_assertions::assert_eq;
 
     use super::parse_cli_from;
     use crate::config::{BindFamily, Config};
