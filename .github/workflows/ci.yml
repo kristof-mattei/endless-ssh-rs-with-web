@@ -299,31 +299,7 @@ jobs:
           name: version-bump-patch
           path: /tmp/
 
-<<<<<<< HEAD
-      - *set_up_mold
-
-      - *set_up_toolchain
-
-      - name: Install cargo-edit to do set-version
-        uses: taiki-e/install-action@f176c07a0a40cbfdd08ee9aa8bf1655701d11e69 # v2.67.25
-        with:
-          tool: cargo-edit
-
-      - name: Set the Cargo.toml version before we copy in the data into the Docker container
-||||||| 3f3d8be9
-      - *set_up_mold
-
-      - *set_up_toolchain
-
-      - name: Install cargo-edit to do set-version
-        uses: taiki-e/install-action@4573997e3b6c0fbc22f7acab193b00a8a3ca817d # v2.67.24
-        with:
-          tool: cargo-edit
-
-      - name: Set the Cargo.toml version before we copy in the data into the Docker container
-=======
       - name: Apply version bump patch
->>>>>>> upstream/main
         shell: bash
         run: |
           git apply /tmp/version-bump.patch
