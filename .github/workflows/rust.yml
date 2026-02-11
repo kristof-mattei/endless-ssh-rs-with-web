@@ -192,7 +192,7 @@ jobs:
           rustup update
 
       - name: Install nextest, custom test runner, with native support for junit and grcov
-        uses: taiki-e/install-action@1e67dedb5e3c590e1c9d9272ace46ef689da250d # v2.67.27
+        uses: taiki-e/install-action@d4422f254e595ee762a758628fe4f16ce050fa2e # v2.67.28
         with:
           tool: cargo-nextest, grcov
 
@@ -230,20 +230,26 @@ jobs:
             --binary-path ./target/debug/ \
             --branch \
             --ignore-not-existing \
-            --keep-only "crates/**/src/**" \
+            --keep-only "crates/**" \
             --llvm \
             --output-path ./reports/lcov.info \
             --output-type lcov \
             --source-dir .
+
+      - name: Record Rust version
+        shell: bash
+        run: echo "RUST=$(rustc --version)" >> "$GITHUB_ENV"
 
       - name: Upload coverage results (to Codecov.io)
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
         with:
           disable_search: true
           disable_telem: true
+          env_vars: OS,RUST
           fail_ci_if_error: true
-          flags: ${{ github.job }}
+          flags: back-end
           files: reports/lcov.info
+          name: code-coverage
           plugins: ""
           report_type: "coverage"
           use_oidc: true
@@ -253,9 +259,11 @@ jobs:
         with:
           disable_search: true
           disable_telem: true
+          env_vars: OS,RUST
           fail_ci_if_error: true
-          flags: ${{ github.job }}
+          flags: back-end
           files: reports/results.xml
+          name: test-results
           plugins: ""
           report_type: "test_results"
           use_oidc: true
@@ -306,6 +314,7 @@ jobs:
     # combination of upstream skip and success: success
     runs-on: ubuntu-slim
     needs:
+      - changes
       - cargo-build
       - cargo-clippy-and-report
       - cargo-fmt
