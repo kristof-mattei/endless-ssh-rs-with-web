@@ -924,6 +924,8 @@
 - Remove `-`  by @kristof-mattei ([`b8df04c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b8df04cf2d1f4f1abe9f8c670882cdbf4837f1d6))
 - Port  by @kristof-mattei ([`96bc80c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/96bc80cbe8147e225b211e78a714dcc9aaf0ef32))
 - Truncate changelog when too long  by @kristof-mattei ([`d06dc1c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d06dc1c8f9e10be96f3bf88aca729b2886c5ca31))
+- Also truncate the release notes in the release  by @kristof-mattei ([`5c05c13`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5c05c13dfee4524b931f1879804cdff9e80c6a33))
+- Long form options  by @kristof-mattei ([`55c52d6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/55c52d64284913d31a02cbc831c82b0b94465176))
 
 ### 🧪 Testing
 
@@ -952,6 +954,7 @@
 - *(fmt)* Fmt  by @kristof-mattei ([`f7b0a11`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f7b0a1189c2e2b834199e2fc876b95aa63c8a246))
 - *(release)* Release v1.5.0  ([`5504d10`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5504d10df91b765fac320a1ae903bc761017728c))
 - *(release)* Release 0.0.1  ([`a075d2d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a075d2d69cd0202de3d42c8a888ca14b49e0051f))
+- *(release)* Release v0.0.1-alpha.1  by @github-actions[bot] ([`13bc650`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/13bc650527f4d7b1f1edf4e69bfe3766f63a52da))
 - *(release)* Release v0.0.1-alpha.1  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
 - *(version)* V1.2.0  by @invalid-email-address ([`1dbbec6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1dbbec608864c5cb559a90d8904996011daef52c))
 - *(version)* V1.3.0  by @invalid-email-address ([`bee1b83`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bee1b83e6cfe1afd6286073fc1bb38787c0ba48e))
@@ -1336,6 +1339,7 @@
 - Remove debug line  by @kristof-mattei ([`8624ad4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8624ad4a193ebb9152e5ea6ba2e091bb2d9380d2))
 - Remove debug line  by @kristof-mattei ([`6a52ed9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6a52ed9a45931dd5e4f7b8222607cdcdd2a20596))
 - Bump packages  by @kristof-mattei ([`c0410ab`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c0410abd6331e7defd9a64183b0593e20ca250e4))
+- Remove colon  by @kristof-mattei ([`635bd83`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/635bd8386a4c2e47f7cace63f54341234c80218f))
 
 ### ◀️ Revert
 
