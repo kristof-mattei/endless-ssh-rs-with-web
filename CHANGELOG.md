@@ -1,5 +1,10 @@
 <!-- header goes here -->
-## [0.0.1] - 2026-02-19
+## [0.0.1-alpha.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.1-alpha.1..v0.0.1-alpha.2) - 2026-02-19
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.0.1-alpha.2  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+## [0.0.1-alpha.1] - 2026-02-19
 
 ### 🚀 Features
 
@@ -955,7 +960,7 @@
 - *(release)* Release v1.5.0  ([`5504d10`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5504d10df91b765fac320a1ae903bc761017728c))
 - *(release)* Release 0.0.1  ([`a075d2d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a075d2d69cd0202de3d42c8a888ca14b49e0051f))
 - *(release)* Release v0.0.1-alpha.1  by @github-actions[bot] ([`13bc650`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/13bc650527f4d7b1f1edf4e69bfe3766f63a52da))
-- *(release)* Release v0.0.1-alpha.1  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- *(release)* Release v0.0.1-alpha.1  by @github-actions[bot] ([`20a3ce5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/20a3ce528fb104482ca18c68ada19f8fcdaa626b))
 - *(version)* V1.2.0  by @invalid-email-address ([`1dbbec6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1dbbec608864c5cb559a90d8904996011daef52c))
 - *(version)* V1.3.0  by @invalid-email-address ([`bee1b83`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bee1b83e6cfe1afd6286073fc1bb38787c0ba48e))
 - *(version)* V1.3.1  by @invalid-email-address ([`096c422`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/096c4229799cecace867a1de699a7f65eefe59bb))
