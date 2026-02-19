@@ -14,16 +14,16 @@ macro_rules! await_linux_only_signal {
     }};
 }
 
-/// Waits forever for a `SIGUSR1`.
-pub async fn wait_for_sigusr1() -> Result<(), std::io::Error> {
-    await_linux_only_signal!(SignalKind::user_defined1());
+/// Waits forever for a `SIGTERM`.
+pub async fn wait_for_sigterm() -> Result<(), std::io::Error> {
+    await_linux_only_signal!(SignalKind::terminate());
 
     Ok(())
 }
 
-/// Waits forever for a `SIGTERM`.
-pub async fn wait_for_sigterm() -> Result<(), std::io::Error> {
-    await_linux_only_signal!(SignalKind::terminate());
+/// Waits forever for a `SIGUSR1`.
+pub async fn wait_for_sigusr1() -> Result<(), std::io::Error> {
+    await_linux_only_signal!(SignalKind::user_defined1());
 
     Ok(())
 }

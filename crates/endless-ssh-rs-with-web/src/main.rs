@@ -116,7 +116,7 @@ async fn start_tasks() -> Result<(), eyre::Report> {
         tokio::sync::mpsc::unbounded_channel::<Client<TcpStream>>();
 
     // available slots semaphore
-    let semaphore = Arc::new(Semaphore::new(config.max_clients.into()));
+    let semaphore = Arc::new(Semaphore::new(config.max_clients.get().into()));
 
     let application_state = ApplicationState::new(states::config::Config {});
 
