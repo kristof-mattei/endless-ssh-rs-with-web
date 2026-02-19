@@ -1,8 +1,9 @@
 absolute-paths-allowed-crates = [
-    "axum",
     "axum_proxy",
+    "axum",
     "clap",
     "std",
+    "tokio_util",
     "tokio",
     "tracing_subscriber",
 ]

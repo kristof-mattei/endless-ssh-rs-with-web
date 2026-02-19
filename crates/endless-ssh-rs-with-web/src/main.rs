@@ -16,6 +16,7 @@ mod span;
 mod state;
 mod states;
 mod statistics;
+mod task_tracker_ext;
 mod timeout;
 mod traits;
 mod utils;
@@ -49,6 +50,7 @@ use crate::router::build_router;
 use crate::server::setup_server;
 use crate::state::ApplicationState;
 use crate::statistics::{Statistics, statistics_sigusr1_handler};
+use crate::task_tracker_ext::TaskTrackerExt as _;
 use crate::utils::flatten_handle;
 
 #[global_allocator]
@@ -93,9 +95,24 @@ fn print_header() {
     );
 }
 
+async fn set_up_server(application_state: ApplicationState, cancellation_token: CancellationToken) {
+    let bind_to = SocketAddr::from(([0, 0, 0, 0], 3000));
+    let router = build_router(application_state);
+
+    let _guard = cancellation_token.clone().drop_guard();
+
+    match setup_server(bind_to, router, cancellation_token).await {
+        Err(error) => {
+            event!(Level::ERROR, ?error, "Webserver died");
+        },
+        Ok(()) => {
+            event!(Level::INFO, "Webserver shut down gracefully");
+        },
+    }
+}
+
 /// Starts all the tasks, such as the web server, the key refresh, and
 /// ensures all tasks are gracefully shutdown in case of error, ctrl-c or `SIGTERM`.
-#[expect(clippy::too_many_lines, reason = "Task setup")]
 async fn start_tasks() -> Result<(), eyre::Report> {
     let config = get_config()?;
 
@@ -122,54 +139,39 @@ async fn start_tasks() -> Result<(), eyre::Report> {
 
     let tasks = TaskTracker::new();
 
-    {
-        let bind_to = SocketAddr::from(([0, 0, 0, 0], 3000));
-        let router = build_router(application_state);
+    tasks.spawn_with_name(
+        "server",
+        set_up_server(application_state, cancellation_token.clone()),
+    );
 
-        let cancellation_token = cancellation_token.clone();
-
-        tasks.spawn(async move {
-            let _guard = cancellation_token.clone().drop_guard();
-
-            match setup_server(bind_to, router, cancellation_token).await {
-                Err(error) => {
-                    event!(Level::ERROR, ?error, "Webserver died");
-                },
-                Ok(()) => {
-                    event!(Level::INFO, "Webserver shut down gracefully");
-                },
-            }
-        });
-    }
-
-    {
-        tasks.spawn(listen_for_new_connections(
+    tasks.spawn_with_name(
+        "connection listener",
+        listen_for_new_connections(
             Arc::clone(&config),
             cancellation_token.clone(),
             client_sender.clone(),
             Arc::clone(&semaphore),
             statistics_sender.clone(),
-        ));
-    }
+        ),
+    );
 
-    let process_clients_handler = {
-        // listen to new connection channel, convert into client, push to client channel
-        tasks.spawn(process_clients(
+    // listen to new connection channel, convert into client, push to client channel
+    let process_clients_handler = tasks.spawn_with_name(
+        "client processor",
+        process_clients(
             client_cancellation_token.clone(),
             config.delay,
             config.max_line_length,
             client_sender.clone(),
             client_receiver,
             statistics_sender.clone(),
-        ))
-    };
+        ),
+    );
 
-    {
-        tasks.spawn(statistics_sigusr1_handler(
-            cancellation_token.clone(),
-            statistics_sender.clone(),
-        ));
-    }
+    tasks.spawn_with_name(
+        "sigusr1 handler",
+        statistics_sigusr1_handler(cancellation_token.clone(), statistics_sender.clone()),
+    );
 
     {
         let cancellation_token = cancellation_token.clone();
