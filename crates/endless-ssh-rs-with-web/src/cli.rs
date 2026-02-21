@@ -114,7 +114,7 @@ pub fn parse_cli() -> Result<Config, eyre::Error> {
     parse_cli_from(env::args_os())
 }
 
-fn parse_cli_from<I, T>(from: I) -> Result<Config, eyre::Error>
+pub fn parse_cli_from<I, T>(from: I) -> Result<Config, eyre::Error>
 where
     I: IntoIterator<Item = T>,
     T: Into<OsString> + Clone,

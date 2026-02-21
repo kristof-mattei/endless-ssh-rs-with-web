@@ -11,25 +11,29 @@ mod listener;
 mod router;
 mod sender;
 mod server;
+mod shutdown;
 mod signal_handlers;
 mod span;
 mod state;
 mod states;
 mod statistics;
 mod task_tracker_ext;
+mod test_utils;
 mod timeout;
 mod traits;
 mod utils;
 
+use std::convert::Infallible;
 use std::env::{self, VarError};
 use std::net::SocketAddr;
+use std::process::{ExitCode, Termination as _};
 use std::sync::{Arc, LazyLock};
+use std::time::Duration;
 
 use color_eyre::config::HookBuilder;
 use color_eyre::eyre;
 use dotenvy::dotenv;
 use tokio::net::TcpStream;
-use tokio::sync;
 use tokio::sync::Semaphore;
 use tokio::time::timeout;
 use tokio_util::sync::CancellationToken;
@@ -48,35 +52,91 @@ use crate::events::{ClientEvent, database_listen_forever};
 use crate::listener::listen_for_new_connections;
 use crate::router::build_router;
 use crate::server::setup_server;
+use crate::shutdown::Shutdown;
 use crate::state::ApplicationState;
 use crate::statistics::{Statistics, statistics_sigusr1_handler};
 use crate::task_tracker_ext::TaskTrackerExt as _;
-use crate::utils::flatten_handle;
+use crate::utils::flatten_shutdown_handle;
+use crate::utils::task::spawn_with_name;
 
-#[global_allocator]
+#[cfg_attr(not(miri), global_allocator)]
+#[cfg_attr(miri, expect(unused, reason = "Not supported in Miri"))]
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 type StdDuration = std::time::Duration;
 
 const SIZE_IN_BYTES: usize = 1;
 
-static BROADCAST_CHANNEL: LazyLock<sync::broadcast::Sender<ClientEvent>> =
-    LazyLock::new(|| sync::broadcast::channel(100).0);
+static BROADCAST_CHANNEL: LazyLock<tokio::sync::broadcast::Sender<ClientEvent>> =
+    LazyLock::new(|| tokio::sync::broadcast::channel(100).0);
 
-fn get_config() -> Result<Arc<Config>, eyre::Report> {
-    let config = Arc::new(parse_cli().inspect_err(|error| {
-        // this prints the error in color and exits
-        // can't do anything else until
-        // https://github.com/clap-rs/clap/issues/2914
-        // is merged in
-        if let Some(clap_error) = error.downcast_ref::<clap::error::Error>() {
-            clap_error.exit();
-        }
-    })?);
+fn build_filter() -> (EnvFilter, Option<eyre::Report>) {
+    fn build_default_filter() -> EnvFilter {
+        EnvFilter::builder()
+            .parse(format!("INFO,{}=TRACE", env!("CARGO_CRATE_NAME")))
+            .expect("Default filter should always work")
+    }
 
-    config.log();
+    let (filter, parsing_error) = match env::var(EnvFilter::DEFAULT_ENV) {
+        Ok(user_directive) => match EnvFilter::builder().parse(user_directive) {
+            Ok(filter) => (filter, None),
+            Err(error) => (build_default_filter(), Some(eyre::Report::new(error))),
+        },
+        Err(VarError::NotPresent) => (build_default_filter(), None),
+        Err(error @ VarError::NotUnicode(_)) => {
+            (build_default_filter(), Some(eyre::Report::new(error)))
+        },
+    };
 
-    Ok(config)
+    (filter, parsing_error)
+}
+
+fn init_tracing(filter: EnvFilter) -> Result<(), eyre::Report> {
+    let registry = tracing_subscriber::registry();
+
+    #[cfg(feature = "tokio-console")]
+    let registry = registry.with(console_subscriber::ConsoleLayer::builder().spawn());
+
+    Ok(registry
+        .with(tracing_subscriber::fmt::layer().with_filter(filter))
+        .with(tracing_error::ErrorLayer::default())
+        .try_init()?)
+}
+
+fn main() -> ExitCode {
+    // set up .env, if it fails, user didn't provide any
+    let _r = dotenv();
+
+    HookBuilder::default()
+        .capture_span_trace_by_default(true)
+        .display_env_section(false)
+        .install()
+        .expect("Failed to install panic handler");
+
+    let (env_filter, parsing_error) = build_filter();
+
+    init_tracing(env_filter).expect("Failed to set up tracing");
+
+    // bubble up the parsing error
+    if let Err(error) = parsing_error.map_or(Ok(()), Err) {
+        return Err::<Infallible, _>(error).report();
+    }
+
+    // initialize the runtime
+    let shutdown: Shutdown = tokio::runtime::Builder::new_multi_thread()
+        .enable_io()
+        .enable_time()
+        .build()
+        .expect("Failed building the Runtime")
+        .block_on(async {
+            // explicitly launch everything in a spawned task
+            // see https://docs.rs/tokio/latest/tokio/attr.main.html#non-worker-async-function
+            let handle = spawn_with_name("main task runner", start_tasks());
+
+            flatten_shutdown_handle(handle).await
+        });
+
+    shutdown.report()
 }
 
 fn print_header() {
@@ -95,28 +155,32 @@ fn print_header() {
     );
 }
 
-async fn set_up_server(application_state: ApplicationState, cancellation_token: CancellationToken) {
-    let bind_to = SocketAddr::from(([0, 0, 0, 0], 3000));
-    let router = build_router(application_state);
+fn get_config() -> Result<Arc<Config>, eyre::Report> {
+    let config = Arc::new(parse_cli().inspect_err(|error| {
+        // this prints the error in color and exits
+        // can't do anything else until
+        // https://github.com/clap-rs/clap/issues/2914
+        // is merged in
+        if let Some(clap_error) = error.downcast_ref::<clap::error::Error>() {
+            clap_error.exit();
+        }
+    })?);
 
-    let _guard = cancellation_token.clone().drop_guard();
-
-    match setup_server(bind_to, router, cancellation_token).await {
-        Err(error) => {
-            event!(Level::ERROR, ?error, "Webserver died");
-        },
-        Ok(()) => {
-            event!(Level::INFO, "Webserver shut down gracefully");
-        },
-    }
+    Ok(config)
 }
 
-/// Starts all the tasks, such as the web server, the key refresh, and
-/// ensures all tasks are gracefully shutdown in case of error, ctrl-c or `SIGTERM`.
-async fn start_tasks() -> Result<(), eyre::Report> {
-    let config = get_config()?;
-
+/// starts all the tasks, such as the web server, the key refresh, ...
+/// ensures all tasks are gracefully shutdown in case of error, `CTRL+c` or `SIGTERM`.
+#[expect(clippy::too_many_lines, reason = "Entrypoint")]
+async fn start_tasks() -> Shutdown {
     print_header();
+
+    let config = match get_config() {
+        Ok(config) => config,
+        Err(error) => return Shutdown::from(error),
+    };
+
+    config.log();
 
     // this channel is used to communicate between
     // tasks and this function, in the case that a task fails, they'll send a message on the shutdown channel
@@ -183,11 +247,12 @@ async fn start_tasks() -> Result<(), eyre::Report> {
         });
     }
 
+    // done enrolling tasks in this tracker
     tasks.close();
 
     // now we wait forever for either
     // * SIGTERM
-    // * ctrl + c (SIGINT)
+    // * CTRL+c (SIGINT)
     // * a message on the shutdown channel, sent either by the server task or
     // another task when they complete (which means they failed)
     tokio::select! {
@@ -201,10 +266,10 @@ async fn start_tasks() -> Result<(), eyre::Report> {
         },
         result = signal_handlers::wait_for_sigint() => {
             if let Err(error) = result {
-                event!(Level::ERROR, ?error, "Failed to register CTRL+C handler, aborting");
+                event!(Level::ERROR, ?error, "Failed to register CTRL+c handler, aborting");
             } else {
                 // we completed because ...
-                event!(Level::WARN, "CTRL+C detected, stopping all tasks");
+                event!(Level::WARN, "CTRL+c detected, stopping all tasks");
             }
         },
         () = cancellation_token.cancelled() => {
@@ -230,81 +295,43 @@ async fn start_tasks() -> Result<(), eyre::Report> {
     {
         // cancel the statistics handler now that the client processor is gone
         statistics_cancellation_token.cancel();
+
         // wait for abort and do a final abort
-        statistics_join_handle.await?.log_totals();
+        match statistics_join_handle.await {
+            Ok(statistics) => {
+                statistics.log_totals();
+            },
+            Err(error) => {
+                return Shutdown::from(error);
+            },
+        }
     }
 
     // wait for the other tasks to shut down gracefully
-    if timeout(StdDuration::from_millis(10000), tasks.wait())
+    if timeout(Duration::from_secs(10), tasks.wait())
         .await
         .is_err()
     {
         event!(Level::ERROR, "Tasks didn't stop within allotted time!");
     }
 
-    event!(Level::INFO, "Goodbye");
+    event!(Level::INFO, "Done");
 
-    Ok(())
+    Shutdown::Success
 }
 
-fn build_default_filter() -> EnvFilter {
-    EnvFilter::builder()
-        .parse(format!(
-            "DEBUG,{}=TRACE,tower_http::trace=TRACE",
-            env!("CARGO_CRATE_NAME")
-        ))
-        .expect("Default filter should always work")
-}
+async fn set_up_server(application_state: ApplicationState, cancellation_token: CancellationToken) {
+    let bind_to = SocketAddr::from(([0, 0, 0, 0], 3000));
+    let router = build_router(application_state);
 
-fn init_tracing() -> Result<(), eyre::Report> {
-    let (filter, filter_parsing_error) = match env::var(EnvFilter::DEFAULT_ENV) {
-        Ok(user_directive) => match EnvFilter::builder().parse(user_directive) {
-            Ok(filter) => (filter, None),
-            Err(error) => (build_default_filter(), Some(eyre::Report::new(error))),
+    let _guard = cancellation_token.clone().drop_guard();
+
+    match setup_server(bind_to, router, cancellation_token).await {
+        Err(error) => {
+            event!(Level::ERROR, ?error, "Webserver died");
         },
-        Err(VarError::NotPresent) => (build_default_filter(), None),
-        Err(error @ VarError::NotUnicode(_)) => {
-            (build_default_filter(), Some(eyre::Report::new(error)))
+        Ok(()) => {
+            event!(Level::INFO, "Webserver shut down gracefully");
         },
-    };
-
-    let registry = tracing_subscriber::registry();
-
-    #[cfg(feature = "tokio-console")]
-    let registry = registry.with(console_subscriber::ConsoleLayer::builder().spawn());
-
-    registry
-        .with(tracing_subscriber::fmt::layer().with_filter(filter))
-        .with(tracing_error::ErrorLayer::default())
-        .try_init()?;
-
-    filter_parsing_error.map_or(Ok(()), Err)
-}
-
-fn main() -> Result<(), eyre::Report> {
-    // set up .env, if it fails, user didn't provide any
-    let _r = dotenv();
-
-    HookBuilder::default()
-        .capture_span_trace_by_default(true)
-        .display_env_section(false)
-        .install()?;
-
-    init_tracing()?;
-
-    // initialize the runtime
-    let result: Result<(), eyre::Report> = tokio::runtime::Builder::new_multi_thread()
-        .enable_io()
-        .enable_time()
-        .build()
-        .expect("Failed building the Runtime")
-        .block_on(async {
-            // explicitly launch everything in a spawned task
-            // see https://docs.rs/tokio/latest/tokio/attr.main.html#non-worker-async-function
-            let handle = tokio::task::spawn(start_tasks());
-
-            flatten_handle(handle).await
-        });
-
-    result
+    }
 }
