@@ -50,7 +50,7 @@ pub async fn wait_for_sigusr1() -> Result<(), std::io::Error> {
     Ok(())
 }
 
-#[expect(unused, reason = "WIP")]
+#[expect(unused, reason = "Unused")]
 pub fn set_up_handler(
     signum: c_int,
     sig_handler: extern "C" fn(_: c_int),

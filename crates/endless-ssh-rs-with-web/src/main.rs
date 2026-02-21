@@ -63,8 +63,6 @@ use crate::utils::task::spawn_with_name;
 #[cfg_attr(miri, expect(unused, reason = "Not supported in Miri"))]
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
-type StdDuration = std::time::Duration;
-
 const SIZE_IN_BYTES: usize = 1;
 
 static BROADCAST_CHANNEL: LazyLock<tokio::sync::broadcast::Sender<ClientEvent>> =
@@ -282,7 +280,7 @@ async fn start_tasks() -> Shutdown {
 
     client_cancellation_token.cancel();
 
-    if timeout(StdDuration::from_millis(10000), process_clients_handler)
+    if timeout(Duration::from_secs(10), process_clients_handler)
         .await
         .is_err()
     {
