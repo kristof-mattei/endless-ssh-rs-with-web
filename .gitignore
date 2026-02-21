@@ -1,4 +1,5 @@
 # only in root
+/.local
 /coverage
 /dist
 /node_modules
