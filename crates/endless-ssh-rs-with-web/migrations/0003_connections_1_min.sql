@@ -6,9 +6,9 @@ WITH
 SELECT
     time_bucket ('1 minute', connected_at) AS bucket,
     country_code,
-    count(*) AS connects,
+    count(*)::bigint AS connects,
     sum(time_spent) AS time_spent,
-    sum(bytes_sent) AS bytes_sent
+    sum(bytes_sent)::bigint AS bytes_sent
 FROM
     connections
 GROUP BY

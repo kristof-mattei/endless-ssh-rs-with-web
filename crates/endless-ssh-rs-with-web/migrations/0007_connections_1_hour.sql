@@ -6,9 +6,9 @@ WITH
 SELECT
     time_bucket ('1 hour', bucket) AS bucket,
     country_code,
-    sum(connects) AS connects,
+    sum(connects)::bigint AS connects,
     sum(time_spent) AS time_spent,
-    sum(bytes_sent) AS bytes_sent
+    sum(bytes_sent)::bigint AS bytes_sent
 FROM
     connections_5min
 GROUP BY
