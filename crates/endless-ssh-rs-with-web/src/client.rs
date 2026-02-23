@@ -4,9 +4,13 @@ use time::{Duration, OffsetDateTime};
 use tokio::sync::OwnedSemaphorePermit;
 use tracing::{Level, event};
 
+use crate::BROADCAST_CHANNEL;
+use crate::events::ClientEvent;
+
 pub struct Client<S> {
     time_spent: Duration,
     send_next: OffsetDateTime,
+    connected_at: OffsetDateTime,
     bytes_sent: usize,
     addr: SocketAddr,
     tcp_stream: S,
@@ -50,12 +54,14 @@ impl<S> Client<S> {
     pub fn new(
         stream: S,
         addr: SocketAddr,
+        connected_at: OffsetDateTime,
         start_sending_at: OffsetDateTime,
         permit: OwnedSemaphorePermit,
     ) -> Self {
         Self {
             time_spent: Duration::ZERO,
             send_next: start_sending_at,
+            connected_at,
             addr,
             bytes_sent: 0,
             tcp_stream: stream,
@@ -99,7 +105,7 @@ impl<S> Client<S> {
 }
 
 impl<S> Drop for Client<S> {
-    /// Destroys `self` returning time spent annoying this client.
+    /// Destroys `self`, recording stats, and broadcasting the client is gone.
     fn drop(&mut self) {
         event!(
             Level::INFO,
@@ -109,9 +115,20 @@ impl<S> Drop for Client<S> {
             "Dropping client...",
         );
 
+        let disconnected_at = OffsetDateTime::now_utc();
+
+        let _result = BROADCAST_CHANNEL.send(ClientEvent::Disconnected {
+            addr: self.addr,
+            connected_at: self.connected_at,
+            disconnected_at,
+            time_spent: self.time_spent,
+            bytes_sent: self.bytes_sent,
+        });
+
         // no need to shut down the stream, it happens when it is dropped
 
-        // Technically this client's permit isn't available until AFTER this function has ended
+        // Technically this client's permit isn't available until AFTER this function has ended,
+        // as only then the permit gets dropped.
         let available_slots = self.permit.semaphore().available_permits() + 1;
 
         event!(Level::INFO, available_slots);

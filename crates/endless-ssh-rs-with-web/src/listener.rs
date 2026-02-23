@@ -9,11 +9,12 @@ use tokio::sync::{Semaphore, TryAcquireError};
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
-use crate::SIZE_IN_BYTES;
 use crate::client::Client;
 use crate::config::{BindFamily, Config};
+use crate::events::ClientEvent;
 use crate::ffi_wrapper::set_receive_buffer_size;
 use crate::statistics::StatisticsMessage;
+use crate::{BROADCAST_CHANNEL, SIZE_IN_BYTES};
 
 struct Listener<'c> {
     config: &'c Config,
@@ -109,15 +110,25 @@ impl<'c> Listener<'c> {
                     // no in-between, no sense in waiting
                     match Arc::clone(&semaphore).try_acquire_owned() {
                         Ok(permit) => {
+                            let connected_at = OffsetDateTime::now_utc();
+
                             let client = Client::new(
                                 socket,
                                 addr,
-                                OffsetDateTime::now_utc() + self.config.delay,
+                                connected_at,
+                                connected_at + self.config.delay,
                                 permit,
                             );
 
                             // we have a permit, we can send it on the queue
                             client_sender.send(client)?;
+
+                            // now that the client is registred, broadcast for the dashboard
+                            let _r = BROADCAST_CHANNEL.send(ClientEvent::Connected {
+                                ip: addr.ip(),
+                                addr,
+                                connected_at,
+                            });
 
                             let current_clients = usize::from(self.config.max_clients.get())
                                 - semaphore.available_permits();
