@@ -57,9 +57,11 @@ pub fn set_up_handler(
 ) -> Result<(), eyre::Report> {
     #[expect(
         clippy::fn_to_numeric_cast_any,
+        clippy::as_conversions,
         reason = "We actually need the function as a pointer, and this is well-defined"
     )]
-    let sig_handler_ptr = sig_handler as usize;
+    let sig_handler_ptr = sig_handler as *const () as usize;
+
     #[cfg(not(target_os = "macos"))]
     // SAFETY: all zeroes are valid for `sigset_t`
     let sa_mask = unsafe { std::mem::MaybeUninit::<libc::sigset_t>::zeroed().assume_init() };
