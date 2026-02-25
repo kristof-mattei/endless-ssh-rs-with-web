@@ -31,6 +31,10 @@ pub enum ClientEvent {
 #[derive(Clone, serde::Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum WsEvent {
+    Init {
+        active_connections: Vec<ActiveConnectionInfo>,
+    },
+    Ready,
     Connected {
         ip: String,
         #[serde(with = "time::serde::rfc3339")]
@@ -74,7 +78,7 @@ pub async fn database_listen_forever(
     db_pool: sqlx::PgPool,
     geo_ip: Arc<Option<GeoIpReader>>,
     mut internal_events_rx: tokio::sync::mpsc::Receiver<ClientEvent>,
-    ws_broadcast: broadcast::Sender<WsEvent>,
+    ws_broadcast_tx: broadcast::Sender<WsEvent>,
     active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 ) {
     loop {
@@ -94,7 +98,7 @@ pub async fn database_listen_forever(
                 client_event,
                 &db_pool,
                 &geo_ip,
-                &ws_broadcast,
+                &ws_broadcast_tx,
                 &active_connections,
             )
             .await;
@@ -109,7 +113,7 @@ async fn handle_event(
     client_event: ClientEvent,
     db_pool: &sqlx::PgPool,
     geoip: &Arc<Option<GeoIpReader>>,
-    ws_broadcast: &broadcast::Sender<WsEvent>,
+    ws_broadcast_tx: &broadcast::Sender<WsEvent>,
     active_connections: &Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 ) {
     match client_event {
@@ -138,7 +142,7 @@ async fn handle_event(
             active_connections.insert(addr, info);
 
             // ignore send errors, no WS clients connected is fine
-            let _r = ws_broadcast.send(ws_event);
+            let _r = ws_broadcast_tx.send(ws_event);
         },
 
         ClientEvent::Disconnected {
@@ -184,8 +188,8 @@ async fn handle_event(
                         lon: geo.as_ref().and_then(|g| g.longitude),
                     };
 
-                    // Ignore send errors, no WS clients connected yet is fine
-                    let _r = ws_broadcast.send(ws_event);
+                    // ignore send errors, no WS clients connected yet is fine
+                    let _r = ws_broadcast_tx.send(ws_event);
                 },
                 Err(error) => {
                     db::log_db_error(&error);
