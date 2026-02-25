@@ -40,7 +40,7 @@ async fn stats_handler(
             .and_then(|s| OffsetDateTime::parse(s, &Rfc3339).ok())
             .unwrap_or(now);
 
-        // If no from provided, or invalid, fall back to 24 hours before `to`
+        // if no from provided, or invalid, fall back to 24 hours before `to`
         let from = from
             .as_deref()
             .and_then(|s| OffsetDateTime::parse(s, &Rfc3339).ok())

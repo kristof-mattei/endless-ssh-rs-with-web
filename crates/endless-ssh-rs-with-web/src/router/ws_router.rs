@@ -122,7 +122,7 @@ async fn handle_socket(
             }
         },
         Err(error) => {
-            // Don't abort, the client can still receive live events
+            // don't abort, the client can still receive live events
             event!(Level::ERROR, ?error, "Failed to query connection history");
         },
     }
@@ -162,6 +162,7 @@ async fn handle_broadcast(
     match recv {
         Ok(ws_event) => {
             // track last seen seq for deduplication on reconnect
+            // TODO this channel shouldn't use `WsEvent`, it should be a separate type
             if let &WsEvent::Disconnected { seq, .. } = &ws_event {
                 *last_seq = seq;
             }

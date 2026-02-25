@@ -75,14 +75,14 @@ impl GeoIpReader {
     pub async fn init(license_key: &str) -> Option<GeoIpReader> {
         let geo_ip_path = Path::new(GEO_IP_PATH);
 
-        // Create directory structure to where we'll write the file, this doesn't fail if they already exist
+        // create directory structure to where we'll write the file, this doesn't fail if they already exist
         if let Some(parent) = geo_ip_path.parent() {
             if let Err(error) = std::fs::create_dir_all(parent) {
                 event!(Level::ERROR, ?error, structure = %parent.display(), "Failed to create directory structure, writing the file will probably fail");
             }
         }
 
-        // Do we have a file?
+        // do we have a file?
         if should_download_database(license_key, geo_ip_path).await {
             // We don't, try and download
             if let Err(error) = download_database(license_key, geo_ip_path.to_path_buf()).await {
@@ -94,7 +94,7 @@ impl GeoIpReader {
             event!(Level::INFO, "GeoLite2 database up to date");
         }
 
-        // We now have file, let's try and memory map it
+        // we now have file, let's try and memory map it
         let mmap = match try_mmap_file(geo_ip_path) {
             Ok(mapped_file) => mapped_file,
             Err(error) => {
@@ -104,7 +104,7 @@ impl GeoIpReader {
             },
         };
 
-        // Let'st try to read our memory mapped file
+        // let's try to read our memory mapped file
         match maxminddb::Reader::from_source(mmap) {
             Ok(reader) => {
                 event!(Level::INFO, geoip_path = %geo_ip_path.display(), "Loaded GeoLite2 database");
@@ -299,6 +299,6 @@ fn try_mmap_file(path: &Path) -> Result<Mmap, MmapError> {
     }
 
     // SAFETY: we take an advisory lock.
-    // We should probably run as our own user
+    // we should probably run as our own user
     Ok(unsafe { MmapOptions::new().map(&file_read) }?)
 }
