@@ -10,7 +10,7 @@ on:
     - cron: "32 23 * * 5"
 
 env:
-  SQLX_OFFLINE: false
+  SQLX_OFFLINE: true
 
 jobs:
   analyze:
