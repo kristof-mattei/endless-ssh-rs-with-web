@@ -99,6 +99,7 @@ FROM rust-cargo-build AS rust-build
 WORKDIR /build
 
 # now we copy in the source which is more prone to changes and build it
+COPY ./.sqlx ./.sqlx
 COPY ./crates ./crates
 
 # ensure cargo picks up on the fact that we copied in our code

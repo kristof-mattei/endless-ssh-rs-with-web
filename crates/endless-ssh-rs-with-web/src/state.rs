@@ -1,8 +1,14 @@
+use std::net::SocketAddr;
 use std::sync::Arc;
 
 use axum::extract::{FromRef, FromRequestParts};
 use axum::http::request::Parts;
+use dashmap::DashMap;
+use sqlx::PgPool;
+use tokio::sync::broadcast;
 
+use crate::events::{ActiveConnectionInfo, WsEvent};
+use crate::geoip::GeoIpReader;
 use crate::states::config::Config;
 
 /// This is to be able to do:
@@ -22,12 +28,26 @@ impl FromRef<ApplicationState> for Arc<Config> {
 #[derive(Clone)]
 pub struct ApplicationState {
     pub config: Arc<Config>,
+    pub db_pool: PgPool,
+    pub geo_ip: Arc<Option<GeoIpReader>>,
+    pub ws_broadcast: broadcast::Sender<WsEvent>,
+    pub active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 }
 
 impl ApplicationState {
-    pub fn new(config: Config) -> Self {
+    pub fn new(
+        config: Config,
+        db_pool: PgPool,
+        geo_ip: Arc<Option<GeoIpReader>>,
+        ws_broadcast: broadcast::Sender<WsEvent>,
+        active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
+    ) -> Self {
         ApplicationState {
             config: Arc::new(config),
+            db_pool,
+            geo_ip,
+            ws_broadcast,
+            active_connections,
         }
     }
 }

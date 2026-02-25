@@ -3,8 +3,10 @@ mod cli;
 mod client;
 mod client_queue;
 mod config;
+mod db;
 mod events;
 mod ffi_wrapper;
+mod geoip;
 mod helpers;
 mod line;
 mod listener;
@@ -27,14 +29,15 @@ use std::convert::Infallible;
 use std::env::{self, VarError};
 use std::net::SocketAddr;
 use std::process::{ExitCode, Termination as _};
-use std::sync::{Arc, LazyLock};
+use std::sync::Arc;
 use std::time::Duration;
 
 use color_eyre::config::HookBuilder;
 use color_eyre::eyre;
+use dashmap::DashMap;
 use dotenvy::dotenv;
 use tokio::net::TcpStream;
-use tokio::sync::Semaphore;
+use tokio::sync::{Semaphore, broadcast};
 use tokio::time::timeout;
 use tokio_util::sync::CancellationToken;
 use tokio_util::task::TaskTracker;
@@ -48,7 +51,7 @@ use crate::cli::parse_cli;
 use crate::client::Client;
 use crate::client_queue::process_clients;
 use crate::config::Config;
-use crate::events::{ClientEvent, database_listen_forever};
+use crate::events::{ActiveConnectionInfo, ClientEvent, WsEvent, database_listen_forever};
 use crate::listener::listen_for_new_connections;
 use crate::router::build_router;
 use crate::server::setup_server;
@@ -64,9 +67,6 @@ use crate::utils::task::spawn_with_name;
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 const SIZE_IN_BYTES: usize = 1;
-
-static BROADCAST_CHANNEL: LazyLock<tokio::sync::broadcast::Sender<ClientEvent>> =
-    LazyLock::new(|| tokio::sync::broadcast::channel(100).0);
 
 fn build_filter() -> (EnvFilter, Option<eyre::Report>) {
     fn build_default_filter() -> EnvFilter {
@@ -180,6 +180,45 @@ async fn start_tasks() -> Shutdown {
 
     config.log();
 
+    let Ok(database_url) = env::var("DATABASE_URL") else {
+        event!(Level::ERROR, "DATABASE_URL environment variable is not set");
+
+        return Shutdown::from(eyre::eyre!("DATABASE_URL not set"));
+    };
+
+    let db_pool = match db::create_pool(&database_url).await {
+        Ok(pool) => pool,
+        Err(error) => {
+            event!(Level::ERROR, ?error, "Failed to connect to database");
+            return Shutdown::from(eyre::Report::new(error));
+        },
+    };
+
+    if let Err(error) = db::run_migrations(&db_pool).await {
+        event!(Level::ERROR, ?error, "Failed to run database migrations");
+
+        return Shutdown::from(eyre::Report::new(error));
+    }
+
+    event!(Level::INFO, "Database ready");
+
+    let geo_ip = match std::env::var("MAXMIND_LICENSE_KEY") {
+        Ok(key) if !key.is_empty() => Arc::new(geoip::try_init(&key).await),
+        _ => {
+            event!(
+                Level::INFO,
+                "`MAXMIND_LICENSE_KEY` not set, GeoIP lookup will be disabled"
+            );
+
+            Arc::new(None)
+        },
+    };
+
+    let (internal_events_tx, internal_events_rx) = tokio::sync::mpsc::channel::<ClientEvent>(1000);
+    let (ws_broadcast_tx, _ws_broadcast_rx) = broadcast::channel::<WsEvent>(1000);
+    let active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>> =
+        Arc::new(DashMap::new());
+
     // this channel is used to communicate between
     // tasks and this function, in the case that a task fails, they'll send a message on the shutdown channel
     // after which we'll gracefully terminate other services
@@ -197,7 +236,13 @@ async fn start_tasks() -> Shutdown {
     // available slots semaphore
     let semaphore = Arc::new(Semaphore::new(config.max_clients.get().into()));
 
-    let application_state = ApplicationState::new(states::config::Config {});
+    let application_state = ApplicationState::new(
+        states::config::Config {},
+        db_pool.clone(),
+        Arc::clone(&geo_ip),
+        ws_broadcast_tx.clone(),
+        Arc::clone(&active_connections),
+    );
 
     let tasks = TaskTracker::new();
 
@@ -212,6 +257,7 @@ async fn start_tasks() -> Shutdown {
             Arc::clone(&config),
             cancellation_token.clone(),
             client_sender.clone(),
+            internal_events_tx,
             Arc::clone(&semaphore),
             statistics_sender.clone(),
         ),
@@ -237,11 +283,23 @@ async fn start_tasks() -> Shutdown {
 
     {
         let cancellation_token = cancellation_token.clone();
+        let db_pool = db_pool.clone();
+        let geo_ip = Arc::clone(&geo_ip);
+        let ws_broadcast_tx = ws_broadcast_tx.clone();
+        let active_connections = Arc::clone(&active_connections);
 
         tasks.spawn(async move {
             let _guard = cancellation_token.clone().drop_guard();
 
-            database_listen_forever(cancellation_token.clone()).await;
+            database_listen_forever(
+                cancellation_token.clone(),
+                db_pool,
+                geo_ip,
+                internal_events_rx,
+                ws_broadcast_tx,
+                active_connections,
+            )
+            .await;
         });
     }
 

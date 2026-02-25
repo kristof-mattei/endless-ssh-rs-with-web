@@ -14,8 +14,6 @@ keywords = ["random"]
 repository = "https://github.com/kristof-mattei/endless-ssh-rs-with-web"
 include = ["crates/**", "/LICENSE", "/LICENSE-*"]
 
-[workspace.dependencies]
-
 [workspace.metadata.spellcheck]
 config = "spellcheck.toml"
 
@@ -41,7 +39,7 @@ allow_attributes_without_reason = { level = "deny", priority = 127 }
 # Debatable
 # arithmetic_side_effects = { level = "deny", priority = 127 }
 # Debatable, the ones below deny more specific occurences
-# as_conversions = { level = "deny", priority = 127 }
+as_conversions = { level = "deny", priority = 127 }
 as_pointer_underscore = { level = "deny", priority = 127 }
 as_underscore = { level = "deny", priority = 127 }
 assertions_on_result_states = { level = "deny", priority = 127 }

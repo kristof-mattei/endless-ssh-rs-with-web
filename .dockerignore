@@ -3,6 +3,7 @@
 
 # And explicitly include...
 !/.cargo
+!/.sqlx
 !/build-scripts
 !/Cargo.lock
 !/Cargo.toml

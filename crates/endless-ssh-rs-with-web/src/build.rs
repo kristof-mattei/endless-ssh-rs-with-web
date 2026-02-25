@@ -21,6 +21,7 @@ fn main() {
     println!("cargo:rerun-if-changed-env=HOST");
     println!("cargo:rerun-if-changed-env=TARGET");
     println!("cargo:rerun-if-changed-env=CARGO_ENCODED_RUSTFLAGS");
+    println!("cargo:rerun-if-changed=migrations");
 }
 
 fn extract_target_cpu_from_rustflags(rustflags: &OsStr) -> Option<String> {

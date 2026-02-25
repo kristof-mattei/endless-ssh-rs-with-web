@@ -1,5 +1,6 @@
 mod api_router;
 mod html_router;
+mod ws_router;
 
 use axum::Router;
 use axum::handler::HandlerWithoutStateExt as _;

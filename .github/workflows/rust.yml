@@ -11,6 +11,7 @@ env:
   CARGO_FEATURES: --all-features
   CARGO_TERM_COLOR: always
   RUSTFLAGS: --deny=warnings --cfg tokio_unstable
+  SQLX_OFFLINE: true
 
 jobs:
   warm-up-cache:

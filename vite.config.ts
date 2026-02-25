@@ -49,6 +49,7 @@ export default defineConfig(({ mode }) => {
         ],
         optimizeDeps: {
             noDiscovery: true,
+            include: ["react-dom/client", "maplibre-gl"],
             // exclude: ["src/entrypoints/index.ts"],
         },
         root: "front-end/src",
@@ -62,7 +63,7 @@ export default defineConfig(({ mode }) => {
             },
             cors: true,
             proxy: {
-                "/socket.io": {
+                "/api/ws": {
                     target: "http://localhost:3000",
                     changeOrigin: true,
                     secure: false,
