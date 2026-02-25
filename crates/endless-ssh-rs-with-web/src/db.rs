@@ -170,7 +170,7 @@ pub async fn get_connections_since(
     Ok(rows)
 }
 
-/// Aggregated stats returned by the /api/stats endpoint.
+/// Aggregated stats returned by the `/api/stats` endpoint.
 #[derive(Debug, serde::Serialize)]
 pub struct StatsRow {
     pub bucket: OffsetDateTime,
