@@ -9,12 +9,12 @@ use tokio::sync::{Semaphore, TryAcquireError};
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
+use crate::SIZE_IN_BYTES;
 use crate::client::Client;
 use crate::config::{BindFamily, Config};
 use crate::events::ClientEvent;
 use crate::ffi_wrapper::set_receive_buffer_size;
 use crate::statistics::StatisticsMessage;
-use crate::{BROADCAST_CHANNEL, SIZE_IN_BYTES};
 
 struct Listener<'c> {
     config: &'c Config,
@@ -25,6 +25,7 @@ pub async fn listen_for_new_connections(
     config: Arc<Config>,
     cancellation_token: CancellationToken,
     client_sender: tokio::sync::mpsc::UnboundedSender<Client<TcpStream>>,
+    internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
     semaphore: Arc<Semaphore>,
     statistics_sender: UnboundedSender<StatisticsMessage>,
 ) {
@@ -42,19 +43,28 @@ pub async fn listen_for_new_connections(
     event!(Level::INFO, listener = ?listener.listener, "Bound and listening!");
 
     loop {
-        tokio::select! {
+        let accept = listener.accept(
+            &client_sender,
+            &internal_events_tx,
+            Arc::clone(&semaphore),
+            &statistics_sender,
+        );
+
+        let result = tokio::select! {
             biased;
             () = cancellation_token.cancelled() => {
                 break;
             },
-            result = listener.accept(&client_sender, Arc::clone(&semaphore), &statistics_sender) => {
-                if let Err(error) = result {
-                    event!(Level::ERROR, ?error);
-
-                    // TODO properly log errors
-                    break;
-                }
+            result = accept => {
+                result
             },
+        };
+
+        if let Err(error) = result {
+            event!(Level::ERROR, ?error);
+
+            // TODO properly log errors
+            break;
         }
     }
 }
@@ -84,6 +94,7 @@ impl<'c> Listener<'c> {
     pub async fn accept(
         &self,
         client_sender: &UnboundedSender<Client<TcpStream>>,
+        internal_events_tx: &tokio::sync::mpsc::Sender<ClientEvent>,
         semaphore: Arc<Semaphore>,
         statistics_sender: &UnboundedSender<StatisticsMessage>,
     ) -> Result<(), eyre::Report> {
@@ -118,13 +129,14 @@ impl<'c> Listener<'c> {
                                 connected_at,
                                 connected_at + self.config.delay,
                                 permit,
+                                internal_events_tx.clone(),
                             );
 
                             // we have a permit, we can send it on the queue
                             client_sender.send(client)?;
 
                             // now that the client is registred, broadcast for the dashboard
-                            let _r = BROADCAST_CHANNEL.send(ClientEvent::Connected {
+                            let _r = internal_events_tx.send(ClientEvent::Connected {
                                 ip: addr.ip(),
                                 addr,
                                 connected_at,

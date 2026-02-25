@@ -2,9 +2,9 @@ use std::net::SocketAddr;
 
 use time::{Duration, OffsetDateTime};
 use tokio::sync::OwnedSemaphorePermit;
+use tokio::sync::mpsc::Sender;
 use tracing::{Level, event};
 
-use crate::BROADCAST_CHANNEL;
 use crate::events::ClientEvent;
 
 pub struct Client<S> {
@@ -15,6 +15,7 @@ pub struct Client<S> {
     addr: SocketAddr,
     tcp_stream: S,
     permit: OwnedSemaphorePermit,
+    internal_events_tx: Sender<ClientEvent>,
 }
 
 impl<S> std::cmp::Eq for Client<S> {}
@@ -57,6 +58,7 @@ impl<S> Client<S> {
         connected_at: OffsetDateTime,
         start_sending_at: OffsetDateTime,
         permit: OwnedSemaphorePermit,
+        internal_events_tx: Sender<ClientEvent>,
     ) -> Self {
         Self {
             time_spent: Duration::ZERO,
@@ -66,6 +68,7 @@ impl<S> Client<S> {
             bytes_sent: 0,
             tcp_stream: stream,
             permit,
+            internal_events_tx,
         }
     }
 
@@ -117,7 +120,7 @@ impl<S> Drop for Client<S> {
 
         let disconnected_at = OffsetDateTime::now_utc();
 
-        let _result = BROADCAST_CHANNEL.send(ClientEvent::Disconnected {
+        let _result = self.internal_events_tx.send(ClientEvent::Disconnected {
             addr: self.addr,
             connected_at: self.connected_at,
             disconnected_at,
