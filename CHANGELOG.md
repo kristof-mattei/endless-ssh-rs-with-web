@@ -1,5 +1,10 @@
 <!-- header goes here -->
-## [0.0.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.1-alpha.2..v0.0.2) - 2026-02-26
+## [0.0.2-alpha.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.2-alpha.1..v0.0.2-alpha.2) - 2026-02-26
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.0.2  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+## [0.0.2-alpha.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.1-alpha.2..v0.0.2-alpha.1) - 2026-02-26
 
 ### 🐛 Bug Fixes
 
@@ -17,7 +22,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.0.2-alpha.1  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- *(release)* Release v0.0.2-alpha.1  by @github-actions[bot] ([`d78bf2c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d78bf2c5e758b7ea01a92bfe85b5796e7f48f839))
 - Decrease verbosity  by @kristof-mattei ([`64c0473`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/64c04739ca3f7bb5711c2adc38a690f6413f48e7))
 - Modernize  by @kristof-mattei ([`bad2b8f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bad2b8f9b721d7dec117f5e558464cac7d49422f))
 - Modernize II  by @kristof-mattei ([`200d126`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/200d12642285f99e224a2c46e76f0af4d856fa40))
