@@ -13,8 +13,8 @@ pub struct Client<S> {
     connected_at: OffsetDateTime,
     bytes_sent: usize,
     addr: SocketAddr,
-    tcp_stream: S,
-    permit: OwnedSemaphorePermit,
+    tcp_stream: Option<S>,
+    permit: Option<OwnedSemaphorePermit>,
     internal_events_tx: Sender<ClientEvent>,
 }
 
@@ -66,8 +66,8 @@ impl<S> Client<S> {
             connected_at,
             addr,
             bytes_sent: 0,
-            tcp_stream: stream,
-            permit,
+            tcp_stream: Some(stream),
+            permit: Some(permit),
             internal_events_tx,
         }
     }
@@ -103,7 +103,7 @@ impl<S> Client<S> {
     }
 
     pub fn tcp_stream_mut(&mut self) -> &mut S {
-        &mut self.tcp_stream
+        self.tcp_stream.as_mut().unwrap()
     }
 }
 
@@ -120,20 +120,44 @@ impl<S> Drop for Client<S> {
 
         let disconnected_at = OffsetDateTime::now_utc();
 
-        let _result = self.internal_events_tx.send(ClientEvent::Disconnected {
-            addr: self.addr,
-            connected_at: self.connected_at,
-            disconnected_at,
-            time_spent: self.time_spent,
-            bytes_sent: self.bytes_sent,
+        if let Some(permit) = self.permit.take() {
+            let available_slots = permit.semaphore().available_permits();
+
+            drop(permit);
+
+            event!(Level::INFO, available_slots = available_slots + 1);
+        } else {
+            event!(
+                Level::ERROR,
+                "Client had no permit, this should never happen."
+            );
+        }
+
+        if let Some(tcp_stream) = self.tcp_stream.take() {
+            drop(tcp_stream);
+        } else {
+            event!(
+                Level::ERROR,
+                "Client had tcp stream, this should never happen.."
+            );
+        }
+
+        let internal_events_tx = self.internal_events_tx.clone();
+        let addr = self.addr;
+        let connected_at = self.connected_at;
+        let time_spent = self.time_spent;
+        let bytes_sent = self.bytes_sent;
+
+        tokio::spawn(async move {
+            let _result = internal_events_tx
+                .send(ClientEvent::Disconnected {
+                    addr,
+                    connected_at,
+                    disconnected_at,
+                    time_spent,
+                    bytes_sent,
+                })
+                .await;
         });
-
-        // no need to shut down the stream, it happens when it is dropped
-
-        // Technically this client's permit isn't available until AFTER this function has ended,
-        // as only then the permit gets dropped.
-        let available_slots = self.permit.semaphore().available_permits() + 1;
-
-        event!(Level::INFO, available_slots);
     }
 }
