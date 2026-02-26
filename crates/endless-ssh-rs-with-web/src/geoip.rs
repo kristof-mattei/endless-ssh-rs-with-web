@@ -48,6 +48,7 @@ pub async fn try_init(license_key: &str) -> Option<GeoIpReader> {
             return Some(geo_ip_reader);
         } else {
             let geo_ip_path = Path::new(GEO_IP_PATH);
+
             // remove files so that the download will trigger again
             if let Err(db_removal) = std::fs::remove_file(geo_ip_path) {
                 event!(
@@ -57,6 +58,7 @@ pub async fn try_init(license_key: &str) -> Option<GeoIpReader> {
                     "Failed to delete the GeoLite2 database"
                 );
             }
+
             if let Err(etag_removal) = std::fs::remove_file(geo_ip_path.with_extension("etag")) {
                 event!(
                     Level::ERROR,
@@ -74,18 +76,23 @@ pub async fn try_init(license_key: &str) -> Option<GeoIpReader> {
 impl GeoIpReader {
     pub async fn init(license_key: &str) -> Option<GeoIpReader> {
         let geo_ip_path = Path::new(GEO_IP_PATH);
+        let geo_ip_path =
+            std::path::absolute(geo_ip_path).unwrap_or_else(|_err| geo_ip_path.to_path_buf());
 
         // create directory structure to where we'll write the file, this doesn't fail if they already exist
         if let Some(parent) = geo_ip_path.parent() {
             if let Err(error) = std::fs::create_dir_all(parent) {
-                event!(Level::ERROR, ?error, structure = %parent.display(), "Failed to create directory structure, writing the file will probably fail");
+                let path =
+                    std::path::absolute(parent).unwrap_or_else(|_error| parent.to_path_buf());
+
+                event!(Level::ERROR, ?error, structure = %path.display(), "Failed to create directory structure, writing the file will probably fail");
             }
         }
 
         // do we have a file?
-        if should_download_database(license_key, geo_ip_path).await {
+        if should_download_database(license_key, &geo_ip_path).await {
             // We don't, try and download
-            if let Err(error) = download_database(license_key, geo_ip_path.to_path_buf()).await {
+            if let Err(error) = download_database(license_key, geo_ip_path.clone()).await {
                 event!(Level::ERROR, ?error, "Failed to download GeoLite2 database");
 
                 return None;
@@ -95,10 +102,10 @@ impl GeoIpReader {
         }
 
         // we now have file, let's try and memory map it
-        let mmap = match try_mmap_file(geo_ip_path) {
+        let mmap = match try_mmap_file(&geo_ip_path) {
             Ok(mapped_file) => mapped_file,
             Err(error) => {
-                event!(Level::ERROR, ?error, database_path = ?geo_ip_path.display(), "Fialed to open database as mmap");
+                event!(Level::ERROR, ?error, database_path = ?geo_ip_path.display(), "Failed to open database as mmap");
 
                 return None;
             },
