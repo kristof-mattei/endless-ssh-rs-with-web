@@ -1,4 +1,13 @@
 <!-- header goes here -->
+## [0.1.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.0..v0.1.1) - 2026-02-26
+
+### 🐛 Bug Fixes
+
+- Copy in dist too  by @kristof-mattei ([`d2f75b6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d2f75b6ca960891326d3d830747b3229cbce4ed8))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.1.1  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
 ## [0.1.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.3..v0.1.0) - 2026-02-26
 
 ### 🚀 Features
@@ -13,7 +22,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.1.0  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- *(release)* Release v0.1.0  by @github-actions[bot] ([`422571e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/422571e618558d22a2d14e553e44257b5e149a55))
 ## [0.0.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.2..v0.0.3) - 2026-02-26
 
 ### 🐛 Bug Fixes
