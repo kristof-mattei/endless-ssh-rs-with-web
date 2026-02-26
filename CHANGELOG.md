@@ -1,9 +1,46 @@
 <!-- header goes here -->
+## [0.0.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.1-alpha.2..v0.0.2) - 2026-02-26
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate clap to 4.5.60  by @renovate[bot] ([`be66c43`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/be66c430471aa42b9322bb95753cf111ef191e91))
+- Truncation on total size, not characters per line  by @kristof-mattei ([`62df253`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/62df253e9217379e282005a81983159343359b1e))
+- Add , for readability  by @kristof-mattei ([`910b62f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/910b62fbdf9c3ba6895f9d2945d3be90f33fb9c3))
+- Ensure pre-release and release tags on containers are emitted with the 'v' prefix  by @kristof-mattei ([`6edac00`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6edac007d710b502d0db3c6e95a644eaf6a2044a))
+- Skip spellcheck on release/ branches  by @kristof-mattei ([`736f013`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/736f01396b30052e9f01927fd93f321f49ffeb8a))
+- Modernize eslint config  by @kristof-mattei ([`1abeb0b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1abeb0b7b7cde360862cd036a4ceae710d178f7b))
+- Pass through ws to backend  by @kristof-mattei ([`1b0d3b5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1b0d3b533f0fb2f95c6c97903b1d5bf627ab4e94))
+- Rebuild when migrations change  by @kristof-mattei ([`fdc871e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fdc871e7c0e484499351607821baf1b8b825ef67))
+- Set correct column types for sums  by @kristof-mattei ([`a544945`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a54494597d1bbaf1f29013885f9cb603275dfdb9))
+- Await the future / block until send completes  by @kristof-mattei ([`afda5c2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/afda5c26572de6c29d8a2c3fe8d41cad5f89ec5f))
+- `time_spent` is now a proper `u64`  by @kristof-mattei ([`ba0e7b8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ba0e7b8cfe8388f396eb5a4f48ed297997400f9b))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.0.2-alpha.1  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- Decrease verbosity  by @kristof-mattei ([`64c0473`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/64c04739ca3f7bb5711c2adc38a690f6413f48e7))
+- Modernize  by @kristof-mattei ([`bad2b8f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bad2b8f9b721d7dec117f5e558464cac7d49422f))
+- Modernize II  by @kristof-mattei ([`200d126`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/200d12642285f99e224a2c46e76f0af4d856fa40))
+- Add db setup  by @kristof-mattei ([`1988f93`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1988f93f56405988979cf0a671bf820e776eb6de))
+- Db types  by @kristof-mattei ([`34bb490`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/34bb49017d08604e262aea17cc8188e75aa7f76c))
+- Increase strictness  by @kristof-mattei ([`c7d844c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c7d844c4f83a4d844dddf2d682fe71b4084c0c62))
+- Track `connected_at` time  by @kristof-mattei ([`ac46a5d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ac46a5dc04cf9058c8a4831db1c9aa1438b44eb1))
+- Geo ip implementation  by @kristof-mattei ([`c25f539`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c25f5392681b647c45017b1062e58cfb210d7c88))
+- Internal state  by @kristof-mattei ([`79d1c34`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/79d1c3434d19a440d4466ec10e28eb102b80e478))
+- Ws handler  by @kristof-mattei ([`4692ff6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4692ff6b97baf026e795ed41a6bd259e158eecc8))
+- Dependencies  by @kristof-mattei ([`4359548`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/43595487cc4256ac3c5ef280f4b01d3debaf98ca))
+- Comments  by @kristof-mattei ([`c0821cb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c0821cb726da336ccabd5c71c9cc6163d676f7f6))
+- Fe prep  by @kristof-mattei ([`8b69ce4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8b69ce4af068114882aeb2b072251b19f12c53e4))
+- Sqlx offline  by @kristof-mattei ([`670d95a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/670d95af3452e0101382b2b1b260f11aa9585172))
+- Spellcheck  by @kristof-mattei ([`52aeb76`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/52aeb7668e0a1e98ace8f4e8a5852062fa417fa6))
+- Fmt  by @kristof-mattei ([`5864330`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5864330a2d3a82df9361d459893c9071f8192f2d))
+- Also copy over .sqlx/  by @kristof-mattei ([`863b8d7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/863b8d7f2dbd6cac500ffbd5afd31a03f89d5c17))
+- `attest-build-provenance` is deprecated  by @kristof-mattei ([`26fa46a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/26fa46a6ed449dddd256e1817aa81300cd374346))
 ## [0.0.1-alpha.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.1-alpha.1..v0.0.1-alpha.2) - 2026-02-19
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.0.1-alpha.2  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- *(release)* Release v0.0.1-alpha.2  by @github-actions[bot] ([`42117ea`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/42117ea73b81e2aaab781ebb63693f97d5129881))
 ## [0.0.1-alpha.1] - 2026-02-19
 
 ### 🚀 Features
