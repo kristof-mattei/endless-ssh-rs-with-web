@@ -65,6 +65,11 @@ pub async fn run_migrations(pool: &PgPool) -> Result<(), MigrateError> {
 /// Convert `IpAddr` to `IpNetwork` for `PostgreSQL` INET binding.
 /// Inserting an `IpAddr` works equally as well, but then we're not explicit.
 fn to_inet(ip: IpAddr) -> IpNet {
+    let ip = match ip {
+        ip @ IpAddr::V4(_) => ip,
+        ip @ IpAddr::V6(ipv6_addr) => ipv6_addr.to_ipv4_mapped().map_or(ip, IpAddr::V4),
+    };
+
     match ip {
         IpAddr::V4(v4) => IpNet::V4(Ipv4Net::new(v4, 32).expect("32 is a valid IPv4 prefix")),
         IpAddr::V6(v6) => IpNet::V6(Ipv6Net::new(v6, 128).expect("128 is a valid IPv6 prefix")),
