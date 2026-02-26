@@ -1,4 +1,19 @@
 <!-- header goes here -->
+## [0.1.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.3..v0.1.0) - 2026-02-26
+
+### 🚀 Features
+
+- Add UI  by @kristof-mattei ([`1e0daac`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1e0daacd499a4500353aecb137ea1cc2ad78036d))
+
+### 🐛 Bug Fixes
+
+- Pass through `/api` as a whole, to include `/api/stats`  by @kristof-mattei ([`d7a7f91`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d7a7f9152e561e08391e40e24f9e4694739f951a))
+- When inserting an IPv4 mapped IPv6 address, convert it to a real IPv4 address  by @kristof-mattei ([`9e4aeb8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9e4aeb8490ebd0121300b666e37fed88c0f73ae7))
+- Move restrictions to where clause  by @kristof-mattei ([`ca51781`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ca517815ba459042c9de7d4809f7de7017e0d98f))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.1.0  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
 ## [0.0.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.2..v0.0.3) - 2026-02-26
 
 ### 🐛 Bug Fixes
@@ -8,7 +23,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.0.3  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- *(release)* Release v0.0.3  by @github-actions[bot] ([`0ee1ced`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0ee1ced1c75d554404bac4cca7c6bbe41df7939a))
 ## [0.0.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.2-alpha.1..v0.0.2) - 2026-02-26
 
 ### ⚙️ Miscellaneous Tasks
