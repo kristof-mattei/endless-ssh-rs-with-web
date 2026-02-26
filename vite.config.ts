@@ -63,7 +63,7 @@ export default defineConfig(({ mode }) => {
             },
             cors: true,
             proxy: {
-                "/api/ws": {
+                "/api": {
                     target: "http://localhost:3000",
                     changeOrigin: true,
                     secure: false,
