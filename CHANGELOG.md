@@ -1,9 +1,19 @@
 <!-- header goes here -->
-## [0.0.2-alpha.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.2-alpha.1..v0.0.2-alpha.2) - 2026-02-26
+## [0.0.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.2..v0.0.3) - 2026-02-26
+
+### 🐛 Bug Fixes
+
+- Add certs so we can download the file in our docker container  by @kristof-mattei ([`1d84c3d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1d84c3da453e2d6d58bb80bb58c0a6114595ee57))
+- Use the full path, if possible  by @kristof-mattei ([`85e684e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/85e684e4b34daab7752039768c66303b8851bcb8))
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.0.2  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- *(release)* Release v0.0.3  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+## [0.0.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.2-alpha.1..v0.0.2) - 2026-02-26
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.0.2  by @github-actions[bot] ([`a9e3d41`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a9e3d41e1e1f7c65b291c7aa6d6b30125beed7b0))
 ## [0.0.2-alpha.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.1-alpha.2..v0.0.2-alpha.1) - 2026-02-26
 
 ### 🐛 Bug Fixes
