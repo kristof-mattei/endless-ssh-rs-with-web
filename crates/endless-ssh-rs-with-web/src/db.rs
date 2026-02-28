@@ -10,6 +10,7 @@ use time::{Duration, OffsetDateTime};
 use tracing::{Level, event};
 
 use crate::geoip::GeoInfo;
+use crate::utils::ser_helpers::as_secs;
 
 /// Raw connection record.
 #[derive(Debug, Clone)]
@@ -181,6 +182,7 @@ pub struct StatsRow {
     pub bucket: OffsetDateTime,
     pub country_code: Option<String>,
     pub connects: i64,
+    #[serde(serialize_with = "as_secs")]
     pub time_spent: Duration,
     pub bytes_sent: i64,
 }

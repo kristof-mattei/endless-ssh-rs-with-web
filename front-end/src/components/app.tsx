@@ -82,7 +82,6 @@ export const App: React.FC = () => {
                 });
 
                 setTotalTimeSecs((n) => {
-                    // TODO fix: right now `time_spent` is an array of [seconds, nanoseconds]
                     return n + wsEvent.time_spent;
                 });
 

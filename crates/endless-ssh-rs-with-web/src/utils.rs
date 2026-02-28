@@ -1,3 +1,4 @@
+pub mod ser_helpers;
 pub mod task;
 
 use tokio::task::JoinHandle;
