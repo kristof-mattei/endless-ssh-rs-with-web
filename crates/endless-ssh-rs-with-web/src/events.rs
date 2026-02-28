@@ -2,7 +2,6 @@ use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
 
 use dashmap::DashMap;
-use serde::Serializer;
 use time::{Duration, OffsetDateTime};
 use tokio::sync::broadcast;
 use tokio_util::sync::CancellationToken;
@@ -10,6 +9,7 @@ use tracing::{Level, event};
 
 use crate::db;
 use crate::geoip::GeoIpReader;
+use crate::utils::ser_helpers::as_secs;
 
 /// Internal event bus.
 #[derive(Clone)]
@@ -26,13 +26,6 @@ pub enum ClientEvent {
         time_spent: Duration,
         bytes_sent: usize,
     },
-}
-
-fn secs<S>(duration: &Duration, s: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    s.serialize_i64(duration.whole_seconds())
 }
 
 /// WebSocket broadcast.
@@ -57,7 +50,7 @@ pub enum WsEvent {
         connected_at: OffsetDateTime,
         #[serde(with = "time::serde::rfc3339")]
         disconnected_at: OffsetDateTime,
-        #[serde(serialize_with = "secs")]
+        #[serde(serialize_with = "as_secs")]
         time_spent: Duration,
         bytes_sent: usize,
         country_code: Option<String>,
