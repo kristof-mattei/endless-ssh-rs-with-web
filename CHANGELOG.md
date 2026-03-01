@@ -1,4 +1,23 @@
 <!-- header goes here -->
+## [0.1.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.1..v0.1.2) - 2026-03-01
+
+### 🐛 Bug Fixes
+
+- Set tailwindcss to the right index.html  by @kristof-mattei ([`b64085c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b64085c69c7f4df23bdd498f01fa24bda8fa82ad))
+- All time is exposed as seconds  by @kristof-mattei ([`e52fa92`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e52fa926394f008af4e33b9c74191f143ddc0dc8))
+- Insert IP as-is  by @kristof-mattei ([`03b565f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/03b565fd9a448229ee6966d1c3125a98c0b7791f))
+- Keep the IP an IP internally  by @kristof-mattei ([`7d79e1f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7d79e1f9b160dc0db18b499eb82b2c1cc528f985))
+- Revert to from-to  by @kristof-mattei ([`add520b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/add520bf5f470a08ec0c6e453b2e2d071b175cc6))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.1.2-alpha.1  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- Exclude `.local`  by @kristof-mattei ([`601a037`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/601a0370824954ef65b4397f9df22316a62a3edb))
+- Disable `as_conversions`  by @kristof-mattei ([`fde057e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fde057edfb6d315213527b52f70d4b3621370da3))
+- Typo  by @kristof-mattei ([`59e98b7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/59e98b7382ca6c0a220af8fdbe468ef70b21128c))
+- Clean up old unused code  by @kristof-mattei ([`25ce9e3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/25ce9e36499774966fc82bd6657b668f4036a3d1))
+- Devcontainer  by @kristof-mattei ([`873d252`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/873d252188c360768c3bf83f02a70cd00c3469a4))
+- Sort  by @kristof-mattei ([`04999ea`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/04999ea3404c87fd409152ae6a1768601b0257e2))
 ## [0.1.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.0..v0.1.1) - 2026-02-26
 
 ### 🐛 Bug Fixes
@@ -7,7 +26,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.1.1  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- *(release)* Release v0.1.1  by @github-actions[bot] ([`1423cd7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1423cd7b19ed49d6d7c8fe2db28a6f9ab1945fe6))
 ## [0.1.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.0.3..v0.1.0) - 2026-02-26
 
 ### 🚀 Features
