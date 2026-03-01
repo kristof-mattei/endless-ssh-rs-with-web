@@ -58,6 +58,8 @@ const sharedRules = {
     ],
 
     "sort-keys": ["off"],
+
+    "unicorn/no-array-sort": ["off"],
     "unicorn/no-null": ["off"],
     "unicorn/prefer-ternary": ["off"],
 
