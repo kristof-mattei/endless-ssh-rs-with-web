@@ -49,7 +49,7 @@ export default defineConfig(({ mode }) => {
         ],
         optimizeDeps: {
             noDiscovery: true,
-            include: ["react-dom/client", "maplibre-gl"],
+            include: ["maplibre-gl", "react-dom/client"],
             // exclude: ["src/entrypoints/index.ts"],
         },
         root: "front-end/src",
