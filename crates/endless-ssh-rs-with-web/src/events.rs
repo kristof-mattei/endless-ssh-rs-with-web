@@ -66,7 +66,7 @@ pub enum WsEvent {
 /// We might merge this with the actual Client.
 #[derive(Clone, serde::Serialize)]
 pub struct ActiveConnectionInfo {
-    pub ip: String,
+    pub ip: IpAddr,
     #[serde(with = "time::serde::rfc3339")]
     pub connected_at: OffsetDateTime,
     pub lat: Option<f64>,
@@ -127,7 +127,7 @@ async fn handle_event(
             let geo = (**geoip).as_ref().and_then(|reader| reader.lookup(ip));
 
             let info = ActiveConnectionInfo {
-                ip: ip.to_string(),
+                ip,
                 connected_at,
                 lat: geo.as_ref().and_then(|g| g.latitude),
                 lon: geo.as_ref().and_then(|g| g.longitude),
@@ -135,7 +135,7 @@ async fn handle_event(
             };
 
             let ws_event = WsEvent::Connected {
-                ip: info.ip.clone(),
+                ip: info.ip.to_canonical().to_string(),
                 connected_at,
                 lat: info.lat,
                 lon: info.lon,
