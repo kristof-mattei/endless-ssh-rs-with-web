@@ -9,9 +9,9 @@ export interface StatsRow {
     bytes_sent: number;
 }
 
-type Since = "1h" | "24h" | "30d" | "7d" | "all";
+type Range = "1h" | "24h" | "30d" | "7d" | "all";
 
-const SINCE_CHOICES: { label: string; value: Since }[] = [
+const RANGES: { label: string; value: Range }[] = [
     { label: "Last hour", value: "1h" },
     { label: "Last 24 h", value: "24h" },
     { label: "Last 7 days", value: "7d" },
@@ -19,10 +19,10 @@ const SINCE_CHOICES: { label: string; value: Since }[] = [
     { label: "All time", value: "all" },
 ];
 
-function sinceToParameter(since: Since): string {
+function rangeToParameters(range: Range): { from: string; to: string } {
     const now = new Date();
-
-    const msMap: Record<Since, number> = {
+    const to = now.toISOString();
+    const msMap: Record<Range, number> = {
         "1h": 60 * 60 * 1000,
         "24h": 24 * 60 * 60 * 1000,
         "7d": 7 * 24 * 60 * 60 * 1000,
@@ -30,7 +30,9 @@ function sinceToParameter(since: Since): string {
         all: 365 * 24 * 60 * 60 * 1000 * 10,
     };
 
-    return new Date(now.getTime() - msMap[since]).toISOString();
+    const from = new Date(now.getTime() - msMap[range]).toISOString();
+
+    return { from, to };
 }
 
 interface Properties {
@@ -38,17 +40,17 @@ interface Properties {
 }
 
 export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
-    const [selected, setSelected] = useState<Since>("24h");
+    const [selected, setSelected] = useState<Range>("24h");
     const [loading, setLoading] = useState(false);
 
     const fetchStats = useCallback(
-        async (since: Since) => {
+        async (range: Range) => {
             setLoading(true);
             try {
-                const sinceParameter = sinceToParameter(since);
-
-                const response = await fetch(`/api/stats?since=${encodeURIComponent(sinceParameter)}`);
-
+                const { from, to } = rangeToParameters(range);
+                const response = await fetch(
+                    `/api/stats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
+                );
                 if (response.ok) {
                     const rows = (await response.json()) as StatsRow[];
                     onData(rows);
@@ -61,7 +63,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     );
 
     const handleChange = useCallback(
-        (range: Since) => {
+        (range: Range) => {
             setSelected(range);
             void fetchStats(range);
         },
@@ -71,7 +73,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     return (
         <div className="flex items-center gap-2">
             <span className="text-sm text-gray-400">Time range:</span>
-            {SINCE_CHOICES.map((r) => {
+            {RANGES.map((r) => {
                 return (
                     <button
                         key={r.value}
