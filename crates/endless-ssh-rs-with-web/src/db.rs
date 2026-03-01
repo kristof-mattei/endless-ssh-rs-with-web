@@ -174,6 +174,7 @@ pub async fn get_connections_since(
 /// Aggregated stats returned by the `/api/stats` endpoint.
 #[derive(Debug, serde::Serialize)]
 pub struct StatsRow {
+    #[serde(serialize_with = "time::serde::iso8601::serialize")]
     pub bucket: OffsetDateTime,
     pub country_code: Option<String>,
     pub connects: i64,
