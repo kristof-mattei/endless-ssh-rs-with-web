@@ -9,6 +9,7 @@ use tracing::{Level, event};
 
 use crate::db;
 use crate::geoip::GeoIpReader;
+use crate::utils::ser_helpers::as_secs;
 
 /// Internal event bus.
 #[derive(Clone)]
@@ -22,7 +23,7 @@ pub enum ClientEvent {
         addr: SocketAddr,
         connected_at: OffsetDateTime,
         disconnected_at: OffsetDateTime,
-        time_spent: time::Duration,
+        time_spent: Duration,
         bytes_sent: usize,
     },
 }
@@ -49,6 +50,7 @@ pub enum WsEvent {
         connected_at: OffsetDateTime,
         #[serde(with = "time::serde::rfc3339")]
         disconnected_at: OffsetDateTime,
+        #[serde(serialize_with = "as_secs")]
         time_spent: Duration,
         bytes_sent: usize,
         country_code: Option<String>,
@@ -64,7 +66,7 @@ pub enum WsEvent {
 /// We might merge this with the actual Client.
 #[derive(Clone, serde::Serialize)]
 pub struct ActiveConnectionInfo {
-    pub ip: String,
+    pub ip: IpAddr,
     #[serde(with = "time::serde::rfc3339")]
     pub connected_at: OffsetDateTime,
     pub lat: Option<f64>,
@@ -125,7 +127,7 @@ async fn handle_event(
             let geo = (**geoip).as_ref().and_then(|reader| reader.lookup(ip));
 
             let info = ActiveConnectionInfo {
-                ip: ip.to_string(),
+                ip,
                 connected_at,
                 lat: geo.as_ref().and_then(|g| g.latitude),
                 lon: geo.as_ref().and_then(|g| g.longitude),
@@ -133,7 +135,7 @@ async fn handle_event(
             };
 
             let ws_event = WsEvent::Connected {
-                ip: info.ip.clone(),
+                ip: info.ip.to_canonical().to_string(),
                 connected_at,
                 lat: info.lat,
                 lon: info.lon,

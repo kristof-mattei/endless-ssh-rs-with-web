@@ -4,10 +4,10 @@ use tracing::{Level, event};
 
 use crate::line::randline;
 
-pub async fn sendline<T: tokio::io::AsyncWriteExt + std::marker::Unpin + std::fmt::Debug>(
-    target: &mut T,
-    max_length: usize,
-) -> Result<usize, ()> {
+pub async fn sendline<T>(target: &mut T, max_length: usize) -> Result<usize, ()>
+where
+    T: tokio::io::AsyncWriteExt + std::marker::Unpin + std::fmt::Debug,
+{
     let bytes = randline(max_length);
 
     match target.write_all(bytes.as_slice()).await {
@@ -40,7 +40,6 @@ pub async fn sendline<T: tokio::io::AsyncWriteExt + std::marker::Unpin + std::fm
             ) {
                 event!(
                     Level::INFO,
-                    ?target,
                     ?error,
                     "Failed to send data to client, client gone",
                 );

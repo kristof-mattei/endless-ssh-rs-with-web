@@ -131,7 +131,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install git-cliff to generate changelog & next version number
-        uses: taiki-e/install-action@7f491e26f71f4ec2e6902c7c95c73043f209ab79 # v2.68.9
+        uses: taiki-e/install-action@d6e286fa45544157a02d45a43742857ebbc25d12 # v2.68.16
         with:
           tool: git-cliff
 
@@ -202,7 +202,7 @@ jobs:
           cargo --version
 
       - name: Install cargo-edit to do set-version
-        uses: taiki-e/install-action@7f491e26f71f4ec2e6902c7c95c73043f209ab79 # v2.68.9
+        uses: taiki-e/install-action@d6e286fa45544157a02d45a43742857ebbc25d12 # v2.68.16
         with:
           tool: cargo-edit
 
@@ -219,7 +219,7 @@ jobs:
           git diff > /tmp/version-bump.patch
 
       - name: Upload version bump patch
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           if-no-files-found: error
           name: version-bump-patch
@@ -294,7 +294,7 @@ jobs:
       - *checkout
 
       - name: Download version bump patch
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
           name: version-bump-patch
           path: /tmp/
@@ -388,7 +388,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         if: |
           matrix.runs-on == 'ubuntu-latest'
         with:
@@ -454,7 +454,7 @@ jobs:
             type=ref,event=pr,suffix=-latest
 
       - name: Download artifacts
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         id: artifact
         with:
           merge-multiple: true
@@ -573,7 +573,7 @@ jobs:
       # since we deal with tags (mutable), and the way to get a digest is to use the tag, I prefer
       # sourcing the digest from the local registry we just spun up (trusted)
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f # v3.2.0
+        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
         id: attestation
         with:
           subject-name: ${{ needs.docker-prepare-variables.outputs.full_image_name_remote_registry }}

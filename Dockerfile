@@ -2,7 +2,7 @@
 # check=skip=SecretsUsedInArgOrEnv,error=true
 
 # Rust toolchain setup
-FROM --platform=${BUILDPLATFORM} rust:1.93.1-slim-trixie@sha256:9663b80a1621253d30b146454f903de48f0af925c967be48c84745537cd35d8b AS rust-base
+FROM --platform=${BUILDPLATFORM} rust:1.93.1-slim-trixie@sha256:c0a38f5662afdb298898da1d70b909af4bda4e0acff2dc52aea6360a9b9c6956 AS rust-base
 
 ARG APPLICATION_NAME
 ARG DEBIAN_FRONTEND=noninteractive
@@ -18,6 +18,7 @@ RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt,sharing=locked \
     && apt-get upgrade --yes \
     && apt-get install --no-install-recommends --yes \
         build-essential \
+        ca-certificates \
         musl-dev
 
 FROM rust-base AS rust-linux-amd64
@@ -156,6 +157,9 @@ COPY --from=passwd-build /tmp/passwd_appuser /etc/passwd
 
 COPY --from=rust-build /output/bin/${APPLICATION_NAME} /app/entrypoint
 COPY --from=typescript-build /build/dist /app/dist
+
+# certificates
+COPY --from=rust-base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 USER appuser
 
