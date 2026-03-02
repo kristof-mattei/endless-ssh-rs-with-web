@@ -1,5 +1,19 @@
 <!-- header goes here -->
-## [0.1.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.1..v0.1.2) - 2026-03-01
+## [0.1.2-alpha.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.2-alpha.1..v0.1.2-alpha.2) - 2026-03-02
+
+### 🚀 Features
+
+- Fill in blank statistics  by @kristof-mattei ([`e4910f5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e4910f569ace1f477507ac0a0bd195a55762dea4))
+
+### 🐛 Bug Fixes
+
+- Serialize bucket as iso8601, otherwise JS can't parse it  by @kristof-mattei ([`08fd25e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/08fd25ea87ab6cf7e99ae901f4f68204f6c07870))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.1.2  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- Allow in-place array sort, we are smart enough to figure out the pros and cons  by @kristof-mattei ([`db133a8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/db133a8424d7394a66dfced8f49a52c384d4a428))
+## [0.1.2-alpha.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.1..v0.1.2-alpha.1) - 2026-03-01
 
 ### 🐛 Bug Fixes
 
@@ -11,7 +25,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.1.2-alpha.1  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- *(release)* Release v0.1.2-alpha.1  by @github-actions[bot] ([`03a27ff`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/03a27ff9123616509f953874454adfba182fe46b))
 - Exclude `.local`  by @kristof-mattei ([`601a037`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/601a0370824954ef65b4397f9df22316a62a3edb))
 - Disable `as_conversions`  by @kristof-mattei ([`fde057e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fde057edfb6d315213527b52f70d4b3621370da3))
 - Typo  by @kristof-mattei ([`59e98b7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/59e98b7382ca6c0a220af8fdbe468ef70b21128c))
