@@ -2,9 +2,10 @@ import type React from "react";
 import { useCallback, useRef, useState } from "react";
 
 import { EventFeed } from "@/components/event-feed.tsx";
+import { StatsChart } from "@/components/stats-chart.tsx";
 import { StatsPanel } from "@/components/stats-panel.tsx";
 import { TimeRangeSelector } from "@/components/time-range-selector.tsx";
-import type { StatsRow } from "@/components/time-range-selector.tsx";
+import type { StatsData } from "@/components/time-range-selector.tsx";
 import { WorldMap } from "@/components/world-map.tsx";
 import type { ActiveConnection, DisconnectedEvent, WsEvent } from "@/hooks/use-web-sockets.ts";
 import { useWebSocket } from "@/hooks/use-web-sockets.ts";
@@ -17,8 +18,7 @@ export const App: React.FC = () => {
     const [totalConnections, setTotalConnections] = useState(0);
     const [totalBytes, setTotalBytes] = useState(0);
     const [totalTimeSecs, setTotalTimeSecs] = useState(0);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_statsRows, setStatsRows] = useState<StatsRow[]>([]);
+    const [statsData, setStatsData] = useState<null | StatsData>(null);
 
     const seenSeqReference = useRef<Set<number>>(new Set());
 
@@ -109,7 +109,9 @@ export const App: React.FC = () => {
 
                 <WorldMap activeConnections={activeConnections} />
 
-                <TimeRangeSelector onData={setStatsRows} />
+                <TimeRangeSelector onData={setStatsData} />
+
+                {statsData !== null && <StatsChart rows={statsData.rows} from={statsData.from} to={statsData.to} />}
 
                 <div>
                     <h2 className="mb-2 text-lg font-semibold text-gray-300">Recent disconnections</h2>

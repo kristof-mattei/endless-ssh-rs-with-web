@@ -1,5 +1,5 @@
 import type React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export interface StatsRow {
     bucket: string;
@@ -7,6 +7,12 @@ export interface StatsRow {
     connects: number;
     time_spent: number;
     bytes_sent: number;
+}
+
+export interface StatsData {
+    rows: StatsRow[];
+    from: Date;
+    to: Date;
 }
 
 type Range = "1h" | "24h" | "30d" | "7d" | "all";
@@ -36,7 +42,7 @@ function rangeToParameters(range: Range): { from: string; to: string } {
 }
 
 interface Properties {
-    onData: (rows: StatsRow[]) => void;
+    onData: (data: StatsData) => void;
 }
 
 export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
@@ -46,14 +52,17 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     const fetchStats = useCallback(
         async (range: Range) => {
             setLoading(true);
+
             try {
                 const { from, to } = rangeToParameters(range);
+                const fromDate = new Date(from);
+                const toDate = new Date(to);
                 const response = await fetch(
                     `/api/stats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
                 );
                 if (response.ok) {
                     const rows = (await response.json()) as StatsRow[];
-                    onData(rows);
+                    onData({ rows, from: fromDate, to: toDate });
                 }
             } finally {
                 setLoading(false);
@@ -62,13 +71,14 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
         [onData],
     );
 
-    const handleChange = useCallback(
-        (range: Range) => {
-            setSelected(range);
-            void fetchStats(range);
-        },
-        [fetchStats],
-    );
+    // page load
+    useEffect(() => {
+        void fetchStats(selected);
+    }, [fetchStats, selected]);
+
+    const handleChange = useCallback((range: Range) => {
+        setSelected(range);
+    }, []);
 
     return (
         <div className="flex items-center gap-2">
