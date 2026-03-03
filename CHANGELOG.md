@@ -1,9 +1,21 @@
 <!-- header goes here -->
+## [0.2.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.4..v0.2.0) - 2026-03-03
+
+### 🐛 Bug Fixes
+
+- Don't render commit id if it doesn't exist yet by @kristof-mattei ([`3528d32`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3528d32c7ccb599a9611741fb36736298b36ffde))
+- Disable pre-release by @kristof-mattei ([`79d7dd0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/79d7dd0d0b7dea0e7e5fa1a737e845dea6caa14a))
+- Set default to `none` by @kristof-mattei ([`8f01df9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8f01df921bd091f5230f2721a078de8981ee8265))
+- Fix trailing spaces by @kristof-mattei ([`9341634`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/934163416392000dddfdea80a3cdb1e7156acb47))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.2.0
 ## [0.1.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.3..v0.1.4) - 2026-03-03
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.1.4 
+- *(release)* Release v0.1.4 by @github-actions[bot] ([`3136fd4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3136fd4f5621c500e50eb182dc1e1cff836684b1))
 ## [0.1.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.2..v0.1.3) - 2026-03-03
 
 ### 🐛 Bug Fixes
