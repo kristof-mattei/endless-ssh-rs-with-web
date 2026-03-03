@@ -1,5 +1,15 @@
 <!-- header goes here -->
-## [0.1.2-alpha.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.2-alpha.1..v0.1.2-alpha.2) - 2026-03-02
+## [0.1.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.2..v0.1.3) - 2026-03-03
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate ipnet to 2.12.0  by @renovate[bot] ([`2697a41`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2697a41160435ea839b97f81c571d0f573b05757))
+- *(deps)* Update rust crate tokio to 1.50.0  by @renovate[bot] ([`d95e785`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d95e7850e7a4b4fd29b78a5df52b6397e3d6ef90))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.1.3-alpha.1  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+## [0.1.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.2-alpha.1..v0.1.2) - 2026-03-02
 
 ### 🚀 Features
 
@@ -11,7 +21,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.1.2  ([``](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/))
+- *(release)* Release v0.1.2  by @github-actions[bot] ([`d272c34`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d272c34951e4337a2ae0949577ececdf5212eb46))
 - Allow in-place array sort, we are smart enough to figure out the pros and cons  by @kristof-mattei ([`db133a8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/db133a8424d7394a66dfced8f49a52c384d4a428))
 ## [0.1.2-alpha.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.1..v0.1.2-alpha.1) - 2026-03-01
 
