@@ -36,7 +36,7 @@ pub enum WsEvent {
     },
     Ready,
     Connected {
-        ip: String,
+        ip: IpAddr,
         #[serde(with = "time::serde::rfc3339")]
         connected_at: OffsetDateTime,
         lat: Option<f64>,
@@ -44,7 +44,7 @@ pub enum WsEvent {
     },
     Disconnected {
         seq: i64,
-        ip: String,
+        ip: IpAddr,
         #[serde(with = "time::serde::rfc3339")]
         connected_at: OffsetDateTime,
         #[serde(with = "time::serde::rfc3339")]
@@ -132,7 +132,7 @@ async fn handle_event(
             };
 
             let ws_event = WsEvent::Connected {
-                ip: info.ip.to_canonical().to_string(),
+                ip: info.ip,
                 connected_at,
                 lat: info.lat,
                 lon: info.lon,
@@ -175,7 +175,7 @@ async fn handle_event(
 
                     let ws_event = WsEvent::Disconnected {
                         seq,
-                        ip: addr.ip().to_canonical().to_string(),
+                        ip: addr.ip(),
                         connected_at,
                         disconnected_at,
                         time_spent,

@@ -1,5 +1,3 @@
-use std::net::IpAddr;
-
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::extract::{Query, State};
 use axum::response::IntoResponse;
@@ -58,7 +56,7 @@ async fn send_connection_record(
 ) -> Result<(), ()> {
     let ws_event = WsEvent::Disconnected {
         seq: record.id,
-        ip: IpAddr::from(record.ip_address).to_canonical().to_string(),
+        ip: record.ip_address.into(),
         connected_at: record.connected_at,
         disconnected_at: record.disconnected_at,
         time_spent: record.time_spent.into(),
