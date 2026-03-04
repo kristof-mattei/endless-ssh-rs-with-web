@@ -1,5 +1,22 @@
 <!-- header goes here -->
-## [0.2.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.4..v0.2.0) - 2026-03-03
+## [0.3.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.2.0..v0.3.0) - 2026-03-04
+
+### 🚀 Features
+
+- Wrap our types to allow for cleaner insertions/select by @kristof-mattei ([`e99418f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e99418f09f8b1252d2ba3e77eb81efea55be9f32))
+- Reorder feed columns, add time disconnected by @kristof-mattei ([`e6353e0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e6353e0bdcdcfb4088288b732a3f2335c99faf74))
+
+### 🐛 Bug Fixes
+
+- Validate from - to plausible by @kristof-mattei ([`9596c65`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9596c650675bd352964818e5225a7e05bc6a1324))
+- Non-macro query doesn't need type hint by @kristof-mattei ([`6bc34a5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6bc34a5ed79bb0701a33a113136c25ebf3eb1f3b))
+- Limit recent connections by @kristof-mattei ([`5270ad0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5270ad081827bfec293db5829d015855aeb7b1f8))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(dev)* Expand devcontainer by @kristof-mattei ([`3116a2b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3116a2bda99e806b13a2bef048b15732facbb201))
+- *(release)* Release v0.3.0
+## [0.2.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.4..v0.2.0) - 2026-03-04
 
 ### 🐛 Bug Fixes
 
@@ -10,7 +27,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.2.0
+- *(release)* Release v0.2.0 by @github-actions[bot] ([`374edf7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/374edf749a0ee5722d800cd1d0f99866ee013201))
 ## [0.1.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.3..v0.1.4) - 2026-03-03
 
 ### ⚙️ Miscellaneous Tasks
