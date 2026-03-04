@@ -15,7 +15,6 @@ use crate::utils::ser_helpers::as_secs;
 #[derive(Clone)]
 pub enum ClientEvent {
     Connected {
-        ip: IpAddr,
         addr: SocketAddr,
         connected_at: OffsetDateTime,
     },
@@ -119,15 +118,13 @@ async fn handle_event(
     active_connections: &Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 ) {
     match client_event {
-        ClientEvent::Connected {
-            ip,
-            addr,
-            connected_at,
-        } => {
-            let geo = (**geoip).as_ref().and_then(|reader| reader.lookup(ip));
+        ClientEvent::Connected { addr, connected_at } => {
+            let geo = (**geoip)
+                .as_ref()
+                .and_then(|reader| reader.lookup(addr.ip()));
 
             let info = ActiveConnectionInfo {
-                ip,
+                ip: addr.ip(),
                 connected_at,
                 lat: geo.as_ref().and_then(|g| g.latitude),
                 lon: geo.as_ref().and_then(|g| g.longitude),
@@ -178,7 +175,7 @@ async fn handle_event(
 
                     let ws_event = WsEvent::Disconnected {
                         seq,
-                        ip: addr.ip().to_string(),
+                        ip: addr.ip().to_canonical().to_string(),
                         connected_at,
                         disconnected_at,
                         time_spent,
