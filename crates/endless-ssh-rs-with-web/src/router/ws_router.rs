@@ -118,7 +118,7 @@ async fn handle_socket(
     // replay history all connections with id > since
     let since_id = params.since.unwrap_or(0);
 
-    match db::get_connections_since(&state.db_pool, since_id, Limit::All).await {
+    match db::get_connections_since(&state.db_pool, since_id, Limit::Limit(1000)).await {
         Ok(records) => {
             for rec in records {
                 send_connection_record(&mut socket, rec).await?;
