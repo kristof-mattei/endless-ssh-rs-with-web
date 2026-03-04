@@ -157,12 +157,12 @@ pub async fn get_stats(
         };
 
         let sql = format!(
-            r#"
+            "
         SELECT
             bucket
             , country_code
             , connects
-            , time_spent as "time_spent: DbDuration"
+            , time_spent
             , bytes_sent
         FROM
             {}
@@ -171,7 +171,7 @@ pub async fn get_stats(
             AND bucket < $2
         ORDER BY
             bucket
-        "#,
+        ",
             table
         );
 
@@ -182,18 +182,18 @@ pub async fn get_stats(
             .await?
     } else {
         sqlx::query(
-            r#"
+            "
         SELECT
             bucket
             , country_code
             , connects
-            , time_spent as "time_spent: DbDuration"
+            , time_spent
             , bytes_sent
         FROM
             connections_1day
         ORDER BY
             bucket
-        "#,
+        ",
         )
         .fetch_all(pool)
         .await?
