@@ -137,11 +137,7 @@ impl<'c> Listener<'c> {
 
                             // now that the client is registred, broadcast for the dashboard
                             let _r = internal_events_tx
-                                .send(ClientEvent::Connected {
-                                    ip: addr.ip(),
-                                    addr,
-                                    connected_at,
-                                })
+                                .send(ClientEvent::Connected { addr, connected_at })
                                 .await;
 
                             let current_clients = usize::from(self.config.max_clients.get())
