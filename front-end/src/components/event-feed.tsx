@@ -30,10 +30,11 @@ const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
             <span className="text-lg" title={event.country_code ?? undefined}>
                 {countryFlag(event.country_code)}
             </span>
+            <span className="w-50 text-gray-400">{event.city ?? event.country_name ?? "Unknown"}</span>
             <span className="w-36 truncate font-mono text-gray-300">{event.ip}</span>
-            <span className="text-gray-400">{event.city ?? event.country_name ?? "Unknown"}</span>
-            <span className="ml-auto text-red-400">{formatDuration(event.time_spent)}</span>
-            <span className="text-gray-500">{formatBytes(event.bytes_sent)}</span>
+            <span className="w-80 font-mono text-gray-300">{event.disconnected_at}</span>
+            <span className="ml-auto w-20 text-right text-red-400">{formatDuration(event.time_spent)}</span>
+            <span className="w-10 text-right text-gray-500">{formatBytes(event.bytes_sent)}</span>
         </div>
     );
 };
