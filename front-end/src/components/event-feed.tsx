@@ -45,7 +45,7 @@ const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
             <span className="w-36 truncate font-mono text-gray-300">{ip.is4() ? ip.to4().address : ip.address}</span>
             <span className="w-80 font-mono text-gray-300">{event.disconnected_at}</span>
             <span className="ml-auto w-20 text-right text-red-400">{formatDuration(event.time_spent)}</span>
-            <span className="w-10 text-right text-gray-500">{formatBytes(event.bytes_sent)}</span>
+            <span className="w-30 text-right text-gray-500">{formatBytes(event.bytes_sent)}</span>
         </div>
     );
 };
@@ -54,7 +54,7 @@ export const EventFeed: React.FC<Properties> = ({ events }) => {
     return (
         <div className="flex flex-col gap-1 overflow-y-auto" style={{ maxHeight: "400px" }}>
             {events.length === 0 && <p className="py-6 text-center text-gray-500">Waiting for connections…</p>}
-            {events.toReversed().map((event) => {
+            {events.map((event) => {
                 return <EventRow key={event.seq} event={event} />;
             })}
         </div>

@@ -113,7 +113,7 @@ pub async fn get_connections_since(
         WHERE
             id > $1
         ORDER BY
-            id
+            id DESC
         LIMIT $2
         "#,
         since_id,

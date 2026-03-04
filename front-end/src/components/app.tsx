@@ -69,8 +69,12 @@ export const App: React.FC = () => {
                 });
 
                 setEvents((previous) => {
-                    const next = [...previous, wsEvent];
-                    return next.length > MAX_EVENTS ? next.slice(next.length - MAX_EVENTS) : next;
+                    if (previous.length >= MAX_EVENTS) {
+                        // +1 because we're making space for our new event
+                        return [...previous.slice(previous.length - MAX_EVENTS + 1), wsEvent];
+                    }
+
+                    return [...previous, wsEvent];
                 });
 
                 setTotalConnections((n) => {

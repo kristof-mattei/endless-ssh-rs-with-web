@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use tracing::{Level, event};
 
-pub const DEFAULT_PORT: NonZeroU16 = NonZeroU16::new(2223).unwrap();
+pub const DEFAULT_PORT: NonZeroU16 = NonZeroU16::new(2224).unwrap();
 pub const DEFAULT_DELAY_MS: NonZeroU32 = NonZeroU32::new(10000).unwrap();
 pub const DEFAULT_MAX_LINE_LENGTH: NonZeroU8 = NonZeroU8::new(32).unwrap();
 pub const DEFAULT_MAX_CLIENTS: NonZeroU8 = NonZeroU8::new(64).unwrap();
