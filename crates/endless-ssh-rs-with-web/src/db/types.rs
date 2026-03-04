@@ -12,6 +12,7 @@ use crate::db::conversions::{to_duration, to_inet, to_interval};
 
 pub enum Limit {
     Limit(i64),
+    #[expect(unused, reason = "Not found a purpose yet")]
     All,
 }
 
