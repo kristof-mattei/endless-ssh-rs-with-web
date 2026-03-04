@@ -1,0 +1,83 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            id\n            , ip_address as \"ip_address: DbIpAddr\"\n            , connected_at\n            , disconnected_at\n            , time_spent as \"time_spent: DbDuration\"\n            , bytes_sent\n            , country_code\n            , country_name\n            , city\n            , latitude\n            , longitude\n        FROM\n            connections\n        WHERE\n            id > $1\n        ORDER BY\n            id\n        LIMIT $2\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "ip_address: DbIpAddr",
+        "type_info": "Inet"
+      },
+      {
+        "ordinal": 2,
+        "name": "connected_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 3,
+        "name": "disconnected_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 4,
+        "name": "time_spent: DbDuration",
+        "type_info": "Interval"
+      },
+      {
+        "ordinal": 5,
+        "name": "bytes_sent",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 6,
+        "name": "country_code",
+        "type_info": "Bpchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "country_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 8,
+        "name": "city",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 9,
+        "name": "latitude",
+        "type_info": "Float8"
+      },
+      {
+        "ordinal": 10,
+        "name": "longitude",
+        "type_info": "Float8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "ea9a124e8c68eb2a6da768392663859e5bfeab937c86de64abc24e9e173da6be"
+}

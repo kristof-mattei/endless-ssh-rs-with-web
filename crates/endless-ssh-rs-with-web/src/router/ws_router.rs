@@ -1,3 +1,5 @@
+use std::net::IpAddr;
+
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::extract::{Query, State};
 use axum::response::IntoResponse;
@@ -5,7 +7,8 @@ use serde::Deserialize;
 use tokio::sync::broadcast;
 use tracing::{Level, event};
 
-use crate::db::{self, ConnectionRecord};
+use crate::db;
+use crate::db::types::{ConnectionRecord, Limit};
 use crate::events::{ActiveConnectionInfo, WsEvent};
 use crate::state::ApplicationState;
 
@@ -55,10 +58,10 @@ async fn send_connection_record(
 ) -> Result<(), ()> {
     let ws_event = WsEvent::Disconnected {
         seq: record.id,
-        ip: record.ip_address.to_string(),
+        ip: IpAddr::from(record.ip_address).to_canonical().to_string(),
         connected_at: record.connected_at,
         disconnected_at: record.disconnected_at,
-        time_spent: record.time_spent,
+        time_spent: record.time_spent.into(),
         bytes_sent: usize::try_from(record.bytes_sent).unwrap_or(0),
         country_code: record.country_code,
         country_name: record.country_name,
@@ -115,7 +118,7 @@ async fn handle_socket(
     // replay history all connections with id > since
     let since_id = params.since.unwrap_or(0);
 
-    match db::get_connections_since(&state.db_pool, since_id, 500).await {
+    match db::get_connections_since(&state.db_pool, since_id, Limit::All).await {
         Ok(records) => {
             for rec in records {
                 send_connection_record(&mut socket, rec).await?;
@@ -187,7 +190,7 @@ async fn handle_broadcast(
             );
 
             // re-query DB for missed events
-            match db::get_connections_since(&state.db_pool, *last_seq, 1000).await {
+            match db::get_connections_since(&state.db_pool, *last_seq, Limit::Limit(1000)).await {
                 Ok(records) => {
                     for rec in records {
                         *last_seq = rec.id;

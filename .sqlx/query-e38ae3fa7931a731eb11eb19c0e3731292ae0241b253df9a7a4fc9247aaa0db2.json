@@ -1,0 +1,31 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO connections (\n            connected_at\n            , disconnected_at\n            , time_spent\n            , bytes_sent\n            , ip_address\n            , country_code\n            , country_name\n            , city\n            , latitude\n            , longitude\n        ) VALUES (\n            $1\n            , $2\n            , $3\n            , $4\n            , $5\n            , $6\n            , $7\n            , $8\n            , $9\n            , $10\n        ) RETURNING id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Timestamptz",
+        "Interval",
+        "Int8",
+        "Inet",
+        "Bpchar",
+        "Text",
+        "Text",
+        "Float8",
+        "Float8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e38ae3fa7931a731eb11eb19c0e3731292ae0241b253df9a7a4fc9247aaa0db2"
+}
