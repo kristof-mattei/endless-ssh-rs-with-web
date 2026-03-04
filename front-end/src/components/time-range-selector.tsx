@@ -28,12 +28,14 @@ const RANGES: { label: string; value: Range }[] = [
 function rangeToParameters(range: Range): { from: string; to: string } {
     const now = new Date();
     const to = now.toISOString();
+
     const msMap: Record<Range, number> = {
         "1h": 60 * 60 * 1000,
         "24h": 24 * 60 * 60 * 1000,
         "7d": 7 * 24 * 60 * 60 * 1000,
         "30d": 30 * 24 * 60 * 60 * 1000,
-        all: 365 * 24 * 60 * 60 * 1000 * 10,
+        // now it's 1 year, we'll figure out a better way
+        all: 365 * 24 * 60 * 60 * 1000,
     };
 
     const from = new Date(now.getTime() - msMap[range]).toISOString();

@@ -46,10 +46,13 @@ async fn stats_handler(
             .and_then(|s| OffsetDateTime::parse(s, &Rfc3339).ok())
             .unwrap_or_else(|| to - time::Duration::hours(24));
 
+        if from > to {
+            return (StatusCode::BAD_REQUEST, "`from` needs to be before `to`").into_response();
+        }
+
         Some((from, to))
     };
 
-    // TODO what happens if we swap to & from?
     match db::get_stats(&state.db_pool, from_to).await {
         Ok(rows) => Json(rows).into_response(),
         Err(error) => {
