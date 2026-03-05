@@ -1,4 +1,19 @@
 <!-- header goes here -->
+## [0.4.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.3.0..v0.4.0) - 2026-03-05
+
+### 🚀 Features
+
+- Pass through IP to front-end as-is by @kristof-mattei ([`b5b14a3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b5b14a325fde005adf3d868387ff93449e22e22e))
+
+### 🐛 Bug Fixes
+
+- Ensure we send out canonical IPs until our front-end properly supports IPs in the form `::ffff.1.2.3.4` by @kristof-mattei ([`46b393a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/46b393aac7faaac42840d6ecb791d610897c3169))
+- Show last x disconnections, not first x by @kristof-mattei ([`8100935`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/81009354efc9303c84a51c2aad35ddbd477d97f7))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.4.0
+- Format package.json by @kristof-mattei ([`88588b9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/88588b939a1efb04b6e4e3ffa900cb0c7c9878e0))
 ## [0.3.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.2.0..v0.3.0) - 2026-03-04
 
 ### 🚀 Features
@@ -15,7 +30,7 @@
 ### ⚙️ Miscellaneous Tasks
 
 - *(dev)* Expand devcontainer by @kristof-mattei ([`3116a2b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3116a2bda99e806b13a2bef048b15732facbb201))
-- *(release)* Release v0.3.0
+- *(release)* Release v0.3.0 by @github-actions[bot] ([`0b00f38`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0b00f385bc74e581d08cd658ab00c5a507fe978d))
 ## [0.2.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.1.4..v0.2.0) - 2026-03-04
 
 ### 🐛 Bug Fixes
