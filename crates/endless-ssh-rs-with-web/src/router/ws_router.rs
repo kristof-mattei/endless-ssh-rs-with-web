@@ -1,6 +1,7 @@
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::extract::{Query, State};
 use axum::response::IntoResponse;
+use futures::TryStreamExt as _;
 use serde::Deserialize;
 use tokio::sync::broadcast;
 use tracing::{Level, event};
@@ -116,16 +117,22 @@ async fn handle_socket(
     // replay history all connections with id > since
     let since_id = params.since.unwrap_or(0);
 
-    match db::get_connections_since(&state.db_pool, since_id, Limit::Limit(1000)).await {
-        Ok(records) => {
-            for rec in records {
-                send_connection_record(&mut socket, rec).await?;
-            }
-        },
-        Err(error) => {
-            // don't abort, the client can still receive live events
-            event!(Level::ERROR, ?error, "Failed to query connection history");
-        },
+    let mut records = db::get_connections_since(&state.db_pool, since_id, Limit::Limit(1000));
+
+    loop {
+        match records.try_next().await {
+            Ok(Some(record)) => {
+                send_connection_record(&mut socket, record).await?;
+            },
+            Ok(None) => {
+                break;
+            },
+            Err(error) => {
+                // don't abort, the client can still receive live events
+                event!(Level::ERROR, ?error, "Failed to query connection history");
+                break;
+            },
+        }
     }
 
     // signal that history replay is done.
@@ -188,17 +195,24 @@ async fn handle_broadcast(
             );
 
             // re-query DB for missed events
-            match db::get_connections_since(&state.db_pool, *last_seq, Limit::Limit(1000)).await {
-                Ok(records) => {
-                    for rec in records {
-                        *last_seq = rec.id;
+            let mut records =
+                db::get_connections_since(&state.db_pool, *last_seq, Limit::Limit(1000));
 
-                        send_connection_record(socket, rec).await?;
-                    }
-                },
-                Err(error) => {
-                    event!(Level::ERROR, ?error, "Failed to catch up after WS lag");
-                },
+            loop {
+                match records.try_next().await {
+                    Ok(Some(record)) => {
+                        *last_seq = record.id;
+
+                        send_connection_record(socket, record).await?;
+                    },
+                    Ok(None) => {
+                        break;
+                    },
+                    Err(error) => {
+                        event!(Level::ERROR, ?error, "Failed to catch up after WS lag");
+                        break;
+                    },
+                }
             }
         },
         Err(broadcast::error::RecvError::Closed) => {

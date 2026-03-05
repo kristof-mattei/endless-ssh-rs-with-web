@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            id\n            , ip_address as \"ip_address: DbIpAddr\"\n            , connected_at\n            , disconnected_at\n            , time_spent as \"time_spent: DbDuration\"\n            , bytes_sent\n            , country_code\n            , country_name\n            , city\n            , latitude\n            , longitude\n        FROM\n            connections\n        WHERE\n            id > $1\n        ORDER BY\n            id\n        LIMIT $2\n        ",
+  "query": "\n        SELECT\n            id\n            , ip_address as \"ip_address: DbIpAddr\"\n            , connected_at\n            , disconnected_at\n            , time_spent as \"time_spent: DbDuration\"\n            , bytes_sent\n            , country_code\n            , country_name\n            , city\n            , latitude\n            , longitude\n        FROM (\n            SELECT\n                id\n                , ip_address\n                , connected_at\n                , disconnected_at\n                , time_spent\n                , bytes_sent\n                , country_code\n                , country_name\n                , city\n                , latitude\n                , longitude\n            FROM\n                connections\n            WHERE\n                id > $1\n            ORDER BY\n                id DESC\n            LIMIT $2\n        ) AS subquery\n        ORDER BY\n            id ASC\n        ",
   "describe": {
     "columns": [
       {
@@ -79,5 +79,5 @@
       true
     ]
   },
-  "hash": "ea9a124e8c68eb2a6da768392663859e5bfeab937c86de64abc24e9e173da6be"
+  "hash": "4cded0721fd181132e2b484145a3651a63d5937efec1d50c8dddca197ed58073"
 }
