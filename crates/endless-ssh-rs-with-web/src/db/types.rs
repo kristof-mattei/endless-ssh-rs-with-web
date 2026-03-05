@@ -10,6 +10,7 @@ use time::{Duration, OffsetDateTime};
 
 use crate::db::conversions::{to_duration, to_inet, to_interval};
 
+#[derive(Copy, Clone)]
 pub enum Limit {
     Limit(i64),
     #[expect(unused, reason = "Not found a purpose yet")]
