@@ -8,7 +8,6 @@
 
 /Cargo.lock
 /CHANGELOG.md
-/package.json
 /pnpm-lock.yaml
 /tsconfig.json
 /tsconfig.dev.json
