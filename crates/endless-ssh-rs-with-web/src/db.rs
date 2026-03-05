@@ -3,6 +3,7 @@ pub mod types;
 
 use std::net::IpAddr;
 
+use futures::stream::Stream;
 use sqlx::migrate::MigrateError;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{PgPool, Row as _};
@@ -87,13 +88,13 @@ pub async fn insert_connection(
     Ok(id)
 }
 
-/// Return up to `limit` connection records with id > `since_id`, ordered by id.
-pub async fn get_connections_since(
+/// Return up to `limit` of the most recent connection records with id > `since_id`, ordered by ascending id.
+pub fn get_connections_since(
     pool: &PgPool,
     since_id: i64,
     limit: Limit,
-) -> Result<Vec<ConnectionRecord>, sqlx::Error> {
-    let rows = sqlx::query_as!(
+) -> impl Stream<Item = Result<ConnectionRecord, sqlx::Error>> + Send + '_ {
+    sqlx::query_as!(
         ConnectionRecord,
         r#"
         SELECT
@@ -108,21 +109,34 @@ pub async fn get_connections_since(
             , city
             , latitude
             , longitude
-        FROM
-            connections
-        WHERE
-            id > $1
+        FROM (
+            SELECT
+                id
+                , ip_address
+                , connected_at
+                , disconnected_at
+                , time_spent
+                , bytes_sent
+                , country_code
+                , country_name
+                , city
+                , latitude
+                , longitude
+            FROM
+                connections
+            WHERE
+                id > $1
+            ORDER BY
+                id DESC
+            LIMIT $2
+        ) AS subquery
         ORDER BY
-            id
-        LIMIT $2
+            id ASC
         "#,
         since_id,
         limit as _
     )
-    .fetch_all(pool)
-    .await?;
-
-    Ok(rows)
+    .fetch(pool)
 }
 
 /// Aggregated stats returned by the `/api/stats` endpoint.
