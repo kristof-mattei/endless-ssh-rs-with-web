@@ -5,13 +5,13 @@ import { useState } from "react";
 import type { TooltipContentProps } from "recharts";
 import {
     Bar,
-    BarChart,
     CartesianGrid,
     DefaultTooltipContent,
     ResponsiveContainer,
     Tooltip,
     XAxis,
     YAxis,
+    createHorizontalChart,
 } from "recharts";
 
 import type { Payload } from "recharts/types/component/DefaultTooltipContent";
@@ -144,10 +144,45 @@ interface Properties {
     to: Date;
 }
 
+export const CustomTooltipContent: (properties: TooltipContentProps) => React.JSX.Element = (
+    properties: TooltipContentProps,
+) => {
+    // `payload[0].payload` is the full `BucketPoint`
+    const payload = properties.payload as readonly Payload<number, string>[];
+    const payload0 = payload[0];
+    const bucketPoint = payload0?.payload as BucketPoint | undefined;
+
+    if (bucketPoint === undefined) {
+        // passthrough
+        return <DefaultTooltipContent {...properties} />;
+    }
+
+    const allMetrics = METRICS.map((m) => {
+        return {
+            ...payload0,
+            dataKey: m.value,
+            name: m.label,
+            value: bucketPoint[m.value],
+            formatter: (v: number | undefined) => {
+                return formatYLabel(m.value, v ?? 0);
+            },
+        } as Payload;
+    });
+
+    return <DefaultTooltipContent {...properties} payload={allMetrics} />;
+};
+
 export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
     const [selectedMetric, setMetric] = useState<Metric>("connects");
 
     const points = aggregate(rows, from, to);
+
+    const Typed = createHorizontalChart<BucketPoint, Date>()({
+        XAxis,
+        YAxis,
+        Tooltip,
+        Bar,
+    });
 
     return (
         <div className="rounded-lg bg-gray-800 p-4">
@@ -176,16 +211,18 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                 <p className="py-8 text-center text-gray-500">No data for selected range</p>
             ) : (
                 <ResponsiveContainer width="100%" height={220}>
-                    <BarChart data={points} margin={{ bottom: 52, left: 8, right: 16, top: 8 }}>
+                    <Typed.BarChart data={points} margin={{ bottom: 52, left: 8, right: 16, top: 8 }}>
                         <CartesianGrid stroke="#374151" strokeDasharray="3 3" vertical={false} />
-                        <XAxis
+                        <Typed.XAxis
                             axisLine={{ stroke: "#4b5563" }}
-                            dataKey="bucket"
+                            dataKey={(bp: BucketPoint) => {
+                                return bp.bucket;
+                            }}
                             tick={{ fill: "#6b7280", fontSize: 10 }}
                             tickFormatter={formatBucket}
                             tickLine={true}
                         />
-                        <YAxis
+                        <Typed.YAxis
                             tickFormatter={(v: number) => {
                                 return formatYLabel(selectedMetric, v);
                             }}
@@ -194,7 +231,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                             axisLine={false}
                             tickLine={false}
                         />
-                        <Tooltip<number, string>
+                        <Typed.Tooltip
                             cursor={{ fill: "rgba(255,255,255,0.04)" }}
                             contentStyle={{
                                 background: "#1f2937",
@@ -205,30 +242,8 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                             }}
                             labelStyle={{ fontWeight: 600, color: "#e5e7eb", marginBottom: "4px" }}
                             itemStyle={{ color: "#9ca3af" }}
-                            content={(properties: TooltipContentProps<number, string>) => {
-                                // `payload[0].payload` is the full `BucketPoint`
-                                const payload = properties.payload as readonly Payload<number, string>[];
-                                const payload0 = payload[0];
-
-                                const bucketPoint = payload0?.payload as BucketPoint | undefined;
-
-                                if (bucketPoint === undefined) {
-                                    return <DefaultTooltipContent {...properties} />;
-                                }
-
-                                const allMetrics = METRICS.map((m) => {
-                                    return {
-                                        ...payload0,
-                                        dataKey: m.value,
-                                        name: m.label,
-                                        value: bucketPoint[m.value],
-                                        formatter: (v: number | undefined) => {
-                                            return formatYLabel(m.value, v ?? 0);
-                                        },
-                                    } as Payload<number, string>;
-                                });
-
-                                return <DefaultTooltipContent {...properties} payload={allMetrics} />;
+                            content={(properties) => {
+                                return <CustomTooltipContent {...properties} />;
                             }}
                             labelFormatter={(label: ReactNode) => {
                                 return label instanceof Date ? formatBucket(label) : label;
@@ -236,7 +251,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                         />
                         {METRICS.map((m) => {
                             return (
-                                <Bar
+                                <Typed.Bar
                                     key={m.value}
                                     dataKey={(p: BucketPoint) => {
                                         return p[m.value];
@@ -249,7 +264,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                             );
                         })}
                         <RechartsDevtools />
-                    </BarChart>
+                    </Typed.BarChart>
                 </ResponsiveContainer>
             )}
         </div>
