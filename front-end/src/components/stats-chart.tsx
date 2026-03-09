@@ -1,4 +1,4 @@
-import { RechartsDevtools } from "@recharts/devtools";
+import { RECHARTS_DEVTOOLS_PORTAL_ID, RechartsDevtools } from "@recharts/devtools";
 import type React from "react";
 import type { ReactNode } from "react";
 import { useState } from "react";
@@ -267,6 +267,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                     </Typed.BarChart>
                 </ResponsiveContainer>
             )}
+            {import.meta.env.MODE === "dev" && <div id={RECHARTS_DEVTOOLS_PORTAL_ID} />}
         </div>
     );
 };
