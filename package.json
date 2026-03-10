@@ -29,7 +29,7 @@
     ]
   },
   "dependencies": {
-    "@recharts/devtools": "0.0.10",
+    "@recharts/devtools": "0.0.11",
     "ip-address": "^10.1.0",
     "maplibre-gl": "5.19.0",
     "pretty-bytes": "7.1.0",
