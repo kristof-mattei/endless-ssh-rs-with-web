@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@recharts/devtools':
-        specifier: 0.0.10
-        version: 0.0.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(recharts@3.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1))
+        specifier: 0.0.11
+        version: 0.0.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(recharts@3.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1))
       ip-address:
         specifier: ^10.1.0
         version: 10.1.0
@@ -616,8 +616,8 @@ packages:
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
 
-  '@recharts/devtools@0.0.10':
-    resolution: {integrity: sha512-uxqrqBZpdU0dbl5GVaCxWozQQ6ppV9NAzDq5jkNuKXVLseCIpKcP0a/ubgmOPqn3B/N7082affZccADulIr5SQ==}
+  '@recharts/devtools@0.0.11':
+    resolution: {integrity: sha512-Vik/TqCrEets3VmD6yZQkD0LUYnVrB+NtgsdvfrxmTnZmEy2PkwRQVzFbAwvxmPrqYdW0O9c+ep2uQisdMYGMQ==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
@@ -3755,7 +3755,7 @@ snapshots:
 
   '@polka/url@1.0.0-next.29': {}
 
-  '@recharts/devtools@0.0.10(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(recharts@3.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1))':
+  '@recharts/devtools@0.0.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(recharts@3.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1))':
     dependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
