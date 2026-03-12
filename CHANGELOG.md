@@ -1,4 +1,32 @@
 <!-- header goes here -->
+## [0.5.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.4.0..v0.5.0) - 2026-03-12
+
+### 🚀 Features
+
+- Remove crane by @kristof-mattei ([`073ba68`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/073ba68f70d54c2adebaa489958e9527f20b6c9f))
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate uuid to 1.22.0 by @renovate[bot] ([`2470e0f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2470e0fcbc1db54fefc92e373c81d7a189966a43))
+- *(deps)* Update rust crate libc to 0.2.183 by @renovate[bot] ([`7ef1c23`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7ef1c23de08cb39a2f4755e57ee7a59b0f2dc208))
+- *(deps)* Update recharts (npm) to v3.8.0 by @renovate[bot] ([`a0a849f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a0a849fecc44adf1db24ce824c1970893bf61d97))
+- *(deps)* Update @recharts/devtools (npm) to v0.0.9 by @kristof-mattei ([`eaf36f5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/eaf36f5876ce08753ccc4df4acbe5cf0fc32e25f))
+- *(deps)* Update @recharts/devtools (npm) to v0.0.10 by @renovate[bot] ([`c181124`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c181124685a75f01a1261ecd6c2b1385c323a74f))
+- *(deps)* Update @recharts/devtools (npm) to v0.0.11 by @renovate[bot] ([`62c1b78`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/62c1b7814664de4ae6242e4848f4ee6c2befc65e))
+- *(deps)* Update maplibre-gl (npm) to v5.20.0 by @renovate[bot] ([`7c5ade3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7c5ade380d67bee06bafffb26108bbc2c1ecd99a))
+- Update chart to use recharts 3.8.0 by @kristof-mattei ([`ef863e0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ef863e00f5f41e8ee9fb5251618c33a16804a327))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Allow empty by @kristof-mattei ([`e6ce7fb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e6ce7fbb2a3ceb423c1c822dca92049f70f43ea2))
+- *(ci)* Comment cleanup by @kristof-mattei ([`4fa99d9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4fa99d9cace57656b0c725fa995cbf85cedd07b4))
+- *(release)* Release v0.5.0
+- Clean up ignore by @kristof-mattei ([`404a01e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/404a01e12c18e72240ce1f85a49ee6aa8fc9e403))
+- Rust 1.94.0 Docker by @kristof-mattei ([`9427eb1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9427eb18b46bf01da1357e3d83312f0846aa42ae))
+- Pin sha for Rust image by @kristof-mattei ([`e2986db`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e2986db43914999be69f279056fd5be0908f7216))
+- Use trixie as dev image by @kristof-mattei ([`caa35f4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/caa35f407f67a6bf86e45f83735ec9a5d31df207))
+- Devcontainer mold by @kristof-mattei ([`d4a14c0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d4a14c05f92ed61bad93d07ce0ab095b282d0111))
+- Skip more when releasing by @kristof-mattei ([`762a3bc`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/762a3bcfe9b2c625e41b5020939e9bcdb3fb8815))
 ## [0.4.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.3.0..v0.4.0) - 2026-03-05
 
 ### 🚀 Features
@@ -12,7 +40,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.4.0
+- *(release)* Release v0.4.0 by @github-actions[bot] ([`b0599eb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b0599eb10af8043613969ae0056fd398758f89c2))
 - Format package.json by @kristof-mattei ([`88588b9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/88588b939a1efb04b6e4e3ffa900cb0c7c9878e0))
 ## [0.3.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.2.0..v0.3.0) - 2026-03-04
 
