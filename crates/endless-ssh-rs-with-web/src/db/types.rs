@@ -113,7 +113,7 @@ pub struct ConnectionRecord {
     pub longitude: Option<f64>,
 }
 
-/// All-time aggregate totals for the WS init payload.
+/// All-time aggregate totals for the WebSocket init payload.
 #[expect(clippy::struct_field_names, reason = "Clarity")]
 pub struct AllTimeTotals {
     pub total_connections: i64,
