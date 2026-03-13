@@ -26,6 +26,9 @@ export interface DisconnectedEvent {
 export interface InitEvent {
     type: "init";
     active_connections: ActiveConnection[];
+    total_connections: number;
+    total_bytes_sent: number;
+    total_time_spent: number;
 }
 
 export interface ReadyEvent {

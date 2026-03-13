@@ -10,7 +10,7 @@ use sqlx::{PgPool, Row as _};
 use time::{Duration, OffsetDateTime};
 use tracing::{Level, event};
 
-use crate::db::types::{ConnectionRecord, DbDuration, DbIpAddr, Limit};
+use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, Limit};
 use crate::geoip::GeoInfo;
 use crate::utils::ser_helpers::as_secs;
 
@@ -44,6 +44,8 @@ pub async fn insert_connection(
             );
         })
         .unwrap_or(i64::MAX);
+
+    let mut tx = pool.begin().await?;
 
     let id: i64 = sqlx::query_scalar!(
         r#"
@@ -82,8 +84,25 @@ pub async fn insert_connection(
         geo.and_then(|g| g.latitude),
         geo.and_then(|g| g.longitude)
     )
-    .fetch_one(pool)
+    .fetch_one(&mut *tx)
     .await?;
+
+    sqlx::query!(
+        r#"
+        UPDATE totals
+        SET
+            total_connections = total_connections + 1
+            , total_bytes_sent = total_bytes_sent + $1
+            , total_time_spent = total_time_spent + $2
+        WHERE id = 1
+        "#,
+        bytes_sent,
+        DbDuration(time_spent) as _,
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
 
     Ok(id)
 }
@@ -137,6 +156,24 @@ pub fn get_connections_since(
         limit as _
     )
     .fetch(pool)
+}
+
+pub async fn get_totals(pool: &PgPool) -> Result<AllTimeTotals, sqlx::Error> {
+    let row = sqlx::query_as!(
+        AllTimeTotals,
+        r#"
+        SELECT
+            total_connections AS "total_connections!: i64"
+            , total_bytes_sent AS "total_bytes_sent!: i64"
+            , total_time_spent AS "total_time_spent!: DbDuration"
+        FROM totals
+        WHERE id = 1
+        "#
+    )
+    .fetch_one(pool)
+    .await?;
+
+    Ok(row)
 }
 
 /// Aggregated stats returned by the `/api/stats` endpoint.
