@@ -1,4 +1,26 @@
 <!-- header goes here -->
+## [0.6.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.5.0..v0.6.0) - 2026-03-13
+
+### 🚀 Features
+
+- Separate totals table by @kristof-mattei ([`1a21378`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1a21378a6341d1b328c718e89e3a572d614d05d7))
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate clap to 4.5.61 by @renovate[bot] ([`8b910a1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8b910a103726e054ce5dfc4cbdeac60e424f53a0))
+- *(deps)* Update rust crate clap to 4.6.0 by @renovate[bot] ([`3fcdbe0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3fcdbe05a6b628a1a358551ac4e0a7898fbb4336))
+- *(deps)* Update maplibre-gl (npm) to v5.20.1 by @renovate[bot] ([`f23ac20`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f23ac201c2f455702364ec034b9855ee2d956bf1))
+- *(deps)* Update rust crate tracing-subscriber to 0.3.23 by @renovate[bot] ([`0b76778`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0b767788932497ef718512c6793224bb9c298213))
+- Embed the calculated version in the image label, not the PR it came from by @kristof-mattei ([`654a96c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/654a96c34a4b33e89f2b6eecc443d8097b5cd1c2))
+- Use wildcard by @kristof-mattei ([`084bbe6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/084bbe674e2892d3208daea1f1f473e7b4c9b8bc))
+- Remove border around page by @kristof-mattei ([`b7a0335`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b7a03355484a23483a03fcb2e6cde39fde5a74c0))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.6.0
+- Lowercase variables by @kristof-mattei ([`dff26ac`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/dff26ac37a1826cf3b57c9c848aba1a9de9e5d67))
+- Lowercase variables & path hygiene by @kristof-mattei ([`668015d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/668015dbabaf3cf2f2480896ed7737e4b8f7490c))
+- Spellcheck by @kristof-mattei ([`a6073f7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a6073f70a5b18cc478b60594eba709c3c8a264d9))
 ## [0.5.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.4.0..v0.5.0) - 2026-03-12
 
 ### 🚀 Features
@@ -20,7 +42,7 @@
 
 - *(ci)* Allow empty by @kristof-mattei ([`e6ce7fb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e6ce7fbb2a3ceb423c1c822dca92049f70f43ea2))
 - *(ci)* Comment cleanup by @kristof-mattei ([`4fa99d9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4fa99d9cace57656b0c725fa995cbf85cedd07b4))
-- *(release)* Release v0.5.0
+- *(release)* Release v0.5.0 by @github-actions[bot] ([`ed192a6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ed192a6d6e2a9ae0fe2367a79a56bf1a5ca8769e))
 - Clean up ignore by @kristof-mattei ([`404a01e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/404a01e12c18e72240ce1f85a49ee6aa8fc9e403))
 - Rust 1.94.0 Docker by @kristof-mattei ([`9427eb1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9427eb18b46bf01da1357e3d83312f0846aa42ae))
 - Pin sha for Rust image by @kristof-mattei ([`e2986db`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e2986db43914999be69f279056fd5be0908f7216))
