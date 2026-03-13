@@ -7,7 +7,7 @@ use tokio::sync::broadcast;
 use tracing::{Level, event};
 
 use crate::db;
-use crate::db::types::{ConnectionRecord, Limit};
+use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, Limit};
 use crate::events::{ActiveConnectionInfo, WsEvent};
 use crate::state::ApplicationState;
 
@@ -31,11 +31,18 @@ pub async fn ws_handler(
 async fn send_init_payload(
     socket: &mut WebSocket,
     active_connections: Vec<ActiveConnectionInfo>,
+    totals: AllTimeTotals,
 ) -> Result<(), ()> {
-    let init_payload = match serde_json::to_string(&WsEvent::Init { active_connections }) {
+    let init_payload = match serde_json::to_string(&WsEvent::Init {
+        active_connections,
+        total_connections: totals.total_connections,
+        total_bytes_sent: totals.total_bytes_sent,
+        total_time_spent: totals.total_time_spent.into(),
+    }) {
         Ok(s) => s,
         Err(error) => {
             event!(Level::ERROR, ?error, "Failed to serialize init message");
+
             return Err(());
         },
     };
@@ -112,7 +119,20 @@ async fn handle_socket(
         .map(|v| v.value().clone())
         .collect::<Vec<ActiveConnectionInfo>>();
 
-    send_init_payload(&mut socket, active).await?;
+    let totals = match db::get_totals(&state.db_pool).await {
+        Ok(t) => t,
+        Err(error) => {
+            event!(Level::ERROR, ?error, "Failed to query all-time totals");
+
+            AllTimeTotals {
+                total_connections: 0,
+                total_bytes_sent: 0,
+                total_time_spent: DbDuration(time::Duration::ZERO),
+            }
+        },
+    };
+
+    send_init_payload(&mut socket, active, totals).await?;
 
     // replay history all connections with id > since
     let since_id = params.since.unwrap_or(0);

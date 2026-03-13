@@ -33,6 +33,10 @@ pub enum ClientEvent {
 pub enum WsEvent {
     Init {
         active_connections: Vec<ActiveConnectionInfo>,
+        total_connections: i64,
+        total_bytes_sent: i64,
+        #[serde(serialize_with = "as_secs")]
+        total_time_spent: Duration,
     },
     Ready,
     Connected {

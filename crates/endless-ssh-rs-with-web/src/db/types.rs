@@ -98,7 +98,6 @@ impl From<DbDuration> for Duration {
 }
 
 /// Raw connection record.
-#[derive(Debug, Clone)]
 pub struct ConnectionRecord {
     pub id: i64,
     pub ip_address: DbIpAddr,
@@ -112,4 +111,12 @@ pub struct ConnectionRecord {
     pub city: Option<String>,
     pub latitude: Option<f64>,
     pub longitude: Option<f64>,
+}
+
+/// All-time aggregate totals for the WebSocket init payload.
+#[expect(clippy::struct_field_names, reason = "Clarity")]
+pub struct AllTimeTotals {
+    pub total_connections: i64,
+    pub total_bytes_sent: i64,
+    pub total_time_spent: DbDuration,
 }

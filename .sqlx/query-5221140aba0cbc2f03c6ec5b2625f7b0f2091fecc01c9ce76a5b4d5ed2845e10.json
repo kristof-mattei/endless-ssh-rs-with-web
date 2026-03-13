@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE totals\n        SET\n            total_connections = total_connections + 1\n            , total_bytes_sent = total_bytes_sent + $1\n            , total_time_spent = total_time_spent + $2\n        WHERE id = 1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Interval"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5221140aba0cbc2f03c6ec5b2625f7b0f2091fecc01c9ce76a5b4d5ed2845e10"
+}

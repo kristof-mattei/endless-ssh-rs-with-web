@@ -21,15 +21,20 @@ export const App: React.FC = () => {
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
     const seenSeqReference = useRef<Set<number>>(new Set());
+    const isLiveReference = useRef(false);
 
     const handleEvent = useCallback((wsEvent: WsEvent) => {
         switch (wsEvent.type) {
             case "init": {
+                isLiveReference.current = false;
                 setActiveConnections(wsEvent.active_connections);
+                setTotalConnections(wsEvent.total_connections);
+                setTotalBytes(wsEvent.total_bytes_sent);
+                setTotalTimeSecs(wsEvent.total_time_spent);
                 break;
             }
             case "ready": {
-                // history replay done, no action needed
+                isLiveReference.current = true;
                 break;
             }
             case "connected": {
@@ -77,17 +82,19 @@ export const App: React.FC = () => {
                     return [...previous, wsEvent];
                 });
 
-                setTotalConnections((n) => {
-                    return n + 1;
-                });
+                if (isLiveReference.current) {
+                    setTotalConnections((n) => {
+                        return n + 1;
+                    });
 
-                setTotalBytes((n) => {
-                    return n + wsEvent.bytes_sent;
-                });
+                    setTotalBytes((n) => {
+                        return n + wsEvent.bytes_sent;
+                    });
 
-                setTotalTimeSecs((n) => {
-                    return n + wsEvent.time_spent;
-                });
+                    setTotalTimeSecs((n) => {
+                        return n + wsEvent.time_spent;
+                    });
+                }
 
                 break;
             }
