@@ -3,10 +3,11 @@ use std::sync::Arc;
 
 use color_eyre::eyre;
 use time::OffsetDateTime;
-use tokio::net::{TcpListener, TcpStream};
+use tokio::net::TcpListener;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::{Semaphore, TryAcquireError};
 use tokio_util::sync::CancellationToken;
+use tokio_util::task::TaskTracker;
 use tracing::{Level, event};
 
 use crate::SIZE_IN_BYTES;
@@ -18,13 +19,19 @@ use crate::statistics::StatisticsMessage;
 
 struct Listener<'c> {
     config: &'c Config,
-    listener: TcpListener,
+    #[expect(clippy::struct_field_names, reason = "Clarity")]
+    tcp_listener: TcpListener,
+    client_task_tracker: TaskTracker,
+    cancellation_token: CancellationToken,
+    internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
+    semaphore: Arc<Semaphore>,
+    statistics_sender: UnboundedSender<StatisticsMessage>,
 }
 
 pub async fn listen_for_new_connections(
     config: Arc<Config>,
     cancellation_token: CancellationToken,
-    client_sender: tokio::sync::mpsc::UnboundedSender<Client<TcpStream>>,
+    client_task_tracker: TaskTracker,
     internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
     semaphore: Arc<Semaphore>,
     statistics_sender: UnboundedSender<StatisticsMessage>,
@@ -32,7 +39,16 @@ pub async fn listen_for_new_connections(
     let _guard = cancellation_token.clone().drop_guard();
 
     // listen forever, accept new clients
-    let listener = match Listener::bind(&config).await {
+    let listener = match Listener::bind(
+        &config,
+        client_task_tracker,
+        cancellation_token.clone(),
+        internal_events_tx,
+        semaphore,
+        statistics_sender,
+    )
+    .await
+    {
         Ok(l) => l,
         Err(error) => {
             event!(Level::ERROR, ?error);
@@ -40,37 +56,40 @@ pub async fn listen_for_new_connections(
         },
     };
 
-    event!(Level::INFO, listener = ?listener.listener, "Bound and listening!");
+    event!(Level::INFO, listener = ?listener.tcp_listener, "Bound and listening!");
 
     loop {
-        let accept = listener.accept(
-            &client_sender,
-            &internal_events_tx,
-            Arc::clone(&semaphore),
-            &statistics_sender,
-        );
-
         let result = tokio::select! {
             biased;
             () = cancellation_token.cancelled() => {
                 break;
             },
-            result = accept => {
+            result = listener.accept() => {
                 result
             },
         };
 
         if let Err(error) = result {
-            event!(Level::ERROR, ?error);
+            event!(
+                Level::ERROR,
+                ?error,
+                "Failed to accept new connection, aborting."
+            );
 
-            // TODO properly log errors
             break;
         }
     }
 }
 
 impl<'c> Listener<'c> {
-    pub async fn bind(config: &'c Config) -> Result<Self, eyre::Report> {
+    pub async fn bind(
+        config: &'c Config,
+        client_task_tracker: TaskTracker,
+        cancellation_token: CancellationToken,
+        internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
+        semaphore: Arc<Semaphore>,
+        statistics_sender: UnboundedSender<StatisticsMessage>,
+    ) -> Result<Self, eyre::Report> {
         let sa = match config.bind_family {
             BindFamily::Ipv4 => {
                 SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, config.port.get()))
@@ -88,20 +107,22 @@ impl<'c> Listener<'c> {
 
         let listener = TcpListener::bind(sa).await?;
 
-        Ok(Self { config, listener })
+        Ok(Self {
+            config,
+            tcp_listener: listener,
+            client_task_tracker,
+            cancellation_token,
+            internal_events_tx,
+            semaphore,
+            statistics_sender,
+        })
     }
 
-    pub async fn accept(
-        &self,
-        client_sender: &UnboundedSender<Client<TcpStream>>,
-        internal_events_tx: &tokio::sync::mpsc::Sender<ClientEvent>,
-        semaphore: Arc<Semaphore>,
-        statistics_sender: &UnboundedSender<StatisticsMessage>,
-    ) -> Result<(), eyre::Report> {
-        let accept = self.listener.accept().await;
+    pub async fn accept(&self) -> Result<(), eyre::Report> {
+        let accept = self.tcp_listener.accept().await;
 
         {
-            statistics_sender
+            self.statistics_sender
                 .send(StatisticsMessage::NewClient)
                 .expect("Channel should always exist");
         }
@@ -119,7 +140,7 @@ impl<'c> Listener<'c> {
                 } else {
                     // we do try_acquire because either we can add the client or we cannot
                     // no in-between, no sense in waiting
-                    match Arc::clone(&semaphore).try_acquire_owned() {
+                    match Arc::clone(&self.semaphore).try_acquire_owned() {
                         Ok(permit) => {
                             let connected_at = OffsetDateTime::now_utc();
 
@@ -129,19 +150,24 @@ impl<'c> Listener<'c> {
                                 connected_at,
                                 connected_at + self.config.delay,
                                 permit,
-                                internal_events_tx.clone(),
+                                self.internal_events_tx.clone(),
                             );
 
-                            // we have a permit, we can send it on the queue
-                            client_sender.send(client)?;
+                            self.client_task_tracker.spawn(client.listen_forever(
+                                self.cancellation_token.clone(),
+                                self.config.delay,
+                                self.config.max_line_length,
+                                self.statistics_sender.clone(),
+                            ));
 
-                            // now that the client is registred, broadcast for the dashboard
-                            let _r = internal_events_tx
+                            // now that the client is registered, broadcast for the dashboard
+                            let _r = self
+                                .internal_events_tx
                                 .send(ClientEvent::Connected { addr, connected_at })
                                 .await;
 
                             let current_clients = usize::from(self.config.max_clients.get())
-                                - semaphore.available_permits();
+                                - self.semaphore.available_permits();
 
                             event!(
                                 Level::INFO,
