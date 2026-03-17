@@ -125,9 +125,19 @@ impl<S> Client<S> {
 
             event!(Level::DEBUG, addr = ?self.addr(), "Processing client");
 
-            if let Ok(bytes_sent) =
-                sender::sendline(&mut self.tcp_stream_mut(), max_line_length.get().into()).await
-            {
+            let mut stream = self.tcp_stream_mut();
+
+            let send_result = tokio::select! {
+                biased;
+                () = cancellation_token.cancelled() => {
+                    return;
+                },
+                result = sender::sendline(&mut stream, max_line_length.get().into()) => {
+                    result
+                },
+            };
+
+            if let Ok(bytes_sent) = send_result {
                 *self.bytes_sent_mut() += bytes_sent;
                 *self.time_spent_mut() += delay;
 
