@@ -1,7 +1,6 @@
 mod build_env;
 mod cli;
 mod client;
-mod client_queue;
 mod config;
 mod db;
 mod events;
@@ -35,7 +34,6 @@ use color_eyre::config::HookBuilder;
 use color_eyre::eyre;
 use dashmap::DashMap;
 use dotenvy::dotenv;
-use tokio::net::TcpStream;
 use tokio::sync::{Semaphore, broadcast};
 use tokio::time::timeout;
 use tokio_util::sync::CancellationToken;
@@ -47,8 +45,6 @@ use tracing_subscriber::{EnvFilter, Layer as _};
 
 use crate::build_env::get_build_env;
 use crate::cli::parse_cli;
-use crate::client::Client;
-use crate::client_queue::process_clients;
 use crate::config::Config;
 use crate::events::{ActiveConnectionInfo, ClientEvent, WsEvent, database_listen_forever};
 use crate::listener::listen_for_new_connections;
@@ -222,18 +218,15 @@ async fn start_tasks() -> Shutdown {
     // tasks and this function, in the case that a task fails, they'll send a message on the shutdown channel
     // after which we'll gracefully terminate other services
     let cancellation_token = CancellationToken::new();
-    let client_cancellation_token = CancellationToken::new();
     let statistics_cancellation_token = CancellationToken::new();
 
     let (statistics_sender, statistics_join_handle) =
         Statistics::new(statistics_cancellation_token.clone());
 
-    // clients channel
-    let (client_sender, client_receiver) =
-        tokio::sync::mpsc::unbounded_channel::<Client<TcpStream>>();
-
     // available slots semaphore
     let semaphore = Arc::new(Semaphore::new(config.max_clients.get().into()));
+
+    let client_tasks = TaskTracker::new();
 
     let application_state = ApplicationState::new(
         states::config::Config {},
@@ -255,22 +248,9 @@ async fn start_tasks() -> Shutdown {
         listen_for_new_connections(
             Arc::clone(&config),
             cancellation_token.clone(),
-            client_sender.clone(),
+            client_tasks.clone(),
             internal_events_tx,
-            Arc::clone(&semaphore),
-            statistics_sender.clone(),
-        ),
-    );
-
-    // listen to new connection channel, convert into client, push to client channel
-    let process_clients_handler = tasks.spawn_with_name(
-        "client processor",
-        process_clients(
-            client_cancellation_token.clone(),
-            config.delay,
-            config.max_line_length,
-            client_sender.clone(),
-            client_receiver,
+            semaphore,
             statistics_sender.clone(),
         ),
     );
@@ -335,15 +315,15 @@ async fn start_tasks() -> Shutdown {
     // backup, in case we forgot a dropguard somewhere
     cancellation_token.cancel();
 
-    client_cancellation_token.cancel();
+    client_tasks.close();
 
-    if timeout(Duration::from_secs(10), process_clients_handler)
+    if timeout(Duration::from_secs(10), client_tasks.wait())
         .await
         .is_err()
     {
         event!(
             Level::ERROR,
-            "Client processor didn't stop within allotted time!"
+            "Client tasks didn't stop within allotted time!"
         );
     }
 

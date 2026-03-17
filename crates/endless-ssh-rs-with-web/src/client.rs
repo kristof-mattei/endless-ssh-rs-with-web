@@ -1,11 +1,16 @@
 use std::net::SocketAddr;
+use std::num::NonZeroU8;
 
 use time::{Duration, OffsetDateTime};
 use tokio::sync::OwnedSemaphorePermit;
-use tokio::sync::mpsc::Sender;
+use tokio::sync::mpsc::{Sender, UnboundedSender};
+use tokio::time::sleep;
+use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
 use crate::events::ClientEvent;
+use crate::sender;
+use crate::statistics::StatisticsMessage;
 
 pub struct Client<S> {
     time_spent: Duration,
@@ -16,27 +21,6 @@ pub struct Client<S> {
     tcp_stream: Option<S>,
     permit: Option<OwnedSemaphorePermit>,
     internal_events_tx: Sender<ClientEvent>,
-}
-
-impl<S> std::cmp::Eq for Client<S> {}
-
-impl<S> std::cmp::PartialEq for Client<S> {
-    fn eq(&self, other: &Self) -> bool {
-        self.addr == other.addr
-    }
-}
-
-impl<S> std::cmp::Ord for Client<S> {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        // flipped to get the oldest first
-        other.send_next.cmp(&self.send_next)
-    }
-}
-
-impl<S> std::cmp::PartialOrd for Client<S> {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
 }
 
 impl<S> std::fmt::Debug for Client<S> {
@@ -104,6 +88,77 @@ impl<S> Client<S> {
 
     pub fn tcp_stream_mut(&mut self) -> &mut S {
         self.tcp_stream.as_mut().unwrap()
+    }
+
+    pub async fn listen_forever(
+        mut self,
+        cancellation_token: CancellationToken,
+        delay: std::time::Duration,
+        max_line_length: NonZeroU8,
+        statistics_sender: UnboundedSender<StatisticsMessage>,
+    ) where
+        S: tokio::io::AsyncWriteExt + std::marker::Unpin + std::fmt::Debug,
+    {
+        loop {
+            let now = OffsetDateTime::now_utc();
+            let client_send_next = self.send_next();
+
+            if client_send_next > now {
+                let until_ready = (client_send_next - now)
+                    .try_into()
+                    .expect("`send_next` is larger than `now`, so duration should be positive");
+
+                event!(Level::TRACE, addr = ?self.addr(), ?until_ready, "Scheduled client");
+
+                tokio::select! {
+                    biased;
+                    () = cancellation_token.cancelled() => {
+                        return;
+                    },
+                    () = sleep(until_ready) => {}
+                }
+            }
+
+            statistics_sender
+                .send(StatisticsMessage::ProcessedClient)
+                .expect("Channel should always exist");
+
+            event!(Level::DEBUG, addr = ?self.addr(), "Processing client");
+
+            let stream = self.tcp_stream_mut();
+
+            let send_result = tokio::select! {
+                biased;
+                () = cancellation_token.cancelled() => {
+                    return;
+                },
+                result = sender::sendline(stream, max_line_length.get().into()) => {
+                    result
+                },
+            };
+
+            if let Ok(bytes_sent) = send_result {
+                *self.bytes_sent_mut() += bytes_sent;
+                *self.time_spent_mut() += delay;
+
+                statistics_sender
+                    .send(StatisticsMessage::BytesSent(bytes_sent))
+                    .expect("Channel should always exist");
+                statistics_sender
+                    .send(StatisticsMessage::TimeSpent(delay))
+                    .expect("Channel should always exist");
+
+                *self.send_next_mut() = OffsetDateTime::now_utc() + delay;
+            } else {
+                statistics_sender
+                    .send(StatisticsMessage::LostClient)
+                    .expect("Channel should always exist");
+
+                event!(Level::TRACE, ?self, "Client gone");
+
+                return;
+            }
+        }
     }
 }
 
