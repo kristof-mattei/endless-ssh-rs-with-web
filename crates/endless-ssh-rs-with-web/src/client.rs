@@ -125,14 +125,14 @@ impl<S> Client<S> {
 
             event!(Level::DEBUG, addr = ?self.addr(), "Processing client");
 
-            let mut stream = self.tcp_stream_mut();
+            let stream = self.tcp_stream_mut();
 
             let send_result = tokio::select! {
                 biased;
                 () = cancellation_token.cancelled() => {
                     return;
                 },
-                result = sender::sendline(&mut stream, max_line_length.get().into()) => {
+                result = sender::sendline(stream, max_line_length.get().into()) => {
                     result
                 },
             };
