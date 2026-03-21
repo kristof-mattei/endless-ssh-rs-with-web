@@ -15,8 +15,11 @@ importers:
       '@recharts/devtools':
         specifier: 0.0.11
         version: 0.0.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(recharts@3.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@16.13.1)(react@19.2.4)(redux@5.0.1))
+      country-flag-emoji-polyfill:
+        specifier: 0.1.8
+        version: 0.1.8
       ip-address:
-        specifier: ^10.1.0
+        specifier: 10.1.0
         version: 10.1.0
       maplibre-gl:
         specifier: 5.21.0
@@ -1322,6 +1325,9 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  country-flag-emoji-polyfill@0.1.8:
+    resolution: {integrity: sha512-Mbah52sADS3gshUYhK5142gtUuJpHYOXlXtLFI3Ly4RqgkmPMvhX9kMZSTqDM8P7UqtSW99eHKFphhQSGXA3Cg==}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -4243,6 +4249,8 @@ snapshots:
       path-type: 4.0.0
     optionalDependencies:
       typescript: 6.0.1-rc
+
+  country-flag-emoji-polyfill@0.1.8: {}
 
   cross-spawn@7.0.6:
     dependencies:

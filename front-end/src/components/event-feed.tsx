@@ -53,12 +53,12 @@ const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
 
     return (
         <div className="flex items-center gap-3 rounded bg-gray-800 px-3 py-2 text-sm">
-            <span className="text-lg" title={event.country_code ?? undefined}>
+            <span className="w-5 text-lg flags-font" title={event.country_code ?? undefined}>
                 {countryFlag(event.country_code)}
             </span>
             <span className="w-50 text-gray-400">{event.city ?? event.country_name ?? "Unknown"}</span>
-            <span className="w-36 truncate font-mono text-gray-300">{ip.is4() ? ip.to4().address : ip.address}</span>
-            <span className="w-300 font-mono text-gray-300 border-1">{disconnectedAt}</span>
+            <span className="w-90 truncate font-mono text-gray-300">{ip.is4() ? ip.to4().address : ip.address}</span>
+            <span className="w-300 font-mono text-gray-300">{disconnectedAt}</span>
             <span className="ml-auto w-20 text-right text-red-400">{formatDuration(event.time_spent)}</span>
             <span className="w-30 text-right text-gray-500">{formatBytes(event.bytes_sent)}</span>
         </div>
