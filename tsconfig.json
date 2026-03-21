@@ -8,7 +8,7 @@
         "esModuleInterop": true,
         "exactOptionalPropertyTypes": true,
         "forceConsistentCasingInFileNames": true,
-        "importHelpers": true,
+        "importHelpers": false,
         "incremental": true,
         "isolatedDeclarations": true,
         "isolatedModules": true,
