@@ -4,7 +4,6 @@ use std::sync::Arc;
 use color_eyre::eyre;
 use time::OffsetDateTime;
 use tokio::net::TcpListener;
-use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::{Semaphore, TryAcquireError};
 use tokio_util::sync::CancellationToken;
 use tokio_util::task::TaskTracker;
@@ -15,7 +14,6 @@ use crate::client::Client;
 use crate::config::{BindFamily, Config};
 use crate::events::ClientEvent;
 use crate::ffi_wrapper::set_receive_buffer_size;
-use crate::statistics::StatisticsMessage;
 
 struct Listener<'c> {
     config: &'c Config,
@@ -25,7 +23,6 @@ struct Listener<'c> {
     cancellation_token: CancellationToken,
     internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
     semaphore: Arc<Semaphore>,
-    statistics_sender: UnboundedSender<StatisticsMessage>,
 }
 
 pub async fn listen_for_new_connections(
@@ -34,7 +31,6 @@ pub async fn listen_for_new_connections(
     client_task_tracker: TaskTracker,
     internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
     semaphore: Arc<Semaphore>,
-    statistics_sender: UnboundedSender<StatisticsMessage>,
 ) {
     let _guard = cancellation_token.clone().drop_guard();
 
@@ -45,7 +41,6 @@ pub async fn listen_for_new_connections(
         cancellation_token.clone(),
         internal_events_tx,
         semaphore,
-        statistics_sender,
     )
     .await
     {
@@ -88,7 +83,6 @@ impl<'c> Listener<'c> {
         cancellation_token: CancellationToken,
         internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
         semaphore: Arc<Semaphore>,
-        statistics_sender: UnboundedSender<StatisticsMessage>,
     ) -> Result<Self, eyre::Report> {
         let sa = match config.bind_family {
             BindFamily::Ipv4 => {
@@ -114,18 +108,11 @@ impl<'c> Listener<'c> {
             cancellation_token,
             internal_events_tx,
             semaphore,
-            statistics_sender,
         })
     }
 
     pub async fn accept(&self) -> Result<(), eyre::Report> {
         let accept = self.tcp_listener.accept().await;
-
-        {
-            self.statistics_sender
-                .send(StatisticsMessage::NewClient)
-                .expect("Channel should always exist");
-        }
 
         match accept {
             Ok((socket, addr)) => {
@@ -157,7 +144,6 @@ impl<'c> Listener<'c> {
                                 self.cancellation_token.clone(),
                                 self.config.delay,
                                 self.config.max_line_length,
-                                self.statistics_sender.clone(),
                             ));
 
                             // now that the client is registered, broadcast for the dashboard
