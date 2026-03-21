@@ -1,14 +1,16 @@
 import type React from "react";
 import { useCallback, useRef, useState } from "react";
 
-import { EventFeed } from "@/components/event-feed.tsx";
-import { StatsChart } from "@/components/stats-chart.tsx";
-import { StatsPanel } from "@/components/stats-panel.tsx";
-import { TimeRangeSelector } from "@/components/time-range-selector.tsx";
-import type { StatsData } from "@/components/time-range-selector.tsx";
-import { WorldMap } from "@/components/world-map.tsx";
-import type { ActiveConnection, DisconnectedEvent, WsEvent } from "@/hooks/use-web-sockets.ts";
-import { useWebSocket } from "@/hooks/use-web-sockets.ts";
+import type { ActiveConnection, DisconnectedEvent, WsEvent } from "../hooks/use-web-sockets";
+
+import { useWebSocket } from "../hooks/use-web-sockets";
+
+import { EventFeed } from "./event-feed";
+import { StatsChart } from "./stats-chart";
+import { StatsPanel } from "./stats-panel";
+import { TimeRangeSelector } from "./time-range-selector";
+import type { StatsData } from "./time-range-selector";
+import { WorldMap } from "./world-map";
 
 const MAX_EVENTS = 100;
 

@@ -7,8 +7,9 @@ import { loadEnv } from "vite";
 import { checker } from "vite-plugin-checker";
 import svgr from "vite-plugin-svgr";
 import { coverageConfigDefaults, defineConfig } from "vitest/config";
+import type { ViteUserConfigFn } from "vitest/config";
 
-export default defineConfig(({ mode }) => {
+const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
     const environment = loadEnv(mode, process.cwd(), "");
     const port = Number.parseInt(environment["VITE_PORT"] ?? "");
 
@@ -91,3 +92,5 @@ export default defineConfig(({ mode }) => {
 
     return config;
 });
+
+export default configFunction;

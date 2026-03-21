@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "allowImportingTsExtensions": true,
+        "allowImportingTsExtensions": false,
         "allowSyntheticDefaultImports": true,
         "alwaysStrict": true,
         "declaration": true,
@@ -8,12 +8,14 @@
         "esModuleInterop": true,
         "exactOptionalPropertyTypes": true,
         "forceConsistentCasingInFileNames": true,
+        "importHelpers": true,
         "incremental": true,
+        "isolatedDeclarations": true,
         "isolatedModules": true,
         "jsx": "react-jsxdev",
-        "module": "nodenext",
+        "module": "preserve",
         "moduleDetection": "force",
-        "moduleResolution": "nodenext",
+        "moduleResolution": "bundler",
         "noEmit": true,
         "noFallthroughCasesInSwitch": true,
         "noImplicitAny": true,
@@ -25,9 +27,7 @@
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "paths": {
-            "@/*": ["./front-end/src/*"]
-        },
+        "paths": {},
         "preserveConstEnums": true,
         "resolveJsonModule": true,
         "resolvePackageJsonExports": true,
@@ -46,6 +46,7 @@
         "useUnknownInCatchVariables": true,
         "verbatimModuleSyntax": true
     },
+    "exclude": ["dist/"],
     "include": [
         "front-end/**/*.ts",
         "front-end/**/*.tsx",

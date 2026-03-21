@@ -14,10 +14,11 @@ import {
     createHorizontalChart,
 } from "recharts";
 
-import type { Payload } from "recharts/types/component/DefaultTooltipContent.d.ts";
+import type { Payload } from "recharts/types/component/DefaultTooltipContent";
 
-import type { StatsRow } from "@/components/time-range-selector.tsx";
-import { formatBytes, formatDuration } from "@/lib/formatting.ts";
+import { formatBytes, formatDuration } from "../lib/formatting";
+
+import type { StatsRow } from "./time-range-selector";
 
 interface BucketPointValues {
     bytes_sent: number;

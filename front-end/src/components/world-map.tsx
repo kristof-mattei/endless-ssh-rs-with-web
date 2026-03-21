@@ -3,7 +3,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import type React from "react";
 import { Map, Marker } from "react-map-gl/maplibre";
 
-import type { ActiveConnection } from "@/hooks/use-web-sockets.ts";
+import type { ActiveConnection } from "../hooks/use-web-sockets";
 
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 

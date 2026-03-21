@@ -1,6 +1,6 @@
 import type React from "react";
 
-import { formatBytes, formatDuration } from "@/lib/formatting.ts";
+import { formatBytes, formatDuration } from "../lib/formatting";
 
 interface Properties {
     totalConnections: number;

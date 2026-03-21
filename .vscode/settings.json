@@ -1,7 +1,7 @@
 {
     "debug.internalConsoleOptions": "neverOpen",
-    "js/ts.preferences.importModuleSpecifier": "non-relative",
-    "js/ts.preferences.importModuleSpecifierEnding": "js",
+    "js/ts.preferences.importModuleSpecifier": "relative",
+    "js/ts.preferences.importModuleSpecifierEnding": "minimal",
     "js/ts.tsdk.path": "node_modules/typescript/lib",
     "lldb.launch.expressions": "simple",
     "lldb.launch.terminal": "integrated",
