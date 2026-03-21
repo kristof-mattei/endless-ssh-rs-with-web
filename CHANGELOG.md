@@ -1,4 +1,13 @@
 <!-- header goes here -->
+## [0.7.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.6.1..v0.7.0) - 2026-03-21
+
+### 🚀 Features
+
+- Use temporal to render disconnected date by @kristof-mattei ([`fc588fa`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fc588fac69ae3fbed9286d49e7187c00de08c64a))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.7.0
 ## [0.6.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.6.0..v0.6.1) - 2026-03-21
 
 ### 🐛 Bug Fixes
@@ -13,7 +22,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.6.1
+- *(release)* Release v0.6.1 by @github-actions[bot] ([`e685bd2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e685bd2ba03af8291d442dc0a9fa44421e040942))
 - Disable formatting on push to main, different array syntax by @kristof-mattei ([`c1d61b0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c1d61b06948c3bde697272a21bd27c66d0cb5fd8))
 - Force new version by @kristof-mattei ([`8d63f6a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8d63f6ac9c2487ee800ae92882f18df310d86f28))
 - Allow cancelling mid-send by @kristof-mattei ([`577f222`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/577f2221959614ff534bfc5704ff178f5ac7c080))
