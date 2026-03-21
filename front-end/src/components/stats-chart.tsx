@@ -1,7 +1,6 @@
-import { RechartsDevtools } from "@recharts/devtools";
 import type React from "react";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import type { TooltipContentProps } from "recharts";
 import {
     Bar,
@@ -37,6 +36,16 @@ const METRICS: readonly { value: Metric; label: string }[] = [
     { value: "bytes_sent", label: "Bytes wasted" },
     { value: "time_spent", label: "Time wasted" },
 ];
+
+const RechartsDevelopmentTools = import.meta.env.DEV
+    ? lazy(async () => {
+          const module = await import("@recharts/devtools");
+
+          return { default: module.RechartsDevtools };
+      })
+    : () => {
+          return null;
+      };
 
 function formatYLabel(metric: Metric, value: number): string {
     switch (metric) {
@@ -264,7 +273,11 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                                 />
                             );
                         })}
-                        <RechartsDevtools />
+                        {import.meta.env.DEV && (
+                            <Suspense fallback={null}>
+                                <RechartsDevelopmentTools />
+                            </Suspense>
+                        )}
                     </Typed.BarChart>
                 </ResponsiveContainer>
             )}
