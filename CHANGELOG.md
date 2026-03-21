@@ -1,4 +1,27 @@
 <!-- header goes here -->
+## [0.6.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.6.0..v0.6.1) - 2026-03-21
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update maplibre-gl (npm) to v5.20.2 by @renovate[bot] ([`e0398f6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e0398f6792be7bc4e35eb48560b274b5553fca16))
+- *(deps)* Update rust crate tar to 0.4.45 by @renovate[bot] ([`e38f1ac`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e38f1ac204717f96190c9872eabd2897c1725ec9))
+- *(deps)* Update maplibre-gl (npm) to v5.21.0 by @renovate[bot] ([`e586f31`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e586f31a7a11e28b328897fbdff4410e215a2ba6))
+- Make clients run themselves by @kristof-mattei ([`c9147da`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c9147dac0c8af6884fa5ec38e6ac178f60007ae9))
+- Correct path by @kristof-mattei ([`79a0291`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/79a029190ae80e1293ae8cec675bd7bd48260566))
+- Remove redundant &mut by @kristof-mattei ([`f95160f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f95160f2f50da767736d0fc806bd7680d65720c0))
+- `std::mem::zeroed()` asserts that all zeroes is valid for the struct by @kristof-mattei ([`27578b6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/27578b6de7eba37f39f8e0ab485090ce01224248))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.6.1
+- Disable formatting on push to main, different array syntax by @kristof-mattei ([`c1d61b0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c1d61b06948c3bde697272a21bd27c66d0cb5fd8))
+- Force new version by @kristof-mattei ([`8d63f6a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8d63f6ac9c2487ee800ae92882f18df310d86f28))
+- Allow cancelling mid-send by @kristof-mattei ([`577f222`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/577f2221959614ff534bfc5704ff178f5ac7c080))
+- Use variable to prevent quotes from messing up command by @kristof-mattei ([`a8b7ee2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a8b7ee2b27e83dbf671da3894a7cc761dc144874))
+- Pin version of timescaledb by @kristof-mattei ([`9c977e5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9c977e5559b10d10f96179927ae400a7523685e6))
+- Remove statistics, they were per-process lifetime by @kristof-mattei ([`476d945`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/476d9459a3b44e6beebf97b9502874fb4f6f7c9b))
+- Enable todo lint by @kristof-mattei ([`9845400`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/98454009112fecde7fe758f3034ae7d5c0e33bbd))
+- Detect when client disappears, instead of waiting when send fails by @kristof-mattei ([`e30dca0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e30dca0dda708f249320997b05b29abfb81f79ba))
 ## [0.6.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.5.0..v0.6.0) - 2026-03-13
 
 ### 🚀 Features
@@ -17,7 +40,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.6.0
+- *(release)* Release v0.6.0 by @github-actions[bot] ([`286c9c9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/286c9c989895adec7e80cad5c25137fd2226050d))
 - Lowercase variables by @kristof-mattei ([`dff26ac`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/dff26ac37a1826cf3b57c9c848aba1a9de9e5d67))
 - Lowercase variables & path hygiene by @kristof-mattei ([`668015d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/668015dbabaf3cf2f2480896ed7737e4b8f7490c))
 - Spellcheck by @kristof-mattei ([`a6073f7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a6073f70a5b18cc478b60594eba709c3c8a264d9))
