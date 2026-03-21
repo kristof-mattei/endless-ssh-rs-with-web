@@ -1,8 +1,8 @@
 import { Address6 } from "ip-address";
 import type React from "react";
 
-import type { DisconnectedEvent } from "@/hooks/use-web-sockets.ts";
-import { formatBytes, formatDuration } from "@/lib/formatting.ts";
+import type { DisconnectedEvent } from "../hooks/use-web-sockets";
+import { formatBytes, formatDuration } from "../lib/formatting";
 
 interface Properties {
     events: DisconnectedEvent[];
