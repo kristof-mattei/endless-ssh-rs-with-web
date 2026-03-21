@@ -1,4 +1,21 @@
 <!-- header goes here -->
+## [0.8.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.7.0..v0.8.0) - 2026-03-21
+
+### 🚀 Features
+
+- Country flags in all browsers by @kristof-mattei ([`4fca80e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4fca80ebccb904de80f05ab04107221a1465cf5f))
+
+### 🐛 Bug Fixes
+
+- Removed comments by @kristof-mattei ([`d925354`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d92535433b84bc9f0ebb353cb87b27e64b65bfbe))
+- Only render chart devtools in dev by @kristof-mattei ([`a071860`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a07186062e4b219e2c0066f6a1958cc5c06da5fa))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.8.0
+- Ts super strict by @kristof-mattei ([`7473c8a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7473c8a8bd0cb3bd5c68ba80085dc313ad3ebabb))
+- Relative paths by @kristof-mattei ([`49378d1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/49378d177546e605e874fe1edf1f2fa7344500c7))
+- Disable importhelpers by @kristof-mattei ([`925e025`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/925e0257d7fd440d8851d222acd173a4b606a86e))
 ## [0.7.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.6.1..v0.7.0) - 2026-03-21
 
 ### 🚀 Features
@@ -7,7 +24,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.7.0
+- *(release)* Release v0.7.0 by @github-actions[bot] ([`25b550e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/25b550ee0588e7eed1dc357dfba0736e662fd50e))
 ## [0.6.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.6.0..v0.6.1) - 2026-03-21
 
 ### 🐛 Bug Fixes
