@@ -1,6 +1,9 @@
+import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
 import { createRoot } from "react-dom/client";
 
 import { App } from "../components/app";
+
+polyfillCountryFlagEmojis();
 
 const container = document.querySelector("#root");
 
