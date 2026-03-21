@@ -499,6 +499,7 @@ jobs:
           cache-from: type=registry,ref=${{ steps.variables.outputs.buildcache_main_ref }}
           cache-to: type=registry,ref=${{ steps.variables.outputs.buildcache_main_ref }},mode=max
           platforms: linux/${{ matrix.platform }}
+          push: true
 
   docker-publish:
     name: Publish Docker container
