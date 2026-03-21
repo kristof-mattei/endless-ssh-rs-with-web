@@ -1,5 +1,3 @@
-import nodePath from "node:path";
-
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
@@ -23,14 +21,11 @@ export default defineConfig(({ mode }) => {
             emptyOutDir: true,
             sourcemap: true,
             outDir: "../../dist",
-            rollupOptions: {
+            rolldownOptions: {
                 output: {},
             },
         },
         resolve: {
-            alias: {
-                "@/": nodePath.resolve("src/"),
-            },
             tsconfigPaths: true,
         },
         plugins: [

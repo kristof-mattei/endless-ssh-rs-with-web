@@ -1,36 +1,50 @@
 {
     "compilerOptions": {
         "allowImportingTsExtensions": true,
+        "allowSyntheticDefaultImports": true,
+        "alwaysStrict": true,
+        "declaration": true,
+        "declarationMap": true,
         "esModuleInterop": true,
         "exactOptionalPropertyTypes": true,
         "forceConsistentCasingInFileNames": true,
         "incremental": true,
         "isolatedModules": true,
         "jsx": "react-jsxdev",
-        "module": "preserve",
-        "moduleResolution": "bundler",
+        "module": "nodenext",
+        "moduleDetection": "force",
+        "moduleResolution": "nodenext",
         "noEmit": true,
         "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
         "noImplicitOverride": true,
         "noImplicitReturns": true,
+        "noImplicitThis": true,
         "noPropertyAccessFromIndexSignature": true,
         "noUncheckedIndexedAccess": true,
         "noUncheckedSideEffectImports": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "paths": {
-            "@/*": [
-                "./front-end/src/*",
-            ]
+            "@/*": ["./front-end/src/*"]
         },
+        "preserveConstEnums": true,
         "resolveJsonModule": true,
+        "resolvePackageJsonExports": true,
+        "resolvePackageJsonImports": true,
         "skipLibCheck": true,
         "sourceMap": true,
         "strict": true,
+        "strictBindCallApply": true,
+        "strictBuiltinIteratorReturn": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
         "target": "esnext",
-        "types": [
-            "vite/client",
-        ]
+        "types": ["vite/client"],
+        "useDefineForClassFields": true,
+        "useUnknownInCatchVariables": true,
+        "verbatimModuleSyntax": true
     },
     "include": [
         "front-end/**/*.ts",
@@ -41,6 +55,6 @@
         "dependency-cruiser.config.mjs",
         "eslint.config.mjs",
         "prettier.config.mjs",
-        "tailwind.config.mjs",
+        "tailwind.config.mjs"
     ]
 }

@@ -14,7 +14,7 @@ import {
     createHorizontalChart,
 } from "recharts";
 
-import type { Payload } from "recharts/types/component/DefaultTooltipContent";
+import type { Payload } from "recharts/types/component/DefaultTooltipContent.d.ts";
 
 import type { StatsRow } from "@/components/time-range-selector.tsx";
 import { formatBytes, formatDuration } from "@/lib/formatting.ts";
