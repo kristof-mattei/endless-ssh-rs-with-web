@@ -216,6 +216,7 @@ async fn start_tasks() -> Shutdown {
     // tasks and this function, in the case that a task fails, they'll send a message on the shutdown channel
     // after which we'll gracefully terminate other services
     let cancellation_token = CancellationToken::new();
+    let client_cancellation_token = cancellation_token.child_token();
 
     // available slots semaphore
     let semaphore = Arc::new(Semaphore::new(config.max_clients.get().into()));
@@ -237,16 +238,25 @@ async fn start_tasks() -> Shutdown {
         set_up_server(application_state, cancellation_token.clone()),
     );
 
-    tasks.spawn_with_name(
-        "connection listener",
-        listen_for_new_connections(
-            Arc::clone(&config),
-            cancellation_token.clone(),
-            client_tasks.clone(),
-            internal_events_tx,
-            semaphore,
-        ),
-    );
+    {
+        let cancellation_token = cancellation_token.clone();
+        let client_tasks = client_tasks.clone();
+        let client_cancellation_token = client_cancellation_token.clone();
+
+        tasks.spawn_with_name("connection listener", async move {
+            let _guard = cancellation_token.drop_guard_ref();
+            let _client_guard = client_cancellation_token.clone().drop_guard();
+
+            listen_for_new_connections(
+                Arc::clone(&config),
+                client_cancellation_token,
+                client_tasks,
+                internal_events_tx,
+                semaphore,
+            )
+            .await;
+        });
+    }
 
     {
         let cancellation_token = cancellation_token.clone();
@@ -259,7 +269,7 @@ async fn start_tasks() -> Shutdown {
             let _guard = cancellation_token.clone().drop_guard();
 
             database_listen_forever(
-                cancellation_token.clone(),
+                cancellation_token,
                 db_pool,
                 geo_ip,
                 internal_events_rx,
@@ -300,11 +310,10 @@ async fn start_tasks() -> Shutdown {
         },
     }
 
-    // backup, in case we forgot a dropguard somewhere
-    cancellation_token.cancel();
-
+    client_cancellation_token.cancel();
     client_tasks.close();
 
+    // drain clients
     if timeout(Duration::from_secs(10), client_tasks.wait())
         .await
         .is_err()
@@ -314,6 +323,9 @@ async fn start_tasks() -> Shutdown {
             "Client tasks didn't stop within allotted time!"
         );
     }
+
+    // cancel main, in case we forgot a dropguard somewhere
+    cancellation_token.cancel();
 
     // wait for the other tasks to shut down gracefully
     if timeout(Duration::from_secs(10), tasks.wait())
