@@ -17,7 +17,6 @@ mod signal_handlers;
 mod span;
 mod state;
 mod states;
-mod statistics;
 mod task_tracker_ext;
 mod test_utils;
 mod timeout;
@@ -52,7 +51,6 @@ use crate::router::build_router;
 use crate::server::setup_server;
 use crate::shutdown::Shutdown;
 use crate::state::ApplicationState;
-use crate::statistics::{Statistics, statistics_sigusr1_handler};
 use crate::task_tracker_ext::TaskTrackerExt as _;
 use crate::utils::flatten_shutdown_handle;
 use crate::utils::task::spawn_with_name;
@@ -218,10 +216,6 @@ async fn start_tasks() -> Shutdown {
     // tasks and this function, in the case that a task fails, they'll send a message on the shutdown channel
     // after which we'll gracefully terminate other services
     let cancellation_token = CancellationToken::new();
-    let statistics_cancellation_token = CancellationToken::new();
-
-    let (statistics_sender, statistics_join_handle) =
-        Statistics::new(statistics_cancellation_token.clone());
 
     // available slots semaphore
     let semaphore = Arc::new(Semaphore::new(config.max_clients.get().into()));
@@ -251,13 +245,7 @@ async fn start_tasks() -> Shutdown {
             client_tasks.clone(),
             internal_events_tx,
             semaphore,
-            statistics_sender.clone(),
         ),
-    );
-
-    tasks.spawn_with_name(
-        "sigusr1 handler",
-        statistics_sigusr1_handler(cancellation_token.clone(), statistics_sender.clone()),
     );
 
     {
@@ -325,21 +313,6 @@ async fn start_tasks() -> Shutdown {
             Level::ERROR,
             "Client tasks didn't stop within allotted time!"
         );
-    }
-
-    {
-        // cancel the statistics handler now that the client processor is gone
-        statistics_cancellation_token.cancel();
-
-        // wait for abort and do a final abort
-        match statistics_join_handle.await {
-            Ok(statistics) => {
-                statistics.log_totals();
-            },
-            Err(error) => {
-                return Shutdown::from(error);
-            },
-        }
     }
 
     // wait for the other tasks to shut down gracefully

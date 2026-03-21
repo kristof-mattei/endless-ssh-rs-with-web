@@ -37,19 +37,6 @@ pub async fn wait_for_sigint() -> Result<(), std::io::Error> {
     Ok(())
 }
 
-/// Waits forever for a `SIGUSR1`.
-pub async fn wait_for_sigusr1() -> Result<(), std::io::Error> {
-    #[cfg(not(any(target_os = "windows", miri)))]
-    {
-        signal(SignalKind::user_defined1())?.recv().await;
-    };
-
-    #[cfg(any(target_os = "windows", miri))]
-    let _r = std::future::pending::<Result<(), std::io::Error>>().await;
-
-    Ok(())
-}
-
 #[expect(unused, reason = "Unused")]
 pub fn set_up_handler(
     signum: c_int,

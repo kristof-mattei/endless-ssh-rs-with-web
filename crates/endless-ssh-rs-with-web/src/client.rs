@@ -3,14 +3,13 @@ use std::num::NonZeroU8;
 
 use time::{Duration, OffsetDateTime};
 use tokio::sync::OwnedSemaphorePermit;
-use tokio::sync::mpsc::{Sender, UnboundedSender};
+use tokio::sync::mpsc::Sender;
 use tokio::time::sleep;
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
 use crate::events::ClientEvent;
 use crate::sender;
-use crate::statistics::StatisticsMessage;
 
 pub struct Client<S> {
     time_spent: Duration,
@@ -95,7 +94,6 @@ impl<S> Client<S> {
         cancellation_token: CancellationToken,
         delay: std::time::Duration,
         max_line_length: NonZeroU8,
-        statistics_sender: UnboundedSender<StatisticsMessage>,
     ) where
         S: tokio::io::AsyncWriteExt + std::marker::Unpin + std::fmt::Debug,
     {
@@ -119,10 +117,6 @@ impl<S> Client<S> {
                 }
             }
 
-            statistics_sender
-                .send(StatisticsMessage::ProcessedClient)
-                .expect("Channel should always exist");
-
             event!(Level::DEBUG, addr = ?self.addr(), "Processing client");
 
             let stream = self.tcp_stream_mut();
@@ -141,19 +135,8 @@ impl<S> Client<S> {
                 *self.bytes_sent_mut() += bytes_sent;
                 *self.time_spent_mut() += delay;
 
-                statistics_sender
-                    .send(StatisticsMessage::BytesSent(bytes_sent))
-                    .expect("Channel should always exist");
-                statistics_sender
-                    .send(StatisticsMessage::TimeSpent(delay))
-                    .expect("Channel should always exist");
-
                 *self.send_next_mut() = OffsetDateTime::now_utc() + delay;
             } else {
-                statistics_sender
-                    .send(StatisticsMessage::LostClient)
-                    .expect("Channel should always exist");
-
                 event!(Level::TRACE, ?self, "Client gone");
 
                 return;
