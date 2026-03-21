@@ -10,13 +10,13 @@ use tokio_util::task::TaskTracker;
 use tracing::{Level, event};
 
 use crate::SIZE_IN_BYTES;
-use crate::client::Client;
+use crate::client::{ClientContext, handle_client};
 use crate::config::{BindFamily, Config};
 use crate::events::ClientEvent;
 use crate::ffi_wrapper::set_receive_buffer_size;
 
-struct Listener<'c> {
-    config: &'c Config,
+struct Listener {
+    config: Arc<Config>,
     #[expect(clippy::struct_field_names, reason = "Clarity")]
     tcp_listener: TcpListener,
     client_task_tracker: TaskTracker,
@@ -32,11 +32,9 @@ pub async fn listen_for_new_connections(
     internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
     semaphore: Arc<Semaphore>,
 ) {
-    let _guard = cancellation_token.clone().drop_guard();
-
     // listen forever, accept new clients
     let listener = match Listener::bind(
-        &config,
+        Arc::clone(&config),
         client_task_tracker,
         cancellation_token.clone(),
         internal_events_tx,
@@ -47,6 +45,7 @@ pub async fn listen_for_new_connections(
         Ok(l) => l,
         Err(error) => {
             event!(Level::ERROR, ?error);
+
             return;
         },
     };
@@ -76,9 +75,9 @@ pub async fn listen_for_new_connections(
     }
 }
 
-impl<'c> Listener<'c> {
+impl Listener {
     pub async fn bind(
-        config: &'c Config,
+        config: Arc<Config>,
         client_task_tracker: TaskTracker,
         cancellation_token: CancellationToken,
         internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
@@ -131,19 +130,16 @@ impl<'c> Listener<'c> {
                         Ok(permit) => {
                             let connected_at = OffsetDateTime::now_utc();
 
-                            let client = Client::new(
+                            self.client_task_tracker.spawn(handle_client(
                                 socket,
                                 addr,
                                 connected_at,
-                                connected_at + self.config.delay,
                                 permit,
-                                self.internal_events_tx.clone(),
-                            );
-
-                            self.client_task_tracker.spawn(client.listen_forever(
-                                self.cancellation_token.clone(),
-                                self.config.delay,
-                                self.config.max_line_length,
+                                Arc::clone(&self.config),
+                                ClientContext {
+                                    cancellation_token: self.cancellation_token.clone(),
+                                    internal_events_tx: self.internal_events_tx.clone(),
+                                },
                             ));
 
                             // now that the client is registered, broadcast for the dashboard
