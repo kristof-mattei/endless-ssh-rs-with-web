@@ -33,8 +33,23 @@ function tryParseIp(ip: string): Address6 {
     }
 }
 
+function disconnectedAtToHumanReadable(disconnectedAt: string): string {
+    const disconnected_at = Temporal.Instant.from(disconnectedAt);
+
+    const localZdt = disconnected_at.toZonedDateTimeISO(Temporal.Now.timeZoneId());
+
+    const humanReadable = localZdt.toLocaleString(undefined, {
+        dateStyle: "full",
+        timeStyle: "full",
+    });
+
+    return humanReadable;
+}
+
 const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
     const ip = tryParseIp(event.ip);
+
+    const disconnectedAt = disconnectedAtToHumanReadable(event.disconnected_at);
 
     return (
         <div className="flex items-center gap-3 rounded bg-gray-800 px-3 py-2 text-sm">
@@ -43,7 +58,7 @@ const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
             </span>
             <span className="w-50 text-gray-400">{event.city ?? event.country_name ?? "Unknown"}</span>
             <span className="w-36 truncate font-mono text-gray-300">{ip.is4() ? ip.to4().address : ip.address}</span>
-            <span className="w-80 font-mono text-gray-300">{event.disconnected_at}</span>
+            <span className="w-300 font-mono text-gray-300 border-1">{disconnectedAt}</span>
             <span className="ml-auto w-20 text-right text-red-400">{formatDuration(event.time_spent)}</span>
             <span className="w-30 text-right text-gray-500">{formatBytes(event.bytes_sent)}</span>
         </div>
