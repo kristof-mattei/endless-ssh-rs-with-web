@@ -190,8 +190,7 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-
             ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-
 
-      - &set_up_toolchain
-        name: Set up toolchain
+      - name: Set up toolchain
         shell: bash
         run: |
           rm ${HOME}/.cargo/bin/cargo-fmt
