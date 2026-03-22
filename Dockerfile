@@ -20,7 +20,8 @@ RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt,sharing=locked \
         build-essential \
         ca-certificates \
         musl-dev \
-        patch
+        patch \
+        sccache
 
 FROM rust-base AS rust-linux-amd64
 ARG TARGET=x86_64-unknown-linux-musl
@@ -93,6 +94,8 @@ RUN --mount=type=cache,id=cargo-git,target=/tmp/cache/git/db,sharing=locked \
     cp -rp /usr/local/cargo/registry/cache/. /tmp/cache/registry/cache/
 
 RUN --mount=type=cache,id=target-${TARGETPLATFORMDASH},target=${CARGO_TARGET_DIR},sharing=locked \
+    --mount=type=secret,id=actions_results_url \
+    --mount=type=secret,id=actions_runtime_token \
     /build-scripts/build.sh build --frozen --release
 
 # Rust full build
@@ -111,6 +114,8 @@ ENV PATH="/output/bin:$PATH"
 
 # build with sources with default version number
 RUN --mount=type=cache,id=target-${TARGETPLATFORMDASH},target=${CARGO_TARGET_DIR},sharing=locked \
+    --mount=type=secret,id=actions_results_url \
+    --mount=type=secret,id=actions_runtime_token \
     /build-scripts/build.sh build --frozen --release
 
 # apply version bump (if any)
@@ -120,6 +125,8 @@ RUN [ ! -s version-bump.patch ] || patch --strip 1 < version-bump.patch
 # build with new version number, minor update
 # --release not needed, it is implied with install
 RUN --mount=type=cache,id=target-${TARGETPLATFORMDASH},target=${CARGO_TARGET_DIR},sharing=locked \
+    --mount=type=secret,id=actions_results_url \
+    --mount=type=secret,id=actions_runtime_token \
     /build-scripts/build.sh install --frozen --path "./crates/${APPLICATION_NAME}/" --root /output
 
 # front-end (NPM) build
