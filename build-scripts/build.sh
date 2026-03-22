@@ -41,4 +41,15 @@ declare -x "${cxx_var}=${cpp_compiler}"
 cargo_target_linker_var=CARGO_TARGET_${target_upper}_LINKER
 declare -x "${cargo_target_linker_var}=${c_compiler}"
 
+# Enable sccache when GHA cache credentials are available (mounted as Docker secrets)
+if [ -s /run/secrets/actions_results_url ]; then
+    export SCCACHE_GHA_ENABLED=true
+    export ACTIONS_RESULTS_URL=$(cat /run/secrets/actions_results_url)
+    export ACTIONS_RUNTIME_TOKEN=$(cat /run/secrets/actions_runtime_token)
+    export SCCACHE_GHA_CACHE_TO="sccache-${TARGET}"
+    export SCCACHE_GHA_CACHE_FROM="sccache-${TARGET}"
+    export RUSTC_WRAPPER=sccache
+    trap 'sccache --stop-server 2>/dev/null || true' EXIT
+fi
+
 RUSTFLAGS=$rustflags cargo $@ --target ${TARGET}

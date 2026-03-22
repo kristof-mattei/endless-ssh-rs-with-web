@@ -6,6 +6,8 @@ FROM --platform=${BUILDPLATFORM} rust:1.94.0-slim-trixie@sha256:f7bf1c266d9e48c8
 
 ARG APPLICATION_NAME
 ARG DEBIAN_FRONTEND=noninteractive
+ARG SCCACHE=0.14.0
+
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
@@ -19,14 +21,23 @@ RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt,sharing=locked \
     && apt-get install --no-install-recommends --yes \
         build-essential \
         ca-certificates \
+        curl \
         musl-dev \
         patch
 
 FROM rust-base AS rust-linux-amd64
 ARG TARGET=x86_64-unknown-linux-musl
 
+RUN curl --fail --silent --show-error --location https://github.com/mozilla/sccache/releases/download/v$SCCACHE/sccache-v$SCCACHE-x86_64-unknown-linux-musl.tar.gz | \
+    tar --extract --gzip --verbose --strip-components=1 --directory /usr/local/bin sccache-v$SCCACHE-x86_64-unknown-linux-musl/sccache && \
+    chmod +x /usr/local/bin/sccache
+
 FROM rust-base AS rust-linux-arm64
 ARG TARGET=aarch64-unknown-linux-musl
+
+RUN curl --fail --silent --show-error --location https://github.com/mozilla/sccache/releases/download/v$SCCACHE/sccache-v$SCCACHE-aarch64-unknown-linux-musl.tar.gz | \
+    tar --extract --gzip --verbose --strip-components=1 --directory /usr/local/bin sccache-v$SCCACHE-aarch64-unknown-linux-musl/sccache && \
+    chmod +x /usr/local/bin/sccache
 
 FROM rust-linux-${TARGETARCH} AS rust-cargo-build
 
@@ -93,6 +104,8 @@ RUN --mount=type=cache,id=cargo-git,target=/tmp/cache/git/db,sharing=locked \
     cp -rp /usr/local/cargo/registry/cache/. /tmp/cache/registry/cache/
 
 RUN --mount=type=cache,id=target-${TARGETPLATFORMDASH},target=${CARGO_TARGET_DIR},sharing=locked \
+    --mount=type=secret,id=actions_results_url \
+    --mount=type=secret,id=actions_runtime_token \
     /build-scripts/build.sh build --frozen --release
 
 # Rust full build
@@ -111,6 +124,8 @@ ENV PATH="/output/bin:$PATH"
 
 # build with sources with default version number
 RUN --mount=type=cache,id=target-${TARGETPLATFORMDASH},target=${CARGO_TARGET_DIR},sharing=locked \
+    --mount=type=secret,id=actions_results_url \
+    --mount=type=secret,id=actions_runtime_token \
     /build-scripts/build.sh build --frozen --release
 
 # apply version bump (if any)
@@ -120,6 +135,8 @@ RUN [ ! -s version-bump.patch ] || patch --strip 1 < version-bump.patch
 # build with new version number, minor update
 # --release not needed, it is implied with install
 RUN --mount=type=cache,id=target-${TARGETPLATFORMDASH},target=${CARGO_TARGET_DIR},sharing=locked \
+    --mount=type=secret,id=actions_results_url \
+    --mount=type=secret,id=actions_runtime_token \
     /build-scripts/build.sh install --frozen --path "./crates/${APPLICATION_NAME}/" --root /output
 
 # front-end (NPM) build
