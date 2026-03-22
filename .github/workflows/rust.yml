@@ -12,6 +12,8 @@ env:
   CARGO_TERM_COLOR: always
   RUSTFLAGS: --deny=warnings --cfg tokio_unstable
   SQLX_OFFLINE: true
+  RUSTC_WRAPPER: "sccache"
+  SCCACHE_GHA_ENABLED: "true"
 
 jobs:
   warm-up-cache:
@@ -60,6 +62,10 @@ jobs:
           rustup show
 
           cargo --version
+
+      - &set_up_sccache
+        name: Set up sccache
+        uses: mozilla-actions/sccache-action@7d986dd989559c6ecdb630a3fd2557667be217ad # v0.0.9
 
       - name: Fetch
         shell: bash
@@ -129,6 +135,8 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-${{ hashFiles('Cargo.lock') }}-
             ${{ runner.os }}-${{ runner.arch }}-build-${{ env.CACHE_NAME }}-
 
+      - *set_up_sccache
+
       - name: Build
         shell: bash
         run: |
@@ -183,6 +191,8 @@ jobs:
       - *set_up_toolchain
 
       - *cache_target
+
+      - *set_up_sccache
 
       - name: Install llvm-tools
         shell: bash
@@ -305,6 +315,8 @@ jobs:
       - *set_up_toolchain
 
       - *cache_target
+
+      - *set_up_sccache
 
       - name: Run Clippy for GitHub Actions report
         uses: actions-rs-plus/clippy-check@23b52efac3da0e2b197a9ad2e7be0f515502aaaf # v2.5.0
