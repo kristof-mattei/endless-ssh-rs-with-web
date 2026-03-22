@@ -109,20 +109,20 @@ RUN find ./crates -type f -name '*.rs' -exec touch {} +
 
 ENV PATH="/output/bin:$PATH"
 
-# build with real sources
+# build with sources with default version number
 RUN --mount=type=cache,id=target-${TARGETPLATFORMDASH},target=${CARGO_TARGET_DIR},sharing=locked \
     /build-scripts/build.sh build --frozen --release
 
 # apply version bump (if any)
 COPY ./version-bump.patch ./
-RUN patch --strip 1 < version-bump.patch
+RUN [ ! -s version-bump.patch ] || patch --strip 1 < version-bump.patch
 
 # build with new version number, minor update
 # --release not needed, it is implied with install
 RUN --mount=type=cache,id=target-${TARGETPLATFORMDASH},target=${CARGO_TARGET_DIR},sharing=locked \
     /build-scripts/build.sh install --frozen --path "./crates/${APPLICATION_NAME}/" --root /output
 
-# Front-end (NPM) build
+# front-end (NPM) build
 FROM --platform=${BUILDPLATFORM} node:24.14.0-alpine3.22@sha256:76db75ca7e7da9148ae42c92d9be12d12a8d7b03e171f18339355d8078d644a0 AS typescript-build
 
 ENV PNPM_HOME="/pnpm"
