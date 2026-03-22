@@ -6,6 +6,8 @@ FROM --platform=${BUILDPLATFORM} rust:1.94.0-slim-trixie@sha256:f7bf1c266d9e48c8
 
 ARG APPLICATION_NAME
 ARG DEBIAN_FRONTEND=noninteractive
+ARG SCCACHE=0.14.0
+
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean \
     && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
@@ -15,14 +17,23 @@ RUN apt-get update \
     && apt-get install --no-install-recommends --yes \
         build-essential \
         ca-certificates \
+        curl \
         musl-dev \
         patch
 
 FROM rust-base AS rust-linux-amd64
 ARG TARGET=x86_64-unknown-linux-musl
 
+RUN curl --fail --silent --show-error --location https://github.com/mozilla/sccache/releases/download/v$SCCACHE/sccache-v$SCCACHE-x86_64-unknown-linux-musl.tar.gz | \
+    tar --extract --gzip --verbose --strip-components=1 --directory /usr/local/bin sccache-v$SCCACHE-x86_64-unknown-linux-musl/sccache && \
+    chmod +x /usr/local/bin/sccache
+
 FROM rust-base AS rust-linux-arm64
 ARG TARGET=aarch64-unknown-linux-musl
+
+RUN curl --fail --silent --show-error --location https://github.com/mozilla/sccache/releases/download/v$SCCACHE/sccache-v$SCCACHE-aarch64-unknown-linux-musl.tar.gz | \
+    tar --extract --gzip --verbose --strip-components=1 --directory /usr/local/bin sccache-v$SCCACHE-aarch64-unknown-linux-musl/sccache && \
+    chmod +x /usr/local/bin/sccache
 
 FROM rust-linux-${TARGETARCH} AS rust-cargo-build
 
@@ -65,7 +76,9 @@ WORKDIR /build
 
 RUN cargo fetch --locked
 
-RUN /build-scripts/build.sh build --frozen --release
+RUN --mount=type=secret,id=actions_results_url \
+    --mount=type=secret,id=actions_runtime_token \
+    /build-scripts/build.sh build --frozen --release
 
 # Rust full build
 FROM rust-cargo-build AS rust-build
@@ -82,7 +95,9 @@ RUN find ./crates -type f -name '*.rs' -exec touch {} +
 ENV PATH="/output/bin:$PATH"
 
 # build with sources with default version number
-RUN /build-scripts/build.sh build --frozen --release
+RUN --mount=type=secret,id=actions_results_url \
+    --mount=type=secret,id=actions_runtime_token \
+    /build-scripts/build.sh build --frozen --release
 
 # apply version bump (if any)
 COPY ./version-bump.patch ./
@@ -90,7 +105,9 @@ RUN [ ! -s version-bump.patch ] || patch --strip 1 < version-bump.patch
 
 # build with new version number, minor update
 # --release not needed, it is implied with install
-RUN /build-scripts/build.sh install --frozen --path "./crates/${APPLICATION_NAME}/" --root /output
+RUN --mount=type=secret,id=actions_results_url \
+    --mount=type=secret,id=actions_runtime_token \
+    /build-scripts/build.sh install --frozen --path "./crates/${APPLICATION_NAME}/" --root /output
 
 # front-end (NPM) build
 FROM --platform=${BUILDPLATFORM} node:24.14.0-alpine3.22@sha256:76db75ca7e7da9148ae42c92d9be12d12a8d7b03e171f18339355d8078d644a0 AS typescript-build
