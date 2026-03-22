@@ -304,15 +304,7 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: version-bump-patch
-          path: /tmp/
-
-      - name: Apply version bump patch
-        shell: bash
-        run: |
-          git apply --allow-empty /tmp/version-bump.patch
-
-          echo "Applied patch:"
-          git diff
+          path: .
 
       # TODO validate no changes between github.event.pull_request.head.sha and the actual current sha (representing the hypothetical merge)
       - name: Set variables
@@ -432,6 +424,10 @@ jobs:
       fromJSON(needs.repo-has-container.outputs.has_container) == true
     steps:
       - *checkout
+
+      - name: Create empty version bump patch
+        shell: bash
+        run: touch version-bump.patch
 
       - name: Set variables
         shell: bash

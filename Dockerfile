@@ -19,7 +19,8 @@ RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt,sharing=locked \
     && apt-get install --no-install-recommends --yes \
         build-essential \
         ca-certificates \
-        musl-dev
+        musl-dev \
+        patch
 
 FROM rust-base AS rust-linux-amd64
 ARG TARGET=x86_64-unknown-linux-musl
@@ -108,6 +109,15 @@ RUN find ./crates -type f -name '*.rs' -exec touch {} +
 
 ENV PATH="/output/bin:$PATH"
 
+# build with real sources
+RUN --mount=type=cache,id=target-${TARGETPLATFORMDASH},target=${CARGO_TARGET_DIR},sharing=locked \
+    /build-scripts/build.sh build --frozen --release
+
+# apply version bump (if any)
+COPY ./version-bump.patch ./
+RUN patch --strip 1 < version-bump.patch
+
+# build with new version number, minor update
 # --release not needed, it is implied with install
 RUN --mount=type=cache,id=target-${TARGETPLATFORMDASH},target=${CARGO_TARGET_DIR},sharing=locked \
     /build-scripts/build.sh install --frozen --path "./crates/${APPLICATION_NAME}/" --root /output
