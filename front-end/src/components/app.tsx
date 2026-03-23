@@ -46,7 +46,7 @@ export const App: React.FC = () => {
     const [totalTimeSecs, setTotalTimeSecs] = useState(0);
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
-    const seenSeqReference = useRef<Set<number>>(new Set());
+    const seenSeqReference = useRef(new Set());
     const isLiveReference = useRef(false);
 
     const handleEvent = useCallback((wsEvent: WsEvent) => {
