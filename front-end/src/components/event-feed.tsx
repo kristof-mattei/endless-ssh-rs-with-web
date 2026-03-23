@@ -1,3 +1,4 @@
+import { Temporal } from "@js-temporal/polyfill";
 import { Address6 } from "ip-address";
 import type React from "react";
 
@@ -36,11 +37,11 @@ function tryParseIp(ip: string): Address6 {
 function disconnectedAtToHumanReadable(disconnectedAt: string): string {
     const disconnected_at = Temporal.Instant.from(disconnectedAt);
 
-    const localZdt = disconnected_at.toZonedDateTimeISO(Temporal.Now.timeZoneId());
+    const localZonedDateTime = disconnected_at.toZonedDateTimeISO(Temporal.Now.timeZoneId());
 
-    const humanReadable = localZdt.toLocaleString(undefined, {
+    const humanReadable = localZonedDateTime.toLocaleString("en-US", {
         dateStyle: "full",
-        timeStyle: "full",
+        timeStyle: "short",
     });
 
     return humanReadable;

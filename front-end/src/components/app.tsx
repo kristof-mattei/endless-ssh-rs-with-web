@@ -1,3 +1,4 @@
+import { Temporal } from "@js-temporal/polyfill";
 import type React from "react";
 import { useCallback, useRef, useState } from "react";
 
@@ -13,6 +14,29 @@ import type { StatsData } from "./time-range-selector";
 import { WorldMap } from "./world-map";
 
 const MAX_EVENTS = 100;
+
+function getTimezone() {
+    const now: Temporal.ZonedDateTime = Temporal.Now.zonedDateTimeISO();
+
+    // signHH:MM as a string offset (e.g., -07:00)
+    const offset = now.offset;
+
+    const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: now.timeZoneId,
+        timeZoneName: "long",
+    }).formatToParts();
+
+    // long-form descriptive name
+    const timeZoneName = parts.find((p) => {
+        return p.type === "timeZoneName";
+    });
+
+    if (timeZoneName) {
+        return `${timeZoneName.value}, GMT ${offset}`;
+    } else {
+        return `GMT ${offset}`;
+    }
+}
 
 export const App: React.FC = () => {
     const [activeConnections, setActiveConnections] = useState<ActiveConnection[]>([]);
@@ -127,7 +151,9 @@ export const App: React.FC = () => {
                 {statsData !== null && <StatsChart rows={statsData.rows} from={statsData.from} to={statsData.to} />}
 
                 <div>
-                    <h2 className="mb-2 text-lg font-semibold text-gray-300">Recent disconnections</h2>
+                    <h2 className="mb-2 text-lg font-semibold text-gray-300">
+                        Recent disconnections (times in {getTimezone()})
+                    </h2>
                     <EventFeed events={events} />
                 </div>
             </div>
