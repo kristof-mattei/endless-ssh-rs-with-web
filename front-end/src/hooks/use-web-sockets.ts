@@ -53,9 +53,9 @@ const BASE_BACKOFF_MS = 500;
 const MAX_BACKOFF_MS = 30_000;
 
 export function useWebSocket({ onEvent }: Options): void {
-    const lastSeqReference = useRef<number>(0);
+    const lastSeqReference = useRef(0);
     const wsReference = useRef<null | WebSocket>(null);
-    const backoffReference = useRef<number>(BASE_BACKOFF_MS);
+    const backoffReference = useRef(BASE_BACKOFF_MS);
     const retryTimerReference = useRef<null | ReturnType<typeof setTimeout>>(null);
 
     // stable callback reference
