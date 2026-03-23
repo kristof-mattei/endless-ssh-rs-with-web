@@ -1,4 +1,3 @@
-import { Temporal } from "@js-temporal/polyfill";
 import { Address6 } from "ip-address";
 import type React from "react";
 
