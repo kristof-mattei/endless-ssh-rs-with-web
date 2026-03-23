@@ -1,4 +1,17 @@
 <!-- header goes here -->
+## [0.8.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.1..v0.8.2) - 2026-03-23
+
+### 🐛 Bug Fixes
+
+- Show timezone one, temporal polyfill by @kristof-mattei ([`1c827ac`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1c827ac0208faa7786fe2febadff3ce8b456b73b))
+- @typescript-eslint/no-unnecessary-type-arguments by @kristof-mattei ([`73ff981`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/73ff98136b5f00a36a99a94bd3efcbe7079f42e3))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.8.2
+- Remove temporal polyfill by @kristof-mattei ([`8e6417e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8e6417ec6380ea6723984bf045379707195985dd))
+- Remove suprious newline by @kristof-mattei ([`be7faa7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/be7faa7228268d8f0b97fdb7348ac2a552e3c6c6))
+- Sort by @kristof-mattei ([`a8b16ab`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a8b16abc3b307557d1728ff6a5d6f8f217498382))
 ## [0.8.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.0..v0.8.1) - 2026-03-23
 
 ### 🐛 Bug Fixes
@@ -8,7 +21,7 @@
 ### ⚙️ Miscellaneous Tasks
 
 - *(build)* Additional layer in docker for better caching by @kristof-mattei ([`876710a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/876710a991c4efd2fb1804b0d7f26c93caf2478c))
-- *(release)* Release v0.8.1
+- *(release)* Release v0.8.1 by @github-actions[bot] ([`418ca61`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/418ca61fa063dfb6ba0a600fe013f689d69cca7f))
 - Multi-layer cache by @kristof-mattei ([`e0eec38`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e0eec385a7232699587f328ec463921dbff64bbb))
 - Only enable devtools for charts when in dev mode by @kristof-mattei ([`4a62935`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4a62935f405d18eaebd8f227b1e7dbc1580f05bd))
 - No point in caching images as-is by @kristof-mattei ([`bc48ef0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bc48ef0da30d5b31c8eb4ff72010a5f16721a118))
