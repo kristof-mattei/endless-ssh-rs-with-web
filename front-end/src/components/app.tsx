@@ -130,12 +130,13 @@ export const App: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-950 p-4 text-white">
-            <header className="mb-6">
-                <h1 className="text-2xl font-bold text-red-500">endless-ssh-rs honeypot</h1>
-                <p className="text-sm text-gray-500">Live attack map</p>
+            <header>
+                <h1 className="text-2xl font-bold">endless-ssh-rs, an ssh honeypot</h1>
             </header>
 
-            <div className="space-y-6">
+            <section className="space-y-2 mb-6">
+                <h2 className="text-lg font-semibold text-gray-300">Live attack map</h2>
+
                 <StatsPanel
                     totalConnections={totalConnections}
                     totalByteSent={totalBytes}
@@ -144,18 +145,22 @@ export const App: React.FC = () => {
                 />
 
                 <WorldMap activeConnections={activeConnections} />
+            </section>
+
+            <section className="space-y-2 mb-6">
+                <h2 className="text-lg font-semibold text-gray-300">Stats</h2>
 
                 <TimeRangeSelector onData={setStatsData} />
 
                 {statsData !== null && <StatsChart rows={statsData.rows} from={statsData.from} to={statsData.to} />}
+            </section>
 
-                <div>
-                    <h2 className="mb-2 text-lg font-semibold text-gray-300">
-                        Recent disconnections (times in {getTimezone()})
-                    </h2>
-                    <EventFeed events={events} />
-                </div>
-            </div>
+            <section>
+                <h2 className="mb-2 text-lg font-semibold text-gray-300">
+                    Recent disconnections (times in {getTimezone()})
+                </h2>
+                <EventFeed events={events} />
+            </section>
         </div>
     );
 };
