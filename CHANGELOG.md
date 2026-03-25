@@ -1,4 +1,21 @@
 <!-- header goes here -->
+## [0.8.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.2..v0.8.3) - 2026-03-25
+
+### 🐛 Bug Fixes
+
+- Readme by @kristof-mattei ([`902e94f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/902e94fac6b0b374cb2a553b89a177a7fb3bc837))
+- Use skopeo to copy the image, as buildx wrapped the image in an OCI image index by @kristof-mattei ([`7c179a2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7c179a2ac1aeda46e08cb54383d904aed5dc5c8b))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.8.3
+- Move build cache by @kristof-mattei ([`0ab1328`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0ab1328687c12bf15ae3e21bb031a2d38632c4c8))
+- Rename by @kristof-mattei ([`6544b67`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6544b67f89b757a1a86986291fd1efef42f07445))
+- Minor ui tweaks by @kristof-mattei ([`42b8632`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/42b8632d788dac9da0ecdb29290e989627af7540))
+- Remove missed polyfill inclusion by @kristof-mattei ([`e3c2203`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e3c2203d275e97b9bfea0e0559208edb621aff8a))
+- Set title in vscode by @kristof-mattei ([`5020146`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5020146a277b1e0334b2c54e498f07ab0ac61f6a))
+- Copy all by @kristof-mattei ([`fc44621`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fc44621d7d60357bde90fc1fd4e39835859d389e))
+- Don't infer type by @kristof-mattei ([`4dca949`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4dca9497014697d080a933afe2a189cb00014575))
 ## [0.8.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.1..v0.8.2) - 2026-03-23
 
 ### 🐛 Bug Fixes
@@ -8,7 +25,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.8.2
+- *(release)* Release v0.8.2 by @github-actions[bot] ([`17751c6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/17751c68f7f052e9d9127258388e5f01a08a04ed))
 - Remove temporal polyfill by @kristof-mattei ([`8e6417e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8e6417ec6380ea6723984bf045379707195985dd))
 - Remove suprious newline by @kristof-mattei ([`be7faa7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/be7faa7228268d8f0b97fdb7348ac2a552e3c6c6))
 - Sort by @kristof-mattei ([`a8b16ab`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a8b16abc3b307557d1728ff6a5d6f8f217498382))
