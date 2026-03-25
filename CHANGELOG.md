@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.8.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.3..v0.8.4) - 2026-03-25
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.8.3
 ## [0.8.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.2..v0.8.3) - 2026-03-25
 
 ### 🐛 Bug Fixes
@@ -8,7 +13,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.8.3
+- *(release)* Release v0.8.3 by @github-actions[bot] ([`3ff9413`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3ff941321d72876894a608720b9afe1df5d0b4c0))
 - Move build cache by @kristof-mattei ([`0ab1328`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0ab1328687c12bf15ae3e21bb031a2d38632c4c8))
 - Rename by @kristof-mattei ([`6544b67`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6544b67f89b757a1a86986291fd1efef42f07445))
 - Minor ui tweaks by @kristof-mattei ([`42b8632`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/42b8632d788dac9da0ecdb29290e989627af7540))
