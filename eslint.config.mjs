@@ -159,7 +159,6 @@ export default defineConfig(
         },
     },
     {
-        ...love,
         files: ["**/*.ts", "**/*.tsx"],
         ignores: ["**/*.mjs"],
         languageOptions: {
@@ -179,6 +178,7 @@ export default defineConfig(
             perfectionist,
         },
         extends: [
+            love,
             tseslintConfigs.strictTypeChecked,
             tseslintConfigs.recommendedTypeChecked,
             tseslintConfigs.stylisticTypeChecked,

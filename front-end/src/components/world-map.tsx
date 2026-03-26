@@ -1,6 +1,6 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import type React from "react";
+import type * as React from "react";
 import { Map, Marker } from "react-map-gl/maplibre";
 
 import type { ActiveConnection } from "../hooks/use-web-sockets";

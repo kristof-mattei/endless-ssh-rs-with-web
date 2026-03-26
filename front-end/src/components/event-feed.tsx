@@ -1,5 +1,5 @@
 import { Address6 } from "ip-address";
-import type React from "react";
+import type * as React from "react";
 
 import type { DisconnectedEvent } from "../hooks/use-web-sockets";
 import { formatBytes, formatDuration } from "../lib/formatting";
@@ -34,9 +34,9 @@ function tryParseIp(ip: string): Address6 {
 }
 
 function disconnectedAtToHumanReadable(disconnectedAt: string): string {
-    const disconnected_at = Temporal.Instant.from(disconnectedAt);
+    const instant = Temporal.Instant.from(disconnectedAt);
 
-    const localZonedDateTime = disconnected_at.toZonedDateTimeISO(Temporal.Now.timeZoneId());
+    const localZonedDateTime = instant.toZonedDateTimeISO(Temporal.Now.timeZoneId());
 
     const humanReadable = localZonedDateTime.toLocaleString("en-US", {
         dateStyle: "full",

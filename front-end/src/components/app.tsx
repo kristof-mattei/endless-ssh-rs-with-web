@@ -1,4 +1,4 @@
-import type React from "react";
+import type * as React from "react";
 import { useCallback, useRef, useState } from "react";
 
 import type { ActiveConnection, DisconnectedEvent, WsEvent } from "../hooks/use-web-sockets";
@@ -14,7 +14,7 @@ import { WorldMap } from "./world-map";
 
 const MAX_EVENTS = 100;
 
-function getTimezone() {
+function getTimezone(): string {
     const now: Temporal.ZonedDateTime = Temporal.Now.zonedDateTimeISO();
 
     // signHH:MM as a string offset (e.g., -07:00)
@@ -30,10 +30,10 @@ function getTimezone() {
         return p.type === "timeZoneName";
     });
 
-    if (timeZoneName) {
-        return `${timeZoneName.value}, GMT ${offset}`;
-    } else {
+    if (timeZoneName === undefined) {
         return `GMT ${offset}`;
+    } else {
+        return `${timeZoneName.value}, GMT ${offset}`;
     }
 }
 

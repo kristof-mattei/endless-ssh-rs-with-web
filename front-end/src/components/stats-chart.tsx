@@ -30,7 +30,7 @@ type BucketPoint = {
     bucket: Date;
 } & BucketPointValues;
 
-const METRICS: readonly { value: Metric; label: string }[] = [
+const METRICS: ReadonlyArray<{ value: Metric; label: string }> = [
     { value: "connects", label: "Connections" },
     { value: "bytes_sent", label: "Bytes wasted" },
     { value: "time_spent", label: "Time wasted" },
@@ -147,8 +147,9 @@ export const CustomTooltipContent: (properties: TooltipContentProps) => React.JS
     properties: TooltipContentProps,
 ) => {
     // `payload[0].payload` is the full `BucketPoint`
-    const payload = properties.payload as readonly Payload<number, string>[];
+    const payload = properties.payload as readonly Payload[];
     const payload0 = payload[0];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- underlying library is untyped
     const bucketPoint = payload0?.payload as BucketPoint | undefined;
 
     if (bucketPoint === undefined) {
@@ -156,7 +157,8 @@ export const CustomTooltipContent: (properties: TooltipContentProps) => React.JS
         return <DefaultTooltipContent {...properties} />;
     }
 
-    const allMetrics = METRICS.map((m) => {
+    // @ts-expect-error Payload's types are { foo?: T}, not { foo?: T | undefined }
+    const allMetrics: readonly Payload[] = METRICS.map((m) => {
         return {
             ...payload0,
             dataKey: m.value,
@@ -165,13 +167,16 @@ export const CustomTooltipContent: (properties: TooltipContentProps) => React.JS
             formatter: (v: number | undefined) => {
                 return formatYLabel(m.value, v ?? 0);
             },
-        } as Payload;
+        };
     });
 
     return <DefaultTooltipContent {...properties} payload={allMetrics} />;
 };
 
-function useRechartsDevtools() {
+function useRechartsDevtools(): {
+    Component: () => React.JSX.Element;
+    portalId: string;
+} | null {
     const [devtools, setDevtools] = useState<{
         Component: () => React.JSX.Element;
         portalId: string;
@@ -185,6 +190,8 @@ function useRechartsDevtools() {
                         Component: module.RechartsDevtools,
                         portalId: module.RECHARTS_DEVTOOLS_PORTAL_ID,
                     });
+
+                    return null;
                 })
                 .catch(() => {
                     return null;
@@ -288,11 +295,11 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                                 />
                             );
                         })}
-                        {developmentTools && <developmentTools.Component />}
+                        {developmentTools !== null && <developmentTools.Component />}
                     </Typed.BarChart>
                 </ResponsiveContainer>
             )}
-            {developmentTools && <div id={developmentTools.portalId} />}
+            {developmentTools !== null && <div id={developmentTools.portalId} />}
         </div>
     );
 };
