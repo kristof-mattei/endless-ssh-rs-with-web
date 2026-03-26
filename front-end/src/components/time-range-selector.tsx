@@ -1,4 +1,4 @@
-import type React from "react";
+import type * as React from "react";
 import { useCallback, useEffect, useState } from "react";
 
 export interface StatsRow {
@@ -17,7 +17,7 @@ export interface StatsData {
 
 type Range = "1h" | "24h" | "30d" | "7d" | "all";
 
-const RANGES: { label: string; value: Range }[] = [
+const RANGES: Array<{ label: string; value: Range }> = [
     { label: "Last hour", value: "1h" },
     { label: "Last 24 h", value: "24h" },
     { label: "Last 7 days", value: "7d" },
@@ -63,6 +63,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                     `/api/stats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
                 );
                 if (response.ok) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- data from trusted backend
                     const rows = (await response.json()) as StatsRow[];
                     onData({ rows, from: fromDate, to: toDate });
                 }
