@@ -1,4 +1,10 @@
 <!-- header goes here -->
+## [0.8.6](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.5..v0.8.6) - 2026-03-28
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.8.6
+- Convert manifest to index annotations by @kristof-mattei ([`18dc26b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/18dc26bd718035ba816cd816ca0f160aa797b713))
 ## [0.8.5](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.4..v0.8.5) - 2026-03-28
 
 ### 🐛 Bug Fixes
@@ -8,7 +14,7 @@
 ### ⚙️ Miscellaneous Tasks
 
 - *(build)* Switch to annotations by @kristof-mattei ([`c041c69`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c041c6948bd7f7318ad320659d8233d416bcbd6a))
-- *(release)* Release v0.8.5
+- *(release)* Release v0.8.5 by @github-actions[bot] ([`13bb880`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/13bb88060a625b78ffed11885efba250655a6ea0))
 - Strict(er) by @kristof-mattei ([`3428eeb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3428eeb640a671bbee4b93ba89e34ae6cddd9546))
 - Stop skopeo from trying to infer type by @kristof-mattei ([`66ca282`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/66ca282f0a4adcd2a4ee63f8ad69c9c822ac88ac))
 - Ensure we copy all layers by @kristof-mattei ([`6428eb8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6428eb84930a25d7c8d4fda31d0f32dc4ad55f9f))
