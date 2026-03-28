@@ -1,9 +1,14 @@
 <!-- header goes here -->
-## [0.8.6](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.5..v0.8.6) - 2026-03-28
+## [0.8.7](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.6..v0.8.7) - 2026-03-28
 
 ### ⚙️ Miscellaneous Tasks
 
 - *(release)* Release v0.8.6
+## [0.8.6](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.5..v0.8.6) - 2026-03-28
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.8.6 by @github-actions[bot] ([`69fa4f9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/69fa4f9586edd857bcb485cbb30bd21f9460a53c))
 - Convert manifest to index annotations by @kristof-mattei ([`18dc26b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/18dc26bd718035ba816cd816ca0f160aa797b713))
 ## [0.8.5](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.4..v0.8.5) - 2026-03-28
 
