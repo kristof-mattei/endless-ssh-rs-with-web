@@ -1,4 +1,23 @@
 <!-- header goes here -->
+## [0.8.5](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.4..v0.8.5) - 2026-03-28
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate uuid to 1.23.0 by @renovate[bot] ([`923b770`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/923b770234fe2335ef636a8b5a9a8824e67c807a))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(build)* Switch to annotations by @kristof-mattei ([`c041c69`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c041c6948bd7f7318ad320659d8233d416bcbd6a))
+- *(release)* Release v0.8.5
+- Strict(er) by @kristof-mattei ([`3428eeb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3428eeb640a671bbee4b93ba89e34ae6cddd9546))
+- Stop skopeo from trying to infer type by @kristof-mattei ([`66ca282`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/66ca282f0a4adcd2a4ee63f8ad69c9c822ac88ac))
+- Ensure we copy all layers by @kristof-mattei ([`6428eb8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6428eb84930a25d7c8d4fda31d0f32dc4ad55f9f))
+- Also run build & spellcheck once merged, this warms up the cache for subsequent builds by @kristof-mattei ([`e6db1ca`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e6db1ca9fa9b6353c81e9c3870a31fdde32303ce))
+- Speed up spellcheck compilation with sccache by @kristof-mattei ([`5e53dcd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5e53dcd877309fafb5cf123c5a39697ccd2f47d7))
+- Enable sccache for spellcheck by @kristof-mattei ([`d99fa01`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d99fa01ce7d28befefea7882be13557a9d9ffc24))
+- Remove cache cargo for spellcheck, as it doesn't do anything by @kristof-mattei ([`565017e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/565017e04b68ad7de0efad32f98ba111041d773a))
+- Use a spellcheck fork for quicker installation by @kristof-mattei ([`93bfd69`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/93bfd695bd0a871fbdb10a269b4d266194303729))
+- No need to do spellcheck on push anymore, as we use pre-built binaries by @kristof-mattei ([`afa2005`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/afa2005227a8ac9fb078efe5abf6f9cad8f52c37))
 ## [0.8.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.3..v0.8.4) - 2026-03-25
 
 ### 🐛 Bug Fixes
@@ -8,7 +27,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.8.4
+- *(release)* Release v0.8.4 by @github-actions[bot] ([`dbd0475`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/dbd0475c40d32fa7f2e035d7867cf3c17010105e))
 ## [0.8.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.2..v0.8.3) - 2026-03-25
 
 ### 🐛 Bug Fixes
