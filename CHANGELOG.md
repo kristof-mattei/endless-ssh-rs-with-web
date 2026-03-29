@@ -1,9 +1,16 @@
 <!-- header goes here -->
+## [0.8.8](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.7..v0.8.8) - 2026-03-29
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.8.8
+- Ability to publish to docker hub as well by @kristof-mattei ([`99103ff`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/99103ffedc5d4a2322609d3ce9f7e11af58bb1cd))
+- Clarify name by @kristof-mattei ([`f28541f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f28541f272b3cdc9a4a15de6a2e59a03d2e555f2))
 ## [0.8.7](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.6..v0.8.7) - 2026-03-29
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.8.7
+- *(release)* Release v0.8.7 by @github-actions[bot] ([`e85b346`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e85b34677bca7aba0912df29d02dafeef4f14803))
 - Convert manifest to index annotations by @kristof-mattei ([`affcb0a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/affcb0a26c6f809ad3d355a997a62075ed22b827))
 - Don't run machete on push by @kristof-mattei ([`f6bdbd8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f6bdbd887606edbc9ed3a52615afe69de39ed220))
 - If no component bumps, bump patch by @kristof-mattei ([`fd4eca7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fd4eca7deceb7d644a16cb69879411090ed9e599))
