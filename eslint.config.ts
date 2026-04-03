@@ -1,4 +1,6 @@
+import { fixupPluginRules } from "@eslint/compat";
 import { defineConfig, globalIgnores } from "@eslint/config-helpers";
+import type { RulesConfig } from "@eslint/core";
 import js from "@eslint/js";
 import commentsPlugin from "@eslint-community/eslint-plugin-eslint-comments";
 import stylistic from "@stylistic/eslint-plugin";
@@ -16,7 +18,7 @@ import reactRefreshPlugin from "eslint-plugin-react-refresh";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
 import { configs as tseslintConfigs } from "typescript-eslint";
 
-const sharedRules = {
+const sharedRules: RulesConfig = {
     "arrow-body-style": ["error", "always"],
     complexity: ["off"],
     curly: ["error", "all"],
@@ -87,7 +89,7 @@ const sharedRules = {
     "import-x/prefer-default-export": ["off"],
 };
 
-export default defineConfig(
+const config: ReturnType<typeof defineConfig> = defineConfig(
     prettier,
     globalIgnores([".local/*"]),
     js.configs.recommended,
@@ -96,10 +98,11 @@ export default defineConfig(
     {
         ignores: ["dist/**", "reports/**", "coverage/**"],
     },
-    eslintPluginUnicorn.configs["all"],
+    eslintPluginUnicorn.configs.all,
+    reactHooksPlugin.configs.flat.recommended,
     {
         languageOptions: {
-            ...reactPlugin.configs.flat["jsx-runtime"].languageOptions,
+            ...reactPlugin.configs.flat["jsx-runtime"]?.languageOptions,
             parser: tsParser,
             parserOptions: {
                 ecmaVersion: "latest",
@@ -111,8 +114,7 @@ export default defineConfig(
         ...reactPlugin.configs.flat["jsx-runtime"],
         plugins: {
             "react-refresh": reactRefreshPlugin,
-            "react-hooks": reactHooksPlugin,
-            "react-hook-form": reactHookFormPlugin,
+            "react-hook-form": fixupPluginRules(reactHookFormPlugin),
         },
         settings: {
             "import-x/resolver": {
@@ -125,10 +127,9 @@ export default defineConfig(
                 version: "detect",
             },
         },
-        extends: [eslintPluginUnicorn.configs["recommended"]],
+        extends: [eslintPluginUnicorn.configs.recommended],
         rules: {
             ...importPluginConfigs.recommended.rules,
-            ...importPluginConfigs.react.rules,
             ...reactHooksPlugin.configs.recommended.rules,
             ...reactHookFormPlugin.configs.recommended.rules,
 
@@ -174,14 +175,15 @@ export default defineConfig(
             "@stylistic/ts": stylistic,
             n: nPlugin,
             "eslint-comments": commentsPlugin,
-            promise,
             perfectionist,
         },
         extends: [
+            // @ts-expect-error only way I can see to figure out this type conflict
             love,
             tseslintConfigs.strictTypeChecked,
             tseslintConfigs.recommendedTypeChecked,
             tseslintConfigs.stylisticTypeChecked,
+            promise.configs["flat/recommended"],
         ],
         settings: {
             "import-x/resolver": {
@@ -190,13 +192,14 @@ export default defineConfig(
                     alwaysTryTypes: true,
                 },
             },
+            ...importPluginConfigs.react.settings,
         },
         rules: {
             ...importPluginConfigs.typescript.rules,
-            ...importPluginConfigs.react.rules,
             ...importPluginConfigs.recommended.rules,
-
             ...sharedRules,
+
+            ...promise.configs["flat/recommended"].rules,
 
             "no-restricted-imports": ["off"],
 
@@ -265,3 +268,5 @@ export default defineConfig(
         rules: {},
     },
 );
+
+export default config;
