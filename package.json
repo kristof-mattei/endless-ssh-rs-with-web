@@ -32,7 +32,7 @@
         "@recharts/devtools": "0.0.11",
         "country-flag-emoji-polyfill": "0.1.8",
         "ip-address": "^10.1.0",
-        "maplibre-gl": "5.21.1",
+        "maplibre-gl": "5.22.0",
         "pretty-bytes": "^7.1.0",
         "react": "19.2.4",
         "react-compiler-runtime": "1.0.0",
