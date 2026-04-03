@@ -1,7 +1,5 @@
-// eslint-disable-next-line import-x/named -- import-x just can't find them.
-import { fixupPluginRules } from "@eslint/compat";
+import { fixupConfigRules } from "@eslint/compat";
 
-// eslint-disable-next-line import-x/named -- import-x just can't find them.
 import { defineConfig, globalIgnores } from "@eslint/config-helpers";
 import type { RulesConfig } from "@eslint/core";
 import js from "@eslint/js";
@@ -9,7 +7,7 @@ import commentsPlugin from "@eslint-community/eslint-plugin-eslint-comments";
 import stylistic from "@stylistic/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import love from "eslint-config-love";
-import { configs as importPluginConfigs, flatConfigs as importPluginsFlatConfigs } from "eslint-plugin-import-x";
+import { flatConfigs as importPluginsFlatConfigs } from "eslint-plugin-import-x";
 import nPlugin from "eslint-plugin-n";
 import perfectionist from "eslint-plugin-perfectionist";
 import prettier from "eslint-plugin-prettier/recommended";
@@ -102,10 +100,8 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
         ignores: ["dist/**", "reports/**", "coverage/**"],
     },
     eslintPluginUnicorn.configs.all,
-    reactHooksPlugin.configs.flat.recommended,
     {
         languageOptions: {
-            ...reactPlugin.configs.flat["jsx-runtime"]?.languageOptions,
             parser: tsParser,
             parserOptions: {
                 ecmaVersion: "latest",
@@ -114,11 +110,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
                 tsconfigRootDir: import.meta.dirname,
             },
         },
-        ...reactPlugin.configs.flat["jsx-runtime"],
-        plugins: {
-            "react-refresh": reactRefreshPlugin,
-            "react-hook-form": fixupPluginRules(reactHookFormPlugin),
-        },
+        plugins: {},
         settings: {
             "import-x/resolver": {
                 node: {},
@@ -130,12 +122,19 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
                 version: "detect",
             },
         },
-        extends: [eslintPluginUnicorn.configs.recommended],
+        extends: [
+            eslintPluginUnicorn.configs.recommended,
+            reactPlugin.configs.flat["jsx-runtime"] ?? {},
+            reactRefreshPlugin.configs.vite,
+            fixupConfigRules(reactHooksPlugin.configs.flat.recommended),
+            {
+                plugins: {
+                    "react-hook-form": reactHookFormPlugin,
+                },
+                rules: reactHookFormPlugin.configs.recommended.rules,
+            },
+        ],
         rules: {
-            ...importPluginConfigs.recommended.rules,
-            ...reactHooksPlugin.configs.recommended.rules,
-            ...reactHookFormPlugin.configs.recommended.rules,
-
             // Core hooks rules
             "react-hooks/rules-of-hooks": "error",
             "react-hooks/exhaustive-deps": "warn",
@@ -181,12 +180,11 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
             perfectionist,
         },
         extends: [
-            // @ts-expect-error only way I can see to figure out this type conflict
-            love,
+            [love],
             tseslintConfigs.strictTypeChecked,
-            tseslintConfigs.recommendedTypeChecked,
             tseslintConfigs.stylisticTypeChecked,
             promise.configs["flat/recommended"],
+            importPluginsFlatConfigs.react,
         ],
         settings: {
             "import-x/resolver": {
@@ -195,14 +193,9 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
                     alwaysTryTypes: true,
                 },
             },
-            ...importPluginConfigs.react.settings,
         },
         rules: {
-            ...importPluginConfigs.typescript.rules,
-            ...importPluginConfigs.recommended.rules,
             ...sharedRules,
-
-            ...promise.configs["flat/recommended"].rules,
 
             "no-restricted-imports": ["off"],
 
