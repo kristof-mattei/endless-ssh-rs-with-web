@@ -45,7 +45,7 @@
         "@eslint-community/eslint-plugin-eslint-comments": "4.7.1",
         "@eslint/compat": "2.0.3",
         "@eslint/config-helpers": "0.5.3",
-        "@eslint/core": "1.1.1",
+        "@eslint/core": "1.2.0",
         "@eslint/js": "10.0.1",
         "@rolldown/plugin-babel": "0.2.2",
         "@stylistic/eslint-plugin": "5.10.0",
