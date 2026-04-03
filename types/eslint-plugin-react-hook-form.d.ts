@@ -4,6 +4,7 @@ declare module "eslint-plugin-react-hook-form" {
     interface Ruleset {
         rules: Linter.RulesRecord;
     }
+
     type Configs = {
         recommended: Ruleset;
         "react-compiler": Ruleset;

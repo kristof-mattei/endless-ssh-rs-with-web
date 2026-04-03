@@ -131,7 +131,7 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
         rules: {
             ...importPluginConfigs.recommended.rules,
             ...reactHooksPlugin.configs.recommended.rules,
-            // ...fixupConfigRules(reactHookFormPlugin.configs.recommended).rules,
+            ...reactHookFormPlugin.configs.recommended.rules,
 
             // Core hooks rules
             "react-hooks/rules-of-hooks": "error",
@@ -155,8 +155,6 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
             "react-hooks/incompatible-library": "warn",
 
             "react-refresh/only-export-components": "error",
-
-            "import-x/prefer-namespace-import": [2, { patterns: ["react"] }],
 
             ...sharedRules,
         },
@@ -194,14 +192,14 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
                     alwaysTryTypes: true,
                 },
             },
+            ...importPluginConfigs.react.settings,
         },
         rules: {
             ...importPluginConfigs.typescript.rules,
             ...importPluginConfigs.recommended.rules,
-
             ...sharedRules,
 
-            // ...fixupPluginRules(promise.configs?.["flat/recommended"]! as FixupPluginDefinition).rules,
+            ...promise.configs["flat/recommended"].rules,
 
             "no-restricted-imports": ["off"],
 
