@@ -1,4 +1,7 @@
+// eslint-disable-next-line import-x/named -- import-x just can't find them.
 import { fixupPluginRules } from "@eslint/compat";
+
+// eslint-disable-next-line import-x/named -- import-x just can't find them.
 import { defineConfig, globalIgnores } from "@eslint/config-helpers";
 import type { RulesConfig } from "@eslint/core";
 import js from "@eslint/js";
