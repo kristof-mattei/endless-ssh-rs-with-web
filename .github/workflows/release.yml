@@ -48,7 +48,13 @@ jobs:
           token: ${{ secrets.TOKEN_TO_TRIGGER_SUBSEQUENT_WORKFLOWS }}
 
       - name: Install git-cliff to generate changelog & next version number
+<<<<<<< HEAD
         uses: taiki-e/install-action@1ed3272338f573e042a2e6bca3893aa19f43b47a # v2.71.3
+||||||| 8d2b1715
+        uses: taiki-e/install-action@a1df9120380005ebdc788c62449b841b205541dd # v2.71.0
+=======
+        uses: taiki-e/install-action@de6f06126afb86b5250a16ff961c57360c5edccc # v2.72.0
+>>>>>>> upstream/main
         with:
           tool: git-cliff
 
