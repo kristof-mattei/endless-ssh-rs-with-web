@@ -79,12 +79,16 @@ export function useWebSocket({ onEvent }: Options): void {
             });
 
             ws.addEventListener("message", (message: MessageEvent<string>) => {
-                // eslint-disable-next-line @typescript-eslint/init-declarations -- no other way to express (except for an IIFE)
-                let event: undefined | WsEvent;
-                try {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- trusted source
-                    event = JSON.parse(message.data) as WsEvent;
-                } catch {
+                const event = ((): undefined | WsEvent => {
+                    try {
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- trusted source
+                        return JSON.parse(message.data) as WsEvent;
+                    } catch {
+                        return undefined;
+                    }
+                })();
+
+                if (event === undefined) {
                     return;
                 }
 
