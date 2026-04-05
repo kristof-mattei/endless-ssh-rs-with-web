@@ -1,4 +1,31 @@
 <!-- header goes here -->
+## [0.8.10](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.9..v0.8.10) - 2026-04-05
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate libc to 0.2.184 by [@renovate[bot]](https://github.com/renovate[bot]) ([`8c96aee`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8c96aee1ac38596a36a5eabcebba5f6433cd796b))
+- *(deps)* Update rust crate axum-proxy to 0.7.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`044879f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/044879f97a9ab6c83ff8f96c0d82891d4d118ca4))
+- *(deps)* Update maplibre-gl (npm) to v5.22.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`741571c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/741571c9c5583bdac1bae0c8b9be04f1cf0fb562))
+- *(deps)* Update rust crate tokio to 1.51.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`1c429a1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1c429a13b98fc3e8b67ffb6df9bb98c9ff771229))
+- Use love differently by [@kristof-mattei](https://github.com/kristof-mattei) ([`4c631a1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4c631a1517d1c6f9887bc160f6ac734f67c7d9c3))
+- Incorrect package name by [@kristof-mattei](https://github.com/kristof-mattei) ([`e1cba69`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e1cba6908d00126101be282b13313cc32244019b))
+- We can now release without having ANY tags on the repo by [@kristof-mattei](https://github.com/kristof-mattei) ([`80cbc44`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/80cbc44189bf721637640dbf7257f852ca82f877))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Upload edge to docker.io by [@kristof-mattei](https://github.com/kristof-mattei) ([`f235bac`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f235bac7e7bf720a4c42711f12fa57cb361c6adf))
+- *(ci)* Reattest every stage by [@kristof-mattei](https://github.com/kristof-mattei) ([`19c7f04`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/19c7f048fad6474f798c9d810dbe1d2278731d6d))
+- *(ci)* Use skopeo wherever possible by [@kristof-mattei](https://github.com/kristof-mattei) ([`50a6786`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/50a678665fd200021293e938c0b493891077a5ef))
+- *(ci)* Scout for visualizing cves etc by [@kristof-mattei](https://github.com/kristof-mattei) ([`2fe6e06`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2fe6e06ada42423eeacec95be6a29ccbd3806068))
+- *(ci)* Username is not secret by [@kristof-mattei](https://github.com/kristof-mattei) ([`7d168f4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7d168f446d7bbdabaf2bd58c2818af2a65b07c41))
+- *(release)* Release v0.8.10
+- Sort tags by creation time by [@kristof-mattei](https://github.com/kristof-mattei) ([`39ce04b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/39ce04bd2b02ef17d869c2828bf3e641854a25b1))
+- Bump all eslint-packages by [@kristof-mattei](https://github.com/kristof-mattei) ([`b79f6e7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b79f6e7e653908734169f050630f8d644da88917))
+- Update pnpm config to use ignoredBuiltDependencies in package.json by [@kristof-mattei](https://github.com/kristof-mattei) ([`c10743b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c10743bc37f2cf3d0fa078647d8901b65089d7e1))
+- Clean up comment by [@kristof-mattei](https://github.com/kristof-mattei) ([`870f4e8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/870f4e8e379f3c160c127a0a8edd8186e601663f))
+- Placeholder by [@kristof-mattei](https://github.com/kristof-mattei) ([`eff2e8b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/eff2e8bf95169a23ae48fed5debcd79f92dc90e1))
+- Use IIFE to avoid disabling lint by [@kristof-mattei](https://github.com/kristof-mattei) ([`e225659`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e225659da5eb437e51b1103633d480d7faf16a4e))
+- Fix fmt by [@kristof-mattei](https://github.com/kristof-mattei) ([`1c63af5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1c63af585079ee98e0b241fc6683c31982159106))
 ## [0.8.9](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.8..v0.8.9) - 2026-04-01
 
 ### 🐛 Bug Fixes
@@ -7,7 +34,7 @@
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.8.9
+- *(release)* Release v0.8.9 by [@github-actions[bot]](https://github.com/github-actions[bot]) ([`adaded6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/adaded62c3df39ea661260f881c8736662594938))
 - Clarify name by [@kristof-mattei](https://github.com/kristof-mattei) ([`4ea320e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4ea320e830a0c69560e9ebc67fcdcca0f4687605))
 - Prepare doesn't need the cache & toolchain by [@kristof-mattei](https://github.com/kristof-mattei) ([`a255daf`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a255daf9066d8a79c834e73fee97a89c7d32b1a2))
 - Render username link by [@kristof-mattei](https://github.com/kristof-mattei) ([`19debe7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/19debe713ec00dc8f6534a65bab8f1f9ef5dccec))
@@ -50,6 +77,7 @@
 - Speed up spellcheck compilation with sccache by [@kristof-mattei](https://github.com/kristof-mattei) ([`5e53dcd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5e53dcd877309fafb5cf123c5a39697ccd2f47d7))
 - Enable sccache for spellcheck by [@kristof-mattei](https://github.com/kristof-mattei) ([`d99fa01`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d99fa01ce7d28befefea7882be13557a9d9ffc24))
 - Remove cache cargo for spellcheck, as it doesn't do anything by [@kristof-mattei](https://github.com/kristof-mattei) ([`565017e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/565017e04b68ad7de0efad32f98ba111041d773a))
+- More configs as ts by [@kristof-mattei](https://github.com/kristof-mattei) ([`9e72476`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9e724765a75dfef5cf215eb9290b6413f54b7ad9))
 - Use a spellcheck fork for quicker installation by [@kristof-mattei](https://github.com/kristof-mattei) ([`93bfd69`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/93bfd695bd0a871fbdb10a269b4d266194303729))
 - No need to do spellcheck on push anymore, as we use pre-built binaries by [@kristof-mattei](https://github.com/kristof-mattei) ([`afa2005`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/afa2005227a8ac9fb078efe5abf6f9cad8f52c37))
 ## [0.8.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.3..v0.8.4) - 2026-03-25
