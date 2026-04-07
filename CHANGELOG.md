@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.8.11](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.10..v0.8.11) - 2026-04-07
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Release v0.8.11
 ## [0.8.10](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.9..v0.8.10) - 2026-04-05
 
 ### 🐛 Bug Fixes
@@ -18,7 +23,7 @@
 - *(ci)* Use skopeo wherever possible by [@kristof-mattei](https://github.com/kristof-mattei) ([`50a6786`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/50a678665fd200021293e938c0b493891077a5ef))
 - *(ci)* Scout for visualizing cves etc by [@kristof-mattei](https://github.com/kristof-mattei) ([`2fe6e06`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2fe6e06ada42423eeacec95be6a29ccbd3806068))
 - *(ci)* Username is not secret by [@kristof-mattei](https://github.com/kristof-mattei) ([`7d168f4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7d168f446d7bbdabaf2bd58c2818af2a65b07c41))
-- *(release)* Release v0.8.10
+- *(release)* Release v0.8.10 by [@github-actions[bot]](https://github.com/github-actions[bot]) ([`3618a31`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3618a31cff0b031f1f051ff770e29c2b32066560))
 - Sort tags by creation time by [@kristof-mattei](https://github.com/kristof-mattei) ([`39ce04b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/39ce04bd2b02ef17d869c2828bf3e641854a25b1))
 - Bump all eslint-packages by [@kristof-mattei](https://github.com/kristof-mattei) ([`b79f6e7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b79f6e7e653908734169f050630f8d644da88917))
 - Update pnpm config to use ignoredBuiltDependencies in package.json by [@kristof-mattei](https://github.com/kristof-mattei) ([`c10743b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c10743bc37f2cf3d0fa078647d8901b65089d7e1))
