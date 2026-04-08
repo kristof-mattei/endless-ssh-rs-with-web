@@ -34,9 +34,9 @@
         "ip-address": "^10.1.0",
         "maplibre-gl": "5.22.0",
         "pretty-bytes": "^7.1.0",
-        "react": "19.2.4",
+        "react": "19.2.5",
         "react-compiler-runtime": "1.0.0",
-        "react-dom": "19.2.4",
+        "react-dom": "19.2.5",
         "react-map-gl": "8.1.0",
         "recharts": "3.8.1"
     },
