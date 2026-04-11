@@ -1,9 +1,22 @@
 <!-- header goes here -->
+## [0.8.12](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.11..v0.8.12) - 2026-04-11
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate tokio to 1.51.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`b2fe14c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b2fe14c4aef2b14bc237238c074885dacfa7e6b8))
+- *(deps)* Update react monorepo to v19.2.5 by [@renovate[bot]](https://github.com/renovate[bot]) ([`27e0549`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/27e05496926ccc534801abbcb5bd10ae31a64f73))
+- *(deps)* Update react-map-gl (npm) to v8.1.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`4dceb6a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4dceb6a222dc8cb889a3a4e13c67b961ffc1d0d8))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Restore ability to do prerelease versions by [@kristof-mattei](https://github.com/kristof-mattei) ([`7c5b0ea`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7c5b0ea895c5e92aa3c69fec62e3a7156f2ca183))
+- *(ci)* Allow re-release pre-release without having to add features by [@kristof-mattei](https://github.com/kristof-mattei) ([`657a7db`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/657a7db145169f1dd3cd17b587324fae32ec4d04))
+- Use $vite to make sure the same version is used by [@kristof-mattei](https://github.com/kristof-mattei) ([`87f4894`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/87f489419415f7f4be8071f69331698b25182f09))
 ## [0.8.11](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.10..v0.8.11) - 2026-04-07
 
 ### ⚙️ Miscellaneous Tasks
 
-- *(release)* Release v0.8.11
+- *(release)* Release v0.8.11 by [@github-actions[bot]](https://github.com/github-actions[bot]) ([`39d16fd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/39d16fdf66d0d191d3ad3b15dbb75544b716ec9e))
 ## [0.8.10](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.9..v0.8.10) - 2026-04-05
 
 ### 🐛 Bug Fixes
