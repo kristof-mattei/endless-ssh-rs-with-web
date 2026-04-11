@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.8.13](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.12..v0.8.13) - 2026-04-11
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate rand to 0.10.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`4809cc9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4809cc98a737cd207da05a724b81c5a33ab0f45d))
 ## [0.8.12](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.11..v0.8.12) - 2026-04-11
 
 ### 🐛 Bug Fixes
