@@ -11,7 +11,7 @@ services:
     command: sleep infinity
 
   timescaledb:
-    image: timescale/timescaledb:2.26.2-pg18@sha256:91a6c11a7c598b098cbab2d59c36895cd6b6b49fd0aa37f6cdd6d2e3e3e3d6ca
+    image: timescale/timescaledb:2.26.3-pg18@sha256:52c2817087cbd70dfe48ccfaed8ab30c00a430a7348d2989676ed27332042ded
     restart: unless-stopped
     ports:
       - 5432:5432
