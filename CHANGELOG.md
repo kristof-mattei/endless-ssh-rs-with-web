@@ -1,4 +1,21 @@
 <!-- header goes here -->
+## [0.8.14](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.13..v0.8.14) - 2026-04-17
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update maplibre-gl (npm) to v5.23.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`bbf8f0b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bbf8f0b7a69f8ddff064f3de92cda4330c4eeb88))
+- *(deps)* Update rust crate axum to 0.8.9 by [@renovate[bot]](https://github.com/renovate[bot]) ([`503bff1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/503bff1c6323cbe69b9140497f3ccf1cc854d039))
+- *(deps)* Update rust crate libc to 0.2.185 by [@renovate[bot]](https://github.com/renovate[bot]) ([`b23e054`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b23e0540d1689c4db7762f521f08da33b6baebb7))
+- *(deps)* Update rust crate tokio to 1.52.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`38cc7cb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/38cc7cb31f116537178adc7e663159dc8d493036))
+- *(deps)* Update rust crate clap to 4.6.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`295f9cc`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/295f9cc3ed3317400a25a42fd133a4278962db26))
+- *(deps)* Update rust crate uuid to 1.23.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`36eca93`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/36eca93d0c97c8c2054c9e9a2db60282f0c41ce0))
+- *(deps)* Update rust crate tokio to 1.52.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d4ad50b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d4ad50bb6d5457275e5eba987782df6ef930c785))
+- Use renamed crate by [@kristof-mattei](https://github.com/kristof-mattei) ([`7418918`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/741891834207f5a6773cc8793e2c0f57cd8795d1))
+- Disable plugins by [@kristof-mattei](https://github.com/kristof-mattei) ([`3725751`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/37257510cce405e0426a57c6e76ec53d73454c91))
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix lint error by [@kristof-mattei](https://github.com/kristof-mattei) ([`8f423b0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8f423b04f01f51d82fb0a6a3184d0e6e7e5e4d46))
 ## [0.8.13](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.12..v0.8.13) - 2026-04-11
 
 ### 🐛 Bug Fixes
