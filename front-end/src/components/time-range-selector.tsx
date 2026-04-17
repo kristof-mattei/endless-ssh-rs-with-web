@@ -49,12 +49,10 @@ interface Properties {
 
 export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     const [selected, setSelected] = useState<Range>("24h");
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    const fetchStats = useCallback(
+    const doFetch = useCallback(
         async (range: Range) => {
-            setLoading(true);
-
             try {
                 const { from, to } = rangeToParameters(range);
                 const fromDate = new Date(from);
@@ -74,13 +72,13 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
         [onData],
     );
 
-    // page load
     useEffect(() => {
-        void fetchStats(selected);
-    }, [fetchStats, selected]);
+        void doFetch(selected);
+    }, [doFetch, selected]);
 
     const handleChange = useCallback((range: Range) => {
         setSelected(range);
+        setLoading(true);
     }, []);
 
     return (
