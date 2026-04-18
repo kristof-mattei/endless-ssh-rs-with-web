@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.8.15](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.14..v0.8.15) - 2026-04-18
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Link in release proposal now points to sha as tag doesn't exist yet by [@kristof-mattei](https://github.com/kristof-mattei) ([`f2bcfc8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f2bcfc8ed61488c9863b26533432becd6e7267df))
 ## [0.8.14](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.13..v0.8.14) - 2026-04-17
 
 ### 🐛 Bug Fixes
