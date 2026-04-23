@@ -1,4 +1,17 @@
 <!-- header goes here -->
+## [0.8.16](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.15..v0.8.16) - 2026-04-23
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate mimalloc to 0.1.49 by [@renovate[bot]](https://github.com/renovate[bot]) ([`424515e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/424515eb41fbe3c794929fee98c7fed43cc8bdb2))
+- *(deps)* `mimalloc` by default now is v3, removing flag by [@kristof-mattei](https://github.com/kristof-mattei) ([`e18e85c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e18e85c209810b0e9c678c2b36a0717149a66332))
+- *(deps)* `mimalloc` by default now is v3, removing flag by [@kristof-mattei](https://github.com/kristof-mattei) ([`c0fdb8a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c0fdb8aa5fae0dd08bcfb2441388bd458dd23a0c))
+- *(deps)* Update rust crate mimalloc to 0.1.50 by [@renovate[bot]](https://github.com/renovate[bot]) ([`c5a0373`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c5a0373bec1cc114a7cda722682bb23ff248da12))
+- *(deps)* Update maplibre-gl (npm) to v5.24.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`6af6898`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6af6898a28647913bbc0c026a91dff316f5345af))
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove `--offline`, it just doesn't work, don't know why by [@kristof-mattei](https://github.com/kristof-mattei) ([`4ee992e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4ee992e5323b2518d2c43cf269e9cca3a3e6679a))
 ## [0.8.15](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.14..v0.8.15) - 2026-04-18
 
 ### ⚙️ Miscellaneous Tasks
