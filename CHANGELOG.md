@@ -1,4 +1,15 @@
 <!-- header goes here -->
+## [0.8.17](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.16..v0.8.17) - 2026-04-25
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate mimalloc to 0.1.50 by [@renovate[bot]](https://github.com/renovate[bot]) ([`f488e9c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f488e9c023782304221631029603e77be7779648))
+- *(deps)* Update rust crate libc to 0.2.186 by [@renovate[bot]](https://github.com/renovate[bot]) ([`f7775ac`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f7775ac98703380b632a42a393902f3b973e88a4))
+
+### ⚙️ Miscellaneous Tasks
+
+- Move to keep track by [@kristof-mattei](https://github.com/kristof-mattei) ([`875aa78`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/875aa782ea519c14a436571709410d6fa29dd90a))
+- Restore by [@kristof-mattei](https://github.com/kristof-mattei) ([`0a78c60`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0a78c60f728c9bb9117ead72ce20eecedaf5c7ed))
 ## [0.8.16](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.15..v0.8.16) - 2026-04-23
 
 ### 🐛 Bug Fixes
