@@ -1,4 +1,16 @@
 <!-- header goes here -->
+## [0.9.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.17..v0.9.0) - 2026-04-27
+
+### 🚀 Features
+
+- Checkbox to allow for auto-merging a release PR by [@kristof-mattei](https://github.com/kristof-mattei) ([`8b67c89`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8b67c89b30a8d6b3d4822110734fa4497caabe28))
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate maxminddb to 0.28.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`1edeba2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1edeba219daaa05f87e5d1f6087a4d0575b93d9d))
+- *(deps)* Update rust crate maxminddb to 0.28.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`19baa0a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/19baa0a91fc7292f8d701130092ea3fe233d74c1))
+- *(deps)* Update @recharts/devtools (npm) to v0.0.12 by [@renovate[bot]](https://github.com/renovate[bot]) ([`64a4d71`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/64a4d71cf8c28d49c76bc8a9e9aedbfa85c8c40a))
+- *(deps)* Update rust crate reqwest to 0.13.3 by [@renovate[bot]](https://github.com/renovate[bot]) ([`9170f66`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9170f663143114e412dc700e500eacf5070a16e1))
 ## [0.8.17](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.16..v0.8.17) - 2026-04-25
 
 ### 🐛 Bug Fixes
