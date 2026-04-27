@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.9.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.9.0..v0.9.1) - 2026-04-27
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update ip-address (npm) to ^10.1.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`f893cb4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f893cb46fa1d108821caf31484be58244757bb60))
 ## [0.9.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.8.17..v0.9.0) - 2026-04-27
 
 ### 🚀 Features
