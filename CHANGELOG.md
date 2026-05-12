@@ -1,4 +1,17 @@
 <!-- header goes here -->
+## [0.9.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.9.3..v0.9.4) - 2026-05-12
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate tokio to 1.52.2 by [@renovate[bot]](https://github.com/renovate[bot]) ([`401e838`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/401e8385dd4fd7929c9d623d26fa4019aedefd19))
+- *(deps)* Update @recharts/devtools (npm) to v0.0.13 by [@renovate[bot]](https://github.com/renovate[bot]) ([`b084419`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b084419ae55edd485a5a148d7e467d41c17c7a1c))
+- *(deps)* Update react monorepo to v19.2.6 by [@renovate[bot]](https://github.com/renovate[bot]) ([`74ee558`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/74ee558d7e41ce1854017caebac3f9e47cf0def6))
+- *(deps)* Update rust crate tower-http to 0.6.10 by [@renovate[bot]](https://github.com/renovate[bot]) ([`2a39fa3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2a39fa3d812241c7ddd8675f21b3579ccd4d460d))
+- *(deps)* Update rust crate tokio to 1.52.3 by [@renovate[bot]](https://github.com/renovate[bot]) ([`834bdfd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/834bdfd686f6d256ac13a03d7476ee11c6a9dbcc))
+- ConfigError: Config (unnamed): Key "plugins": Cannot redefine plugin "n". by [@kristof-mattei](https://github.com/kristof-mattei) ([`563c8ed`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/563c8ed1f0b6db4598d1302dc2ff070779cd0e54))
+- Add on-early-drop handler by [@kristof-mattei](https://github.com/kristof-mattei) ([`921d25f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/921d25f0848bec3e4a96e091a124bf12c8ca4aae))
+- Broken update by [@kristof-mattei](https://github.com/kristof-mattei) ([`62c533a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/62c533a4b890474a7f61c6c45eed82c1b22342c8))
+- Eslint rules correction by [@kristof-mattei](https://github.com/kristof-mattei) ([`989b553`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/989b55376e9e1d7712ab9ba46b5a612b61ff23fd))
 ## [0.9.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.9.2..v0.9.3) - 2026-05-01
 
 ### 🐛 Bug Fixes
