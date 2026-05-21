@@ -20,6 +20,20 @@
             "terminal": "integrated"
         },
         {
+            "name": "Debug executable 'endless-ssh-rs-with-web' without RUST_LOG",
+            "type": "lldb",
+            "request": "launch",
+            "cargo": {
+                "args": ["run", "--bin=endless-ssh-rs-with-web"]
+            },
+            "args": [],
+            "env": {
+                "RUST_BACKTRACE": "1"
+            },
+            "internalConsoleOptions": "neverOpen",
+            "terminal": "integrated"
+        },
+        {
             "name": "Debug executable 'endless-ssh-rs-with-web' wrong-params",
             "type": "lldb",
             "request": "launch",
