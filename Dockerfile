@@ -93,11 +93,11 @@ RUN [ ! -s version-bump.patch ] || patch --strip 1 < version-bump.patch
 RUN /build-scripts/build.sh install --frozen --path "./crates/${APPLICATION_NAME}/" --root /output
 
 # front-end (NPM) build
-FROM --platform=${BUILDPLATFORM} node:24.15.0-alpine3.22@sha256:b689d4005875ae167178471a7a622ec2909459a3bbb32277260be1971af7a99f AS typescript-build
+FROM --platform=${BUILDPLATFORM} node:26.2.0-alpine3.23@sha256:7c6af15abe4e3de859690e7db171d0d711bf37d27528eddfe625b2fe89e097f8 AS typescript-build
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+RUN npm uninstall --global corepack && npm install --global corepack
 
 # The following block
 # creates an empty app, and we copy in package.json and package-lock.json as they represent our dependencies
@@ -106,7 +106,6 @@ RUN corepack enable
 WORKDIR /build
 COPY package.json pnpm-lock.yaml vite.config.ts tailwind.config.mjs tsconfig.json pnpm-workspace.yaml ./
 
-RUN npm pkg delete scripts.prepare
 # install the corepack our package requires
 RUN corepack install
 
