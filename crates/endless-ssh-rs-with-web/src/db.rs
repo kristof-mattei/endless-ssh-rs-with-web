@@ -6,7 +6,7 @@ use std::net::IpAddr;
 use futures::stream::Stream;
 use sqlx::migrate::MigrateError;
 use sqlx::postgres::PgPoolOptions;
-use sqlx::{PgPool, Row as _};
+use sqlx::{AssertSqlSafe, PgPool, Row as _};
 use time::{Duration, OffsetDateTime};
 use tracing::{Level, event};
 
@@ -226,7 +226,10 @@ pub async fn get_stats(
             table
         );
 
-        sqlx::query(&sql)
+        // The dynamically injected table is a limited to 4 tables
+        let safe_sql = AssertSqlSafe(sql);
+
+        sqlx::query(safe_sql)
             .bind(from)
             .bind(to)
             .fetch_all(pool)
