@@ -4,9 +4,9 @@ pub mod types;
 use std::net::IpAddr;
 
 use futures::stream::Stream;
+use sqlx::PgPool;
 use sqlx::migrate::MigrateError;
 use sqlx::postgres::PgPoolOptions;
-use sqlx::{PgPool, Row as _};
 use time::{Duration, OffsetDateTime};
 use tracing::{Level, event};
 
@@ -188,79 +188,188 @@ pub struct StatsRow {
     pub bytes_sent: i64,
 }
 
-/// Pick the right aggregate tier and return rows for [from, to].
-pub async fn get_stats(
+struct DbStatsRow {
+    bucket: OffsetDateTime,
+    country_code: Option<String>,
+    connects: i64,
+    time_spent: DbDuration,
+    bytes_sent: i64,
+}
+
+impl From<DbStatsRow> for StatsRow {
+    fn from(row: DbStatsRow) -> Self {
+        Self {
+            bucket: row.bucket,
+            country_code: row.country_code,
+            connects: row.connects,
+            time_spent: row.time_spent.0,
+            bytes_sent: row.bytes_sent,
+        }
+    }
+}
+
+async fn get_stats_1min(
     pool: &PgPool,
-    from_to: Option<(OffsetDateTime, OffsetDateTime)>,
+    from: OffsetDateTime,
+    to: OffsetDateTime,
 ) -> Result<Vec<StatsRow>, sqlx::Error> {
-    let rows = if let Some((from, to)) = from_to {
-        let span = to - from;
-        let span_hours = span.whole_hours();
-
-        let table = if span_hours <= 24 {
-            "connections_1min"
-        } else if span_hours <= 24 * 7 {
-            "connections_5min"
-        } else if span_hours <= 24 * 30 {
-            "connections_1h"
-        } else {
-            "connections_1day"
-        };
-
-        let sql = format!(
-            "
+    let rows = sqlx::query_as!(
+        DbStatsRow,
+        r#"
         SELECT
-            bucket
+            bucket AS "bucket!"
             , country_code
-            , connects
-            , time_spent
-            , bytes_sent
+            , connects AS "connects!"
+            , time_spent AS "time_spent!: DbDuration"
+            , bytes_sent AS "bytes_sent!"
         FROM
-            {}
+            connections_1min
         WHERE
             bucket >= $1
             AND bucket < $2
         ORDER BY
             bucket
-        ",
-            table
-        );
+        "#,
+        from,
+        to
+    )
+    .fetch_all(pool)
+    .await?;
 
-        sqlx::query(&sql)
-            .bind(from)
-            .bind(to)
-            .fetch_all(pool)
-            .await?
-    } else {
-        sqlx::query(
-            "
+    Ok(rows.into_iter().map(StatsRow::from).collect())
+}
+
+async fn get_stats_5min(
+    pool: &PgPool,
+    from: OffsetDateTime,
+    to: OffsetDateTime,
+) -> Result<Vec<StatsRow>, sqlx::Error> {
+    let rows = sqlx::query_as!(
+        DbStatsRow,
+        r#"
         SELECT
-            bucket
+            bucket AS "bucket!"
             , country_code
-            , connects
-            , time_spent
-            , bytes_sent
+            , connects AS "connects!"
+            , time_spent AS "time_spent!: DbDuration"
+            , bytes_sent AS "bytes_sent!"
         FROM
-            connections_1day
+            connections_5min
+        WHERE
+            bucket >= $1
+            AND bucket < $2
         ORDER BY
             bucket
-        ",
+        "#,
+        from,
+        to
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(rows.into_iter().map(StatsRow::from).collect())
+}
+
+async fn get_stats_1h(
+    pool: &PgPool,
+    from: OffsetDateTime,
+    to: OffsetDateTime,
+) -> Result<Vec<StatsRow>, sqlx::Error> {
+    let rows = sqlx::query_as!(
+        DbStatsRow,
+        r#"
+        SELECT
+            bucket AS "bucket!"
+            , country_code
+            , connects AS "connects!"
+            , time_spent AS "time_spent!: DbDuration"
+            , bytes_sent AS "bytes_sent!"
+        FROM
+            connections_1h
+        WHERE
+            bucket >= $1
+            AND bucket < $2
+        ORDER BY
+            bucket
+        "#,
+        from,
+        to
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(rows.into_iter().map(StatsRow::from).collect())
+}
+
+async fn get_stats_1day(
+    pool: &PgPool,
+    from: OffsetDateTime,
+    to: OffsetDateTime,
+) -> Result<Vec<StatsRow>, sqlx::Error> {
+    let rows = sqlx::query_as!(
+        DbStatsRow,
+        r#"
+        SELECT
+            bucket AS "bucket!"
+            , country_code
+            , connects AS "connects!"
+            , time_spent AS "time_spent!: DbDuration"
+            , bytes_sent AS "bytes_sent!"
+        FROM
+            connections_1day
+        WHERE
+            bucket >= $1
+            AND bucket < $2
+        ORDER BY
+            bucket
+        "#,
+        from,
+        to
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(rows.into_iter().map(StatsRow::from).collect())
+}
+
+/// Return all 1-day rows when no range is given, otherwise pick the right aggregate tier for the scale of [from, to).
+pub async fn get_stats(
+    pool: &PgPool,
+    from_to: Option<(OffsetDateTime, OffsetDateTime)>,
+) -> Result<Vec<StatsRow>, sqlx::Error> {
+    if let Some((from, to)) = from_to {
+        let span_hours = (to - from).whole_hours();
+
+        if span_hours <= 24 {
+            get_stats_1min(pool, from, to).await
+        } else if span_hours <= 24 * 7 {
+            get_stats_5min(pool, from, to).await
+        } else if span_hours <= 24 * 30 {
+            get_stats_1h(pool, from, to).await
+        } else {
+            get_stats_1day(pool, from, to).await
+        }
+    } else {
+        let rows = sqlx::query_as!(
+            DbStatsRow,
+            r#"
+            SELECT
+                bucket AS "bucket!"
+                , country_code
+                , connects AS "connects!"
+                , time_spent AS "time_spent!: DbDuration"
+                , bytes_sent AS "bytes_sent!"
+            FROM
+                connections_1day
+            ORDER BY
+                bucket
+            "#
         )
         .fetch_all(pool)
-        .await?
-    };
+        .await?;
 
-    rows.into_iter()
-        .map(|row| {
-            Ok(StatsRow {
-                bucket: row.try_get("bucket")?,
-                country_code: row.try_get("country_code")?,
-                connects: row.try_get("connects")?,
-                time_spent: row.try_get::<DbDuration, _>("time_spent")?.into(),
-                bytes_sent: row.try_get("bytes_sent")?,
-            })
-        })
-        .collect()
+        Ok(rows.into_iter().map(StatsRow::from).collect())
+    }
 }
 
 #[track_caller]
