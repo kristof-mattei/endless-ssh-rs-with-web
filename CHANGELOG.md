@@ -1,4 +1,70 @@
 <!-- header goes here -->
+## [0.10.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.9.4..v0.10.0) - 2026-05-22
+
+### 🚀 Features
+
+- Update it all by [@kristof-mattei](https://github.com/kristof-mattei) ([`5d9bb2e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5d9bb2eedb10489cf2fed857cd971d404d13eafd))
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate dashmap to 6.2.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`5bdd1dd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5bdd1dd018066dcaba0cb7ade41e5415796b35aa))
+- *(deps)* Update rust crate dashmap to 6.2.1 (#2680) by [@renovate[bot]](https://github.com/renovate[bot]) in #2680 ([`ab8319e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ab8319e09849bdfd7469bddc1bbd19cd9e4d16b4))
+- *(deps)* Update rust crate tower-http to 0.6.11 by [@renovate[bot]](https://github.com/renovate[bot]) ([`8da5a74`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8da5a74b426c6952310b2adbfaf0ce796f720b49))
+- *(deps)* Update rust crate tower-http to 0.6.11 (#2685) by [@renovate[bot]](https://github.com/renovate[bot]) in #2685 ([`15e5aed`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/15e5aed04527d25a8270d07bf7eaad3c90d78fc8))
+- *(deps)* Update rust crate tar to 0.4.46 by [@renovate[bot]](https://github.com/renovate[bot]) ([`992ad86`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/992ad86101eab667f5411b916d5e881b16e98403))
+- *(deps)* Update rust crate tar to 0.4.46 (#2688) by [@renovate[bot]](https://github.com/renovate[bot]) in #2688 ([`5c0bd8e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5c0bd8eac3ff1aa00aedb39d2c51ebe462dd5618))
+- *(deps)* Update rust crate mimalloc to 0.1.51 by [@renovate[bot]](https://github.com/renovate[bot]) ([`134255f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/134255f25f89db1dda9d7d4f4255f18eeb36620e))
+- *(deps)* Update rust crate mimalloc to 0.1.51 (#2698) by [@renovate[bot]](https://github.com/renovate[bot]) in #2698 ([`5f2f9a5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5f2f9a55cd67b98335a890797f6286ac07f65d67))
+- *(deps)* Update rust crate tracing-subscriber to 0.3.23 by [@renovate[bot]](https://github.com/renovate[bot]) ([`ad48b1d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ad48b1d09073c85cb3dc3a67a8126392b2db42e1))
+- *(deps)* Update rust crate uuid to 1.23.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`f4d6be5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f4d6be5f9240153b8c8bfd2a441fb5d1ce73df4e))
+- *(deps)* Update rust crate axum-proxy to 0.7.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d1e88e4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d1e88e4ed506a2e57fc4f388c9ad461bb209ae2d))
+- *(deps)* Update rust crate tokio to 1.51.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`f33e90b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f33e90b41f736abafe8dfb090b32720915880a8d))
+- *(deps)* Update rust crate tokio to 1.51.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`30f7c05`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/30f7c0591b7db42da479e0290d9c1fbb3cede289))
+- *(deps)* Update react monorepo to v19.2.5 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d2a33b8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d2a33b8c7898641573df95bbe96398b5102511df))
+- *(deps)* Update rust crate axum to 0.8.9 by [@renovate[bot]](https://github.com/renovate[bot]) ([`6e30d12`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6e30d12a6650ec82af04d670c9bd6a457009de54))
+- *(deps)* Update rust crate tokio to 1.52.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`1e45f0b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1e45f0b86c11d3eb16e833a42be71bc67269b703))
+- *(deps)* Update rust crate uuid to 1.23.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`7af18d4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7af18d4e985fb7b58730ed2dc33c4394cb11bae9))
+- *(deps)* Update rust crate tokio to 1.52.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`e6b5342`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e6b5342b0e44cc04e2b9634a0a129d852d001582))
+- *(deps)* Update rust crate mimalloc to 0.1.49 by [@renovate[bot]](https://github.com/renovate[bot]) ([`2079c5b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2079c5bf28a6ca61b52e2de93807d208cbc15e6c))
+- *(deps)* `mimalloc` by default now is v3, removing flag by [@kristof-mattei](https://github.com/kristof-mattei) ([`5fba7a8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5fba7a8ba4fefdab3b2d25fb0aed8d034b149f81))
+- *(deps)* Update rust crate mimalloc to 0.1.50 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d19de97`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d19de97408528e38dea8cf0c5d597f698c62384c))
+- *(deps)* Update rust crate tower-proxy to 0.9.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`c9d7295`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c9d729553cd82d1889d28aedfa6aa6eace1e764b))
+- *(deps)* Update rust crate tokio to 1.52.2 by [@renovate[bot]](https://github.com/renovate[bot]) ([`848c01e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/848c01e340ed4d943cd1739fa381392c722567e3))
+- *(deps)* Update react monorepo to v19.2.6 by [@renovate[bot]](https://github.com/renovate[bot]) ([`df0d499`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/df0d49923a7f0779665b5dd7490f4c887a1e2f51))
+- *(deps)* Update rust crate tower-http to 0.6.10 by [@renovate[bot]](https://github.com/renovate[bot]) ([`3ff6ed9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3ff6ed934d6c68d2caca9aaf50a1d36ba39e554c))
+- *(deps)* Update rust crate tokio to 1.52.3 by [@renovate[bot]](https://github.com/renovate[bot]) ([`bbe9b45`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bbe9b45e56d129216f1228b046c2c84653ec23c8))
+- *(deps)* Update rust crate tower-http to 0.6.11 by [@renovate[bot]](https://github.com/renovate[bot]) ([`00151e8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/00151e8823f9a45d7d43b8949fff7f37837145ba))
+- *(deps)* Update rust crate tower-http to 0.6.11 (#1374) by [@renovate[bot]](https://github.com/renovate[bot]) ([`c1f2ab8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c1f2ab8e9122a837cc3f10e095ca2cc348d0f044))
+- *(deps)* Update rust crate mimalloc to 0.1.51 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d325f2d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d325f2d4c6a8367d95249b7363be7aef8c9a7759))
+- *(deps)* Update rust crate mimalloc to 0.1.51 (#1387) by [@renovate[bot]](https://github.com/renovate[bot]) ([`d7e6e9e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d7e6e9e096fb44aadad630473123a87290e149ee))
+- *(deps)* Update rust crate mimalloc to 0.1.51 by [@renovate[bot]](https://github.com/renovate[bot]) ([`297ccb0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/297ccb05fd6ab86c94994ef240d04deb57450250))
+- *(deps)* Update rust crate mimalloc to 0.1.51 (#2814) by [@renovate[bot]](https://github.com/renovate[bot]) ([`bdb432d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bdb432da30a587fbec7fa48d6e3c4b94081c9a98))
+- *(deps)* Update rust crate serde_json to 1.0.150 by [@renovate[bot]](https://github.com/renovate[bot]) ([`62cda23`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/62cda23f33de029ac1ede664cc1e3444c0bc80ce))
+- *(deps)* Update rust crate serde_json to 1.0.150 (#2706) by [@renovate[bot]](https://github.com/renovate[bot]) in #2706 ([`da2e540`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/da2e540c68c0a486f186b4b45e533fbb0b2da9cb))
+- *(deps)* Update rust crate sqlx to 0.9.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d126fbc`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d126fbc62dab0ce2384b319b83b6d6e214a790ac))
+- *(deps)* Update rust crate sqlx to 0.9.0 (#2707) by [@renovate[bot]](https://github.com/renovate[bot]) in #2707 ([`6e9e439`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6e9e439ce082dcdefd046ad2c239c8ccb2079382))
+- *(deps)* Update rust crate mimalloc to 0.1.52 by [@renovate[bot]](https://github.com/renovate[bot]) ([`03671f2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/03671f2bdf568c1020fb8529d4cc6279ef000cdc))
+- *(deps)* Update rust crate mimalloc to 0.1.52 (#2709) by [@renovate[bot]](https://github.com/renovate[bot]) in #2709 ([`72281e4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/72281e4f85b045a3f682e4ed7305e63f7a5ae304))
+- Rule gone by [@kristof-mattei](https://github.com/kristof-mattei) ([`663f51a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/663f51adfdf1a07b065ab96e00b7a024feab6a13))
+- ConfigError: Config (unnamed): Key "plugins": Cannot redefine plugin "n". by [@kristof-mattei](https://github.com/kristof-mattei) ([`622d13d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/622d13d2d48941641f67344f63c382eb3c16985d))
+- Add on-early-drop handler by [@kristof-mattei](https://github.com/kristof-mattei) ([`681aa40`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/681aa402f3f1459ff9d7a19d24eb7ed055305a14))
+- Broken update by [@kristof-mattei](https://github.com/kristof-mattei) ([`97d62e0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/97d62e0bae4d37e3424d7b25c9866fb131f592e8))
+- Eslint rules correction by [@kristof-mattei](https://github.com/kristof-mattei) ([`952458c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/952458c1a491c7b9f99795930ac0567eee746f15))
+- Use  and add a comment to indicate why the dynamic SQL string is safe in this context by [@kristof-mattei](https://github.com/kristof-mattei) ([`75ddb84`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/75ddb84c53b9593979c6c2adf16b98e98fdf49c5))
+
+### ⚙️ Miscellaneous Tasks
+
+- Ignore tsconfig.tsbuildinfo in root only by [@kristof-mattei](https://github.com/kristof-mattei) ([`683f8ee`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/683f8eea0f6b7b458aec722a09246ccbe02d1afb))
+- Eslint as ts by [@kristof-mattei](https://github.com/kristof-mattei) ([`0443595`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0443595981ba39dc15e8591c436558c7ee4144ef))
+- Use $vite to make sure the same version is used by [@kristof-mattei](https://github.com/kristof-mattei) ([`a1f7e14`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a1f7e14eabcdce21234b6c4123f2d80abd6d2669))
+- From secs by [@kristof-mattei](https://github.com/kristof-mattei) ([`eace928`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/eace9287ed9c4f8379678e2d4928011da35cb9a5))
+- Axum-proxy is deprecated by [@kristof-mattei](https://github.com/kristof-mattei) ([`ec88758`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ec88758ba15abe294d483de9651be6dca5fb1f24))
+- Remove `--offline`, it just doesn't work, don't know why by [@kristof-mattei](https://github.com/kristof-mattei) ([`dd1a0c6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/dd1a0c693efcdb23e2f73c81d37712593dd0ace4))
+- Restore by [@kristof-mattei](https://github.com/kristof-mattei) ([`4982c8c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4982c8c6b8e21d38f568c1456e048424c9b5fd63))
+- Node v26 by [@kristof-mattei](https://github.com/kristof-mattei) ([`7bc6380`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7bc6380cf87c105e0378db3a5c7bda289d0bc227))
+- Node v26, but pin to 26.1.0, and 26.2.0 isn't out on Docker yet by [@kristof-mattei](https://github.com/kristof-mattei) ([`5cb3259`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5cb3259500addc61cfc86f63d6b2cd998655c251))
+- Remove devEngines for now by [@kristof-mattei](https://github.com/kristof-mattei) ([`add2c66`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/add2c6612acfaa850faf3d8b282783c9ce27282a))
+- Disable telemetry by [@kristof-mattei](https://github.com/kristof-mattei) ([`1e3c1b9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1e3c1b9a1c2534225b9d264b301f1f23e3b9b2fc))
 ## [0.9.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.9.3..v0.9.4) - 2026-05-12
 
 ### 🐛 Bug Fixes
