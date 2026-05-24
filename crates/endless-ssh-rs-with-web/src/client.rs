@@ -15,6 +15,8 @@ use crate::config::Config;
 use crate::events::ClientEvent;
 use crate::sender;
 
+const INTERESTED_EVENTS: u32 = (libc::EPOLLRDHUP | libc::EPOLLERR | libc::EPOLLHUP).cast_unsigned();
+
 pub struct ClientContext {
     pub cancellation_token: CancellationToken,
     pub internal_events_tx: Sender<ClientEvent>,
@@ -36,7 +38,7 @@ fn make_disconnect_epoll(socket_fd: i32) -> Result<OwnedFd, std::io::Error> {
 
     // SAFETY: epoll_event is a C struct, zero is a valid bit pattern for it
     let mut ev: libc::epoll_event = unsafe { std::mem::zeroed() };
-    ev.events = (libc::EPOLLRDHUP | libc::EPOLLERR | libc::EPOLLHUP) as u32;
+    ev.events = INTERESTED_EVENTS;
 
     // SAFETY: owned_epfd holds a valid epoll fd; socket_fd is a valid fd owned
     // by the caller; ev is fully initialized
@@ -149,9 +151,7 @@ async fn listen_forever(
                     continue;
                 }
 
-                if n > 0
-                    && ev.events & (libc::EPOLLRDHUP | libc::EPOLLERR | libc::EPOLLHUP) as u32 != 0
-                {
+                if n > 0 && ev.events & INTERESTED_EVENTS != 0 {
                     let partial = wait_started_at.elapsed();
 
                     time_spent += partial;
