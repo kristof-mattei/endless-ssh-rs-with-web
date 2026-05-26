@@ -1,4 +1,22 @@
 <!-- header goes here -->
+## [0.10.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.0..v0.10.1) - 2026-05-26
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate mimalloc to 0.1.52 by [@renovate[bot]](https://github.com/renovate[bot]) ([`1890f97`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1890f97240cf108d41c370179666282ebe343759))
+- *(deps)* Update rust crate mimalloc to 0.1.52 (#2820) by [@renovate[bot]](https://github.com/renovate[bot]) ([`f964185`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f964185dff4cee94f1a89e05ca7be9ae0d4f862a))
+- *(deps)* Update @recharts/devtools (npm) to v0.0.14 by [@renovate[bot]](https://github.com/renovate[bot]) ([`7a0aa8d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7a0aa8de2fcbe756b98e1d58983bfa0583e53a9c))
+- *(deps)* Update @recharts/devtools (npm) to v0.0.14 (#2721) by [@renovate[bot]](https://github.com/renovate[bot]) in #2721 ([`642adfb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/642adfb2a0914b10020b3182fa89eb2f0765039d))
+- *(deps)* Update rust crate reqwest to 0.13.4 by [@renovate[bot]](https://github.com/renovate[bot]) ([`e2ed33b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e2ed33b630f42125249f178430e5c12755f2c62d))
+- *(deps)* Update rust crate reqwest to 0.13.4 (#2729) by [@renovate[bot]](https://github.com/renovate[bot]) in #2729 ([`5bbf81a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5bbf81a9d784cb3e7f94353bb72fe75d4ab68b2d))
+- *(deps)* Update rust crate http to 1.4.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`4bc9c50`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4bc9c50889f82ea3312af4b75fe47f2f752cd2d1))
+- *(deps)* Update rust crate http to 1.4.1 (#2730) by [@renovate[bot]](https://github.com/renovate[bot]) in #2730 ([`3faab99`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3faab99ef92d5b069a358e21f4f7387c7052a20a))
+
+### ⚙️ Miscellaneous Tasks
+
+- Node v26 and pnpm 11.2.2 by [@kristof-mattei](https://github.com/kristof-mattei) ([`16139f7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/16139f7f5ad75af955e9cb7cce9a5968d478ee04))
+- Enable `as_conversions` lint by [@kristof-mattei](https://github.com/kristof-mattei) ([`3bfb7bb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3bfb7bb6d1a60f11ecfa7c46b7b6f3d5f4e795a0))
+- Address new lint by [@kristof-mattei](https://github.com/kristof-mattei) ([`6dbe410`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6dbe4102389ef1c5c902bd871460b3e8210a26fc))
 ## [0.10.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.9.4..v0.10.0) - 2026-05-22
 
 ### 🚀 Features
