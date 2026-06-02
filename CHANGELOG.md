@@ -1,4 +1,16 @@
 <!-- header goes here -->
+## [0.10.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.1..v0.10.2) - 2026-06-02
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate uuid to 1.23.2 by [@renovate[bot]](https://github.com/renovate[bot]) ([`8f909e3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8f909e334310976fa8d30fdbfb6df1417a4344e9))
+- *(deps)* Update rust crate uuid to 1.23.2 (#2748) by [@renovate[bot]](https://github.com/renovate[bot]) in #2748 ([`94fb8cc`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/94fb8cca81c5c003d764b68665a8184ca1b894be))
+- *(deps)* Update react monorepo by [@renovate[bot]](https://github.com/renovate[bot]) ([`b562ae3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b562ae3bfa47e6b637001d4ce7a6c53cc8e85d1f))
+- *(deps)* Update react monorepo (#2767) by [@renovate[bot]](https://github.com/renovate[bot]) in #2767 ([`ff40ca0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ff40ca07dfb6429cc01bea29561ce392fbbc7211))
+
+### ⚙️ Miscellaneous Tasks
+
+- Mandate `pretty_assertions::assert_matches` over `std` version by [@kristof-mattei](https://github.com/kristof-mattei) ([`d5e030c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d5e030cf9a767a50b2c10ad5eac80bf2257c49ab))
 ## [0.10.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.0..v0.10.1) - 2026-05-26
 
 ### 🐛 Bug Fixes
