@@ -117,7 +117,7 @@ COPY front-end ./front-end/
 RUN pnpm run build
 
 # Container user setup
-FROM --platform=${BUILDPLATFORM} alpine:3.24.0@sha256:660e0827bd401543d81323d4886abbd08fda0fe3ba84337837d0b11a67251283 AS passwd-build
+FROM --platform=${BUILDPLATFORM} alpine:3.24.0@sha256:8ddefa941e689fc29abcdeb8dae3b3c6d139cc08ce9a52633931160701770685 AS passwd-build
 
 # setting `--system` prevents prompting for a password
 RUN addgroup --gid 900 appgroup \
