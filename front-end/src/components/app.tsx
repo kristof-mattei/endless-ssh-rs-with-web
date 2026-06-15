@@ -20,10 +20,11 @@ function getTimezone(): string {
     // signHH:MM as a string offset (e.g., -07:00)
     const offset = now.offset;
 
-    const parts = new Intl.DateTimeFormat("en-US", {
+    const format = new Intl.DateTimeFormat("en-US", {
         timeZone: now.timeZoneId,
         timeZoneName: "long",
-    }).formatToParts();
+    });
+    const parts = format.formatToParts();
 
     // long-form descriptive name
     const timeZoneName = parts.find((p) => {
@@ -32,9 +33,9 @@ function getTimezone(): string {
 
     if (timeZoneName === undefined) {
         return `GMT ${offset}`;
-    } else {
-        return `${timeZoneName.value}, GMT ${offset}`;
     }
+
+    return `${timeZoneName.value}, GMT ${offset}`;
 }
 
 export const App: React.FC = () => {

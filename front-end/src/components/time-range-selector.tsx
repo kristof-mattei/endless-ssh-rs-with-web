@@ -38,9 +38,9 @@ function rangeToParameters(range: Range): { from: string; to: string } {
         all: 365 * 24 * 60 * 60 * 1000,
     };
 
-    const from = new Date(now.getTime() - msMap[range]).toISOString();
+    const from = new Date(now.getTime() - msMap[range]);
 
-    return { from, to };
+    return { from: from.toISOString(), to };
 }
 
 interface Properties {
