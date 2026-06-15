@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 import type { TooltipContentProps } from "recharts";
 import {
@@ -132,9 +132,12 @@ function aggregate(rows: StatsRow[], from: Date, to: Date): BucketPoint[] {
         }
     }
 
-    return [...map.values()].sort((a, b) => {
-        return a.bucket.getTime() - b.bucket.getTime();
-    });
+    return map
+        .values()
+        .toArray()
+        .sort((a, b) => {
+            return a.bucket.getTime() - b.bucket.getTime();
+        });
 }
 
 interface Properties {
@@ -173,29 +176,29 @@ export const CustomTooltipContent: (properties: TooltipContentProps) => React.JS
     return <DefaultTooltipContent {...properties} payload={allMetrics} />;
 };
 
+type DevelopmentToolsState = {
+    Component: () => React.JSX.Element;
+    portalId: string;
+} | null;
+
+async function loadDevelopmentTools(setDevtools: Dispatch<SetStateAction<DevelopmentToolsState>>): Promise<void> {
+    const module = await import("@recharts/devtools");
+
+    setDevtools({
+        Component: module.RechartsDevtools,
+        portalId: module.RECHARTS_DEVTOOLS_PORTAL_ID,
+    });
+}
+
 function useRechartsDevtools(): {
     Component: () => React.JSX.Element;
     portalId: string;
 } | null {
-    const [devtools, setDevtools] = useState<{
-        Component: () => React.JSX.Element;
-        portalId: string;
-    } | null>(null);
+    const [devtools, setDevtools] = useState<DevelopmentToolsState>(null);
 
     useEffect(() => {
         if (import.meta.env.DEV) {
-            import("@recharts/devtools")
-                .then((module) => {
-                    setDevtools({
-                        Component: module.RechartsDevtools,
-                        portalId: module.RECHARTS_DEVTOOLS_PORTAL_ID,
-                    });
-
-                    return null;
-                })
-                .catch(() => {
-                    return null;
-                });
+            void loadDevelopmentTools(setDevtools);
         }
     }, []);
 
