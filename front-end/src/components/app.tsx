@@ -32,9 +32,9 @@ function getTimezone(): string {
 
     if (timeZoneName === undefined) {
         return `GMT ${offset}`;
-    } else {
-        return `${timeZoneName.value}, GMT ${offset}`;
     }
+
+    return `${timeZoneName.value}, GMT ${offset}`;
 }
 
 export const App: React.FC = () => {
