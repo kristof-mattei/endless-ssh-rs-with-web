@@ -57,8 +57,8 @@
         "@types/react-dom": "19.2.3",
         "@typescript-eslint/parser": "8.61.0",
         "@vitejs/plugin-react": "6.0.2",
-        "@vitest/coverage-v8": "4.1.8",
-        "@vitest/ui": "4.1.8",
+        "@vitest/coverage-v8": "4.1.9",
+        "@vitest/ui": "4.1.9",
         "babel-plugin-react-compiler": "1.0.0",
         "dependency-cruiser": "17.4.3",
         "eslint": "catalog:default",
@@ -85,6 +85,6 @@
         "vite": "catalog:default",
         "vite-plugin-checker": "0.14.1",
         "vite-plugin-svgr": "5.2.0",
-        "vitest": "4.1.8"
+        "vitest": "4.1.9"
     }
 }
