@@ -49,7 +49,7 @@ interface Properties {
 
 export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     const [selected, setSelected] = useState<Range>("24h");
-    const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
 
     const doFetch = useCallback(
         async (range: Range) => {
@@ -66,7 +66,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                     onData({ rows, from: fromDate, to: toDate });
                 }
             } finally {
-                setLoading(false);
+                setIsLoading(false);
             }
         },
         [onData],
@@ -78,7 +78,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
 
     const handleChange = useCallback((range: Range) => {
         setSelected(range);
-        setLoading(true);
+        setIsLoading(true);
     }, []);
 
     return (
@@ -92,7 +92,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                         onClick={() => {
                             handleChange(r.value);
                         }}
-                        disabled={loading}
+                        disabled={isLoading}
                         className={`rounded px-3 py-1 text-sm transition-colors ${
                             selected === r.value
                                 ? "bg-blue-600 text-white"
@@ -103,7 +103,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                     </button>
                 );
             })}
-            {loading && <span className="ml-2 text-xs text-gray-500">Loading...</span>}
+            {isLoading && <span className="ml-2 text-xs text-gray-500">Loading...</span>}
         </div>
     );
 };

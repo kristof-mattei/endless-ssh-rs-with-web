@@ -11,6 +11,8 @@ export function formatDuration(secs: number): string {
     const s = Math.floor(secs % 60);
 
     const parts: string[] = [];
+
+    // eslint-disable-next-line unicorn/consistent-boolean-name -- doesn't make sense here
     let hitNoneZero = false;
 
     if (d > 0) {

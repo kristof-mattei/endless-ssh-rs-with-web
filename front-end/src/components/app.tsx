@@ -65,6 +65,7 @@ export const App: React.FC = () => {
             }
             case "connected": {
                 setActiveConnections((previous) => {
+                    // eslint-disable-next-line unicorn/consistent-boolean-name -- doesn't make sense here
                     const exists = previous.some((c) => {
                         return c.ip === wsEvent.ip;
                     });
