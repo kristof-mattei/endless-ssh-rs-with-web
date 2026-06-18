@@ -93,7 +93,7 @@ RUN [ ! -s version-bump.patch ] || patch --strip 1 < version-bump.patch
 RUN /build-scripts/build.sh install --frozen --path "./crates/${APPLICATION_NAME}/" --root /output
 
 # front-end (NPM) build
-FROM --platform=${BUILDPLATFORM} node:26.3.1-alpine3.23@sha256:2af9499b0c797f6d1073bef6b910aac8c69c31889d8c7700cdb509823a237f87 AS typescript-build
+FROM --platform=${BUILDPLATFORM} node:26.3.1-alpine3.24 AS typescript-build
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
