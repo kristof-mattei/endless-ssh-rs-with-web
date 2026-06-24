@@ -1,4 +1,33 @@
 <!-- header goes here -->
+## [0.10.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.2..v0.10.3) - 2026-06-24
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate http to 1.4.2 by [@renovate[bot]](https://github.com/renovate[bot]) ([`dc843ef`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/dc843ef9f07ed3dab22c4d4777f3676a07c920db))
+- *(deps)* Update rust crate http to 1.4.2 (#2784) by [@renovate[bot]](https://github.com/renovate[bot]) in #2784 ([`51c9899`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/51c9899db78769e6a7f538cce5b879c49d586a92))
+- *(deps)* Update rust crate uuid to 1.23.3 by [@renovate[bot]](https://github.com/renovate[bot]) ([`4ae07c0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4ae07c08fafbb27d904bf7f00c38116995475905))
+- *(deps)* Update rust crate uuid to 1.23.3 (#2787) by [@renovate[bot]](https://github.com/renovate[bot]) in #2787 ([`fc54bea`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fc54bea335a943007a30ee9ec4b4fccedd569c83))
+- *(deps)* Update rust crate time to 0.3.49 by [@renovate[bot]](https://github.com/renovate[bot]) ([`5f45fb8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5f45fb85f4d5be85c3b73e4d7507f69ff0bdb043))
+- *(deps)* Update rust crate tower-http to 0.7.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`1fe8ff1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1fe8ff15207625ca0a42d89dd1b478c3b7fc1b91))
+- *(deps)* Update rust crate tower-http to 0.7.0 (#2810) by [@renovate[bot]](https://github.com/renovate[bot]) in #2810 ([`c401641`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c40164126d75443655afc97ccd4392597ea89c10))
+- *(deps)* Update rust crate time to 0.3.51 by [@renovate[bot]](https://github.com/renovate[bot]) ([`cd61a29`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/cd61a29a19ff8ed848a696963afea2ec667a92e3))
+- *(deps)* Update rust crate time to 0.3.51 (#2841) by [@renovate[bot]](https://github.com/renovate[bot]) in #2841 ([`a056446`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a05644621d3836d6737aaa50067f8318a341864e))
+- *(deps)* Update rust crate memmap2 to 0.9.11 by [@renovate[bot]](https://github.com/renovate[bot]) ([`79ef84c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/79ef84c1fcea5c9a2bcfa065bfc7c6655a208566))
+- *(deps)* Update rust crate memmap2 to 0.9.11 (#2842) by [@renovate[bot]](https://github.com/renovate[bot]) in #2842 ([`ae8160a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ae8160a1abf964d2078d195a3c85596b6408a00b))
+- *(deps)* Update recharts (npm) to v3.9.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`fe713fb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fe713fb96b8e5137a878dca089634f096865d5b2))
+- *(deps)* Update recharts (npm) to v3.9.0 (#2858) by [@renovate[bot]](https://github.com/renovate[bot]) in #2858 ([`b9feb6a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b9feb6a27f73fae175ed9a19aa0fc07e206a9c88))
+
+### ⚙️ Miscellaneous Tasks
+
+- Use catalogs by [@kristof-mattei](https://github.com/kristof-mattei) ([`896656f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/896656fe7b5b7752e282e082751590d2805c632c))
+- New lints part 1 by [@kristof-mattei](https://github.com/kristof-mattei) ([`21a2f6d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/21a2f6d6556d5d0bb1d461ad4e8a6214de1f9935))
+- New lints part 2 by [@kristof-mattei](https://github.com/kristof-mattei) ([`66ae4c8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/66ae4c8e89f2277d744199efd0b10188837b3ec0))
+- New lints by [@kristof-mattei](https://github.com/kristof-mattei) ([`516a656`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/516a65620b112756257849be7f7a4f3d37635eb6))
+- Address new lints by [@kristof-mattei](https://github.com/kristof-mattei) ([`77fe844`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/77fe844b69fce5b7f3e66432c2152ecfad778bcd))
+- Node 26.3.1-alpine3.24 by [@kristof-mattei](https://github.com/kristof-mattei) ([`552352b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/552352bc7aa3e021967ac9668ec1e49ca5238a2c))
+- Tasks.json should not be executable by [@kristof-mattei](https://github.com/kristof-mattei) ([`5527290`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/552729080cf37c4ef92e90228e73971c42540bd9))
+- Fix typing error by [@kristof-mattei](https://github.com/kristof-mattei) ([`8a6fe49`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8a6fe49fb97f75051b3483e31b84800a66f8d707))
+- @types/nodes v26 by [@kristof-mattei](https://github.com/kristof-mattei) ([`c6f91d2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c6f91d249bad73a3faf43abe46a2755b0e2f5cd0))
 ## [0.10.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.1..v0.10.2) - 2026-06-02
 
 ### 🐛 Bug Fixes
