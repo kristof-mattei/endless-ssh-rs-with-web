@@ -1,4 +1,10 @@
 <!-- header goes here -->
+## [0.10.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.3..v0.10.4) - 2026-06-24
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate uuid to 1.23.4 by [@renovate[bot]](https://github.com/renovate[bot]) ([`419d2d0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/419d2d02bc96ba37e25e2bf30866b5bf12e9f91c))
+- *(deps)* Update rust crate uuid to 1.23.4 (#2865) by [@renovate[bot]](https://github.com/renovate[bot]) in #2865 ([`f998f1b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f998f1b2a00f969f97acff8d745461fc6b0890cf))
 ## [0.10.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.2..v0.10.3) - 2026-06-24
 
 ### 🐛 Bug Fixes
