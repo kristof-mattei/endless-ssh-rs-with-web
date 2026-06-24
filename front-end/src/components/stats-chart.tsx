@@ -146,9 +146,15 @@ interface Properties {
     to: Date;
 }
 
-export const CustomTooltipContent: (properties: TooltipContentProps) => React.JSX.Element = (
-    properties: TooltipContentProps,
+export const CustomTooltipContent: (properties: TooltipContentProps<number, keyof BucketPoint>) => React.JSX.Element = (
+    narrowProperties,
 ) => {
+    // `createHorizontalChart` narrows the tooltip's `ValueType` to `number`, but `DefaultTooltipContent` and `Payload` below aren't generic, they're just `ValueType`.
+    // But since when we send in a `number` they just use it as a `number` this is fine.
+    // we really should copy over their `DefaultTooltipContent`...
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- underlying library is untyped
+    const properties = narrowProperties as unknown as TooltipContentProps;
+
     // `payload[0].payload` is the full `BucketPoint`
     const payload = properties.payload as readonly Payload[];
     const payload0 = payload[0];
