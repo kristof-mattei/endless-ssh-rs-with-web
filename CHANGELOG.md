@@ -1,4 +1,21 @@
 <!-- header goes here -->
+## [0.10.5](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.4..v0.10.5) - 2026-07-01
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate maxminddb to 0.29.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`794cec4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/794cec4af1dbfa893328a178b1c86a344c5cbef1))
+- *(deps)* Update rust crate maxminddb to 0.29.0 (#2881) by [@renovate[bot]](https://github.com/renovate[bot]) in #2881 ([`587f9ce`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/587f9ceec946bc615f02e4d3b13f5c70af0433be))
+- *(deps)* Update rust crate mockall to 0.15.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`1d55d40`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1d55d403cc77de051e9dc71f508f494f64b41e82))
+- *(deps)* Update rust crate mockall to 0.15.0 (#2882) by [@renovate[bot]](https://github.com/renovate[bot]) in #2882 ([`19c66b8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/19c66b897af04d3f361886651c3c16e5fce6de65))
+- *(deps)* Pin dependencies by [@renovate[bot]](https://github.com/renovate[bot]) ([`9479143`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/94791435802419b040c116611b63d77f15c201f8))
+- *(deps)* Pin dependencies (#2888) by [@renovate[bot]](https://github.com/renovate[bot]) in #2888 ([`f7ce987`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f7ce9875d21c3e07018c5955d44bf2847071d8c9))
+- *(deps)* Update rust crate time to v0.3.52 by [@renovate[bot]](https://github.com/renovate[bot]) ([`9f8dec8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9f8dec87487f4ed4ed967f434b3dbc9abbc408d7))
+- *(deps)* Update rust crate time to v0.3.52 (#2890) by [@renovate[bot]](https://github.com/renovate[bot]) in #2890 ([`6fab0f5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6fab0f59c6f9672e27c8aa10faf5d664a45632c1))
+- *(deps)* Update rust crate time to v0.3.53 by [@renovate[bot]](https://github.com/renovate[bot]) ([`e3a9fa0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e3a9fa062c0e0a41ace2918f7c4d15f20850dc2c))
+- *(deps)* Update rust crate time to v0.3.53 (#2903) by [@renovate[bot]](https://github.com/renovate[bot]) in #2903 ([`b5ad7c3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b5ad7c3d54a58b9c3b5ed1d6ed90a6ddc49b1e8c))
+- *(deps)* Update recharts (npm) to v3.9.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`8a35ac5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8a35ac5e5ea3e5fba2258295bb736326a7318ae7))
+- *(deps)* Update recharts (npm) to v3.9.1 (#2902) by [@renovate[bot]](https://github.com/renovate[bot]) in #2902 ([`44a9b8c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/44a9b8cae601792e252500da1b9dab587e7acca0))
+- KeepNames for easier debugging by [@kristof-mattei](https://github.com/kristof-mattei) ([`7f99a05`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7f99a057c252f1551754a7a6335a2280010670f9))
 ## [0.10.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.3..v0.10.4) - 2026-06-24
 
 ### 🐛 Bug Fixes
