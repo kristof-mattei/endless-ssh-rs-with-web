@@ -23,7 +23,9 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
             sourcemap: true,
             outDir: "../../dist",
             rolldownOptions: {
-                output: {},
+                output: {
+                    keepNames: true,
+                },
             },
         },
         resolve: {
