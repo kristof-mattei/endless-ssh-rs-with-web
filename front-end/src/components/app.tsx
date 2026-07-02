@@ -47,6 +47,7 @@ export const App: React.FC = () => {
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
     const seenSeqReference = useRef(new Set());
+    // eslint-disable-next-line unicorn/consistent-boolean-name -- boolean ref
     const isLiveReference = useRef(false);
 
     const handleEvent = useCallback((wsEvent: WsEvent) => {
