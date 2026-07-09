@@ -43,7 +43,6 @@ pub fn set_up_handler(
     sig_handler: extern "C" fn(_: c_int),
 ) -> Result<(), eyre::Report> {
     #[expect(
-        clippy::fn_to_numeric_cast_any,
         clippy::as_conversions,
         reason = "We actually need the function as a pointer, and this is well-defined"
     )]
