@@ -20,12 +20,12 @@ export function formatDuration(secs: number): string {
         hitNoneZero = true;
     }
 
-    if (h > 0 || hitNoneZero) {
+    if (hitNoneZero || h > 0) {
         parts.push(`${h.toString()}h`);
         hitNoneZero = true;
     }
 
-    if (m > 0 || hitNoneZero) {
+    if (hitNoneZero || m > 0) {
         parts.push(`${m.toString()}m`);
     }
 
