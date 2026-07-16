@@ -30,13 +30,13 @@ importers:
         specifier: 0.1.8
         version: 0.1.8
       ip-address:
-        specifier: ^10.2.0
+        specifier: 10.2.0
         version: 10.2.0
       maplibre-gl:
         specifier: 5.24.0
         version: 5.24.0
       pretty-bytes:
-        specifier: ^7.1.0
+        specifier: 7.1.0
         version: 7.1.0
       react:
         specifier: 19.2.7
