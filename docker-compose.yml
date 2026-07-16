@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: timescale/timescaledb:latest-pg18@sha256:bb208a255ce7d44d8d6bed4e9e8059b532be4f56fd6d6d962e37d270bfadf1bd
+    image: timescale/timescaledb:latest-pg18@sha256:2c718e700b1c75b93488085596f2254c991c3aa29584fc282ebbe62fd8335791
     ports:
       - 15432:5432
     env_file:
