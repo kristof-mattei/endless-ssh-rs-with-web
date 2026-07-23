@@ -9,3 +9,7 @@ overrides:
   "eslint-config-love>eslint": "catalog:default"
   "eslint-plugin-import>eslint": "catalog:default"
   "eslint-plugin-react>eslint": "catalog:default"
+packageExtensions:
+  "@vis.gl/react-maplibre@8.1.1":
+    peerDependencies:
+      maplibre-gl: ">=4.0.0 <6"
