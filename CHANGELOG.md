@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.10.8](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.7..v0.10.8) - 2026-07-23
+
+### 🐛 Bug Fixes
+
+- Revert back to mapgl 5 by [@kristof-mattei](https://github.com/kristof-mattei) ([`6a24208`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6a242081d6e266c55e76b32bd87866d630eb5970))
 ## [0.10.7](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.6..v0.10.7) - 2026-07-23
 
 ### 🐛 Bug Fixes
