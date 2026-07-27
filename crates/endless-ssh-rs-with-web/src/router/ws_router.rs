@@ -13,7 +13,7 @@ use crate::state::ApplicationState;
 
 #[derive(Debug, Deserialize)]
 pub struct WsQueryParams {
-    /// Client sends the last event seq it received; we replay everything after it.
+    /// Client sends the last event sequence it received, we replay everything after it.
     pub since: Option<i64>,
 }
 
@@ -63,7 +63,7 @@ async fn send_connection_record(
     record: ConnectionRecord,
 ) -> Result<(), ()> {
     let ws_event = WsEvent::Disconnected {
-        seq: record.id,
+        sequence: record.id,
         ip: record.ip_address.into(),
         connected_at: record.connected_at,
         disconnected_at: record.disconnected_at,
@@ -72,8 +72,8 @@ async fn send_connection_record(
         country_code: record.country_code,
         country_name: record.country_name,
         city: record.city,
-        lat: record.latitude,
-        lon: record.longitude,
+        latitude: record.latitude,
+        longitude: record.longitude,
     };
     match serde_json::to_string(&ws_event) {
         Ok(json) => {
@@ -159,7 +159,7 @@ async fn handle_socket(
     send_ready_payload(&mut socket).await?;
 
     // forward live broadcast events, handling lag with a DB catch-up
-    let mut last_seq: i64 = since_id;
+    let mut last_sequence: i64 = since_id;
 
     loop {
         tokio::select! {
@@ -175,7 +175,7 @@ async fn handle_socket(
 
             // outgoing events from the broadcast channel
             recv = broadcast_rx.recv() => {
-                handle_broadcast(&mut socket, &state, recv, &mut last_seq).await?;
+                handle_broadcast(&mut socket, &state, recv, &mut last_sequence).await?;
             },
         }
     }
@@ -185,14 +185,14 @@ async fn handle_broadcast(
     socket: &mut WebSocket,
     state: &ApplicationState,
     recv: Result<WsEvent, tokio::sync::broadcast::error::RecvError>,
-    last_seq: &mut i64,
+    last_sequence: &mut i64,
 ) -> Result<(), ()> {
     match recv {
         Ok(ws_event) => {
-            // track last seen seq for deduplication on reconnect
+            // track last seen sequence for deduplication on reconnect
             // TODO this channel shouldn't use `WsEvent`, it should be a separate type
-            if let &WsEvent::Disconnected { seq, .. } = &ws_event {
-                *last_seq = seq;
+            if let &WsEvent::Disconnected { sequence, .. } = &ws_event {
+                *last_sequence = sequence;
             }
 
             // forward
@@ -216,12 +216,12 @@ async fn handle_broadcast(
 
             // re-query DB for missed events
             let mut records =
-                db::get_connections_since(&state.db_pool, *last_seq, Limit::Limit(1000));
+                db::get_connections_since(&state.db_pool, *last_sequence, Limit::Limit(1000));
 
             loop {
                 match records.try_next().await {
                     Ok(Some(record)) => {
-                        *last_seq = record.id;
+                        *last_sequence = record.id;
 
                         send_connection_record(socket, record).await?;
                     },

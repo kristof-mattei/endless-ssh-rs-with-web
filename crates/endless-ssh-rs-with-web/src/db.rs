@@ -12,7 +12,7 @@ use tracing::{Level, event};
 
 use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, Limit};
 use crate::geoip::GeoInfo;
-use crate::utils::ser_helpers::as_secs;
+use crate::utils::serde::as_seconds;
 
 pub async fn create_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
     PgPoolOptions::new()
@@ -183,7 +183,7 @@ pub struct StatsRow {
     pub bucket: OffsetDateTime,
     pub country_code: Option<String>,
     pub connects: i64,
-    #[serde(serialize_with = "as_secs")]
+    #[serde(serialize_with = "as_seconds")]
     pub time_spent: Duration,
     pub bytes_sent: i64,
 }

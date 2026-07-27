@@ -12,8 +12,8 @@ interface Properties {
 }
 
 export const WorldMap: React.FC<Properties> = ({ activeConnections }) => {
-    const dots = activeConnections.filter((c): c is { lat: number; lon: number } & ActiveConnection => {
-        return c.lat !== null && c.lon !== null;
+    const dots = activeConnections.filter((c): c is { latitude: number; longitude: number } & ActiveConnection => {
+        return c.latitude !== null && c.longitude !== null;
     });
 
     return (
@@ -26,7 +26,7 @@ export const WorldMap: React.FC<Properties> = ({ activeConnections }) => {
             >
                 {dots.map((dot) => {
                     return (
-                        <Marker key={`${dot.ip}-${dot.connected_at}`} longitude={dot.lon} latitude={dot.lat}>
+                        <Marker key={`${dot.ip}-${dot.connected_at}`} longitude={dot.longitude} latitude={dot.latitude}>
                             <div
                                 style={{
                                     width: "8px",
