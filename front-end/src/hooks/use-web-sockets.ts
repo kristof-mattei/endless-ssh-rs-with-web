@@ -54,9 +54,6 @@ const MAX_BACKOFF_MS = 30_000;
 
 export function useWebSocket({ onEvent }: Options): void {
     const lastSeqReference = useRef(0);
-    const wsReference = useRef<null | WebSocket>(null);
-    const backoffReference = useRef(BASE_BACKOFF_MS);
-    const retryTimerReference = useRef<null | ReturnType<typeof setTimeout>>(null);
 
     // stable callback reference
     const onEventReference = useRef(onEvent);
@@ -66,16 +63,21 @@ export function useWebSocket({ onEvent }: Options): void {
     }, [onEvent]);
 
     useEffect(() => {
+        let isDisposed = false;
+        let socket: null | WebSocket = null;
+        let retryTimer: null | ReturnType<typeof setTimeout> = null;
+        let backoff = BASE_BACKOFF_MS;
+
         function connect(): void {
             const since = lastSeqReference.current;
 
             const url = `${globalThis.location.protocol === "https:" ? "wss" : "ws"}://${globalThis.location.host}/api/ws?since=${since.toString()}`;
 
             const ws = new WebSocket(url);
-            wsReference.current = ws;
+            socket = ws;
 
             ws.addEventListener("open", () => {
-                backoffReference.current = BASE_BACKOFF_MS;
+                backoff = BASE_BACKOFF_MS;
             });
 
             ws.addEventListener("message", (message: MessageEvent<string>) => {
@@ -101,13 +103,15 @@ export function useWebSocket({ onEvent }: Options): void {
             });
 
             ws.addEventListener("close", () => {
-                wsReference.current = null;
+                if (isDisposed) {
+                    return;
+                }
 
                 // exponential backoff reconnect
-                retryTimerReference.current = setTimeout(() => {
-                    backoffReference.current = Math.min(backoffReference.current * 2, MAX_BACKOFF_MS);
+                retryTimer = setTimeout(() => {
+                    backoff = Math.min(backoff * 2, MAX_BACKOFF_MS);
                     connect();
-                }, backoffReference.current);
+                }, backoff);
             });
 
             ws.addEventListener("error", () => {
@@ -118,11 +122,13 @@ export function useWebSocket({ onEvent }: Options): void {
         connect();
 
         return () => {
-            if (retryTimerReference.current !== null) {
-                clearTimeout(retryTimerReference.current);
+            isDisposed = true;
+
+            if (retryTimer !== null) {
+                clearTimeout(retryTimer);
             }
 
-            wsReference.current?.close();
+            socket?.close();
         };
     }, []);
 }
