@@ -4,13 +4,13 @@ export interface ConnectedEvent {
     type: "connected";
     ip: string;
     connected_at: string;
-    lat: null | number;
-    lon: null | number;
+    latitude: null | number;
+    longitude: null | number;
 }
 
 export interface DisconnectedEvent {
     type: "disconnected";
-    seq: number;
+    sequence: number;
     ip: string;
     connected_at: string;
     disconnected_at: string;
@@ -19,8 +19,8 @@ export interface DisconnectedEvent {
     country_code: null | string;
     country_name: null | string;
     city: null | string;
-    lat: null | number;
-    lon: null | number;
+    latitude: null | number;
+    longitude: null | number;
 }
 
 export interface InitEvent {
@@ -38,8 +38,8 @@ export interface ReadyEvent {
 export interface ActiveConnection {
     ip: string;
     connected_at: string;
-    lat: null | number;
-    lon: null | number;
+    latitude: null | number;
+    longitude: null | number;
     country_code: null | string;
 }
 
@@ -53,7 +53,7 @@ const BASE_BACKOFF_MS = 500;
 const MAX_BACKOFF_MS = 30_000;
 
 export function useWebSocket({ onEvent }: Options): void {
-    const lastSeqReference = useRef(0);
+    const lastSequenceReference = useRef(0);
 
     // stable callback reference
     const onEventReference = useRef(onEvent);
@@ -69,7 +69,7 @@ export function useWebSocket({ onEvent }: Options): void {
         let backoff = BASE_BACKOFF_MS;
 
         function connect(): void {
-            const since = lastSeqReference.current;
+            const since = lastSequenceReference.current;
 
             const url = `${globalThis.location.protocol === "https:" ? "wss" : "ws"}://${globalThis.location.host}/api/ws?since=${since.toString()}`;
 
@@ -94,9 +94,9 @@ export function useWebSocket({ onEvent }: Options): void {
                     return;
                 }
 
-                // track last seq for reconnect no-gap
+                // track last sequence for reconnect no-gap
                 if (event.type === "disconnected") {
-                    lastSeqReference.current = event.seq;
+                    lastSequenceReference.current = event.sequence;
                 }
 
                 onEventReference.current(event);

@@ -9,7 +9,7 @@ use tracing::{Level, event};
 
 use crate::db;
 use crate::geoip::GeoIpReader;
-use crate::utils::ser_helpers::as_secs;
+use crate::utils::serde::as_seconds;
 
 /// Internal event bus.
 #[derive(Clone)]
@@ -35,7 +35,7 @@ pub enum WsEvent {
         active_connections: Vec<ActiveConnectionInfo>,
         total_connections: i64,
         total_bytes_sent: i64,
-        #[serde(serialize_with = "as_secs")]
+        #[serde(serialize_with = "as_seconds")]
         total_time_spent: Duration,
     },
     Ready,
@@ -43,24 +43,24 @@ pub enum WsEvent {
         ip: IpAddr,
         #[serde(with = "time::serde::rfc3339")]
         connected_at: OffsetDateTime,
-        lat: Option<f64>,
-        lon: Option<f64>,
+        latitude: Option<f64>,
+        longitude: Option<f64>,
     },
     Disconnected {
-        seq: i64,
+        sequence: i64,
         ip: IpAddr,
         #[serde(with = "time::serde::rfc3339")]
         connected_at: OffsetDateTime,
         #[serde(with = "time::serde::rfc3339")]
         disconnected_at: OffsetDateTime,
-        #[serde(serialize_with = "as_secs")]
+        #[serde(serialize_with = "as_seconds")]
         time_spent: Duration,
         bytes_sent: usize,
         country_code: Option<String>,
         country_name: Option<String>,
         city: Option<String>,
-        lat: Option<f64>,
-        lon: Option<f64>,
+        latitude: Option<f64>,
+        longitude: Option<f64>,
     },
 }
 
@@ -72,8 +72,8 @@ pub struct ActiveConnectionInfo {
     pub ip: IpAddr,
     #[serde(with = "time::serde::rfc3339")]
     pub connected_at: OffsetDateTime,
-    pub lat: Option<f64>,
-    pub lon: Option<f64>,
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
     pub country_code: Option<String>,
 }
 
@@ -130,21 +130,22 @@ async fn handle_event(
             let info = ActiveConnectionInfo {
                 ip: addr.ip(),
                 connected_at,
-                lat: geo.as_ref().and_then(|g| g.latitude),
-                lon: geo.as_ref().and_then(|g| g.longitude),
+                latitude: geo.as_ref().and_then(|g| g.latitude),
+                longitude: geo.as_ref().and_then(|g| g.longitude),
                 country_code: geo.and_then(|g| g.country_code),
             };
 
             let ws_event = WsEvent::Connected {
                 ip: info.ip,
                 connected_at,
-                lat: info.lat,
-                lon: info.lon,
+                latitude: info.latitude,
+                longitude: info.longitude,
             };
 
             active_connections.insert(addr, info);
 
             // ignore send errors, no WS clients connected is fine
+            // TODO I'd want to send a little bit more here for the FE to see more than just a dot on a map.
             let _r = ws_broadcast_tx.send(ws_event);
         },
 
@@ -172,13 +173,13 @@ async fn handle_event(
             )
             .await
             {
-                Ok(seq) => {
+                Ok(sequence) => {
                     let country_code = geo.as_mut().and_then(|geo| geo.country_code.take());
                     let country_name = geo.as_mut().and_then(|geo| geo.country_name.take());
                     let city = geo.as_mut().and_then(|geo| geo.city.take());
 
                     let ws_event = WsEvent::Disconnected {
-                        seq,
+                        sequence,
                         ip: addr.ip(),
                         connected_at,
                         disconnected_at,
@@ -187,8 +188,8 @@ async fn handle_event(
                         country_code,
                         country_name,
                         city,
-                        lat: geo.as_ref().and_then(|g| g.latitude),
-                        lon: geo.as_ref().and_then(|g| g.longitude),
+                        latitude: geo.as_ref().and_then(|g| g.latitude),
+                        longitude: geo.as_ref().and_then(|g| g.longitude),
                     };
 
                     // ignore send errors, no WS clients connected yet is fine

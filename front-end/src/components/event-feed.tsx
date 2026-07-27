@@ -70,7 +70,7 @@ export const EventFeed: React.FC<Properties> = ({ events }) => {
         <div className="flex flex-col gap-1 overflow-y-auto" style={{ maxHeight: "400px" }}>
             {events.length === 0 && <p className="py-6 text-center text-gray-500">Waiting for connections…</p>}
             {events.toReversed().map((event) => {
-                return <EventRow key={event.seq} event={event} />;
+                return <EventRow key={event.sequence} event={event} />;
             })}
         </div>
     );

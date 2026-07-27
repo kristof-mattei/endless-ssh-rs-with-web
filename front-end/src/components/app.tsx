@@ -46,7 +46,7 @@ export const App: React.FC = () => {
     const [totalTimeSecs, setTotalTimeSecs] = useState(0);
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
-    const seenSeqReference = useRef(new Set());
+    const seenSequenceReference = useRef(new Set());
     const isLiveReference = useRef(false);
 
     const handleEvent = useCallback((wsEvent: WsEvent) => {
@@ -79,8 +79,8 @@ export const App: React.FC = () => {
                         {
                             ip: wsEvent.ip,
                             connected_at: wsEvent.connected_at,
-                            lat: wsEvent.lat,
-                            lon: wsEvent.lon,
+                            latitude: wsEvent.latitude,
+                            longitude: wsEvent.longitude,
                             country_code: null,
                         },
                     ];
@@ -89,10 +89,10 @@ export const App: React.FC = () => {
             }
             case "disconnected": {
                 // deduplicate across history replay + live stream
-                if (seenSeqReference.current.has(wsEvent.seq)) {
+                if (seenSequenceReference.current.has(wsEvent.sequence)) {
                     break;
                 }
-                seenSeqReference.current.add(wsEvent.seq);
+                seenSequenceReference.current.add(wsEvent.sequence);
 
                 setActiveConnections((previous) => {
                     return previous.filter((c) => {
