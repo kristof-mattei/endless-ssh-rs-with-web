@@ -70,6 +70,7 @@ const sharedRules: RulesConfig = {
 
     "unicorn/no-array-sort": ["off"],
     "unicorn/no-null": ["off"],
+    "unicorn/prefer-temporal": ["off"],
     "unicorn/prefer-ternary": ["off"],
 
     "import-x/extensions": [
