@@ -26,8 +26,8 @@ importers:
   .:
     dependencies:
       '@recharts/devtools':
-        specifier: 0.0.14
-        version: 0.0.14(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-is@16.13.1)(react@19.2.8)(redux@5.0.1))
+        specifier: 0.0.16
+        version: 0.0.16(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-is@16.13.1)(react@19.2.8)(redux@5.0.1))
       country-flag-emoji-polyfill:
         specifier: 0.1.8
         version: 0.1.8
@@ -754,12 +754,12 @@ packages:
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
 
-  '@recharts/devtools@0.0.14':
-    resolution: {integrity: sha512-FPTpay/nGiULGkGcXSltG6RN0LiQ9wHveLFg/kbD2wWnbZOoKdq/67Xhs4aI9V1D2PPs1VNW+djZ8cw7pNtxiQ==}
+  '@recharts/devtools@0.0.16':
+    resolution: {integrity: sha512-ohU7bDIRzUXDOEUBLtigkYtYNHPzIpFa6GX1f2oeQWqgySZsCujjXNXEwJ09MzVeQ+tvJ09Tnj25FjeJrMHV9w==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
-      recharts: ^3.8.0
+      recharts: 3.9.0
 
   '@reduxjs/toolkit@2.12.0':
     resolution: {integrity: sha512-KiT+RzZbp6mQET+Mg+h2c97+9j1sNflUxQkIHI7Yuzf6Peu+OYpmkn6nbHWmLLWj+1ZODUJFwGZ7gx3L9R9EOw==}
@@ -4524,7 +4524,7 @@ snapshots:
 
   '@polka/url@1.0.0-next.29': {}
 
-  '@recharts/devtools@0.0.14(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-is@16.13.1)(react@19.2.8)(redux@5.0.1))':
+  '@recharts/devtools@0.0.16(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react-is@16.13.1)(react@19.2.8)(redux@5.0.1))':
     dependencies:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
