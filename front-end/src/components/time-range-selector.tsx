@@ -43,6 +43,21 @@ function rangeToParameters(range: Range): { from: string; to: string } {
     return { from: from.toISOString(), to };
 }
 
+async function fetchStats(range: Range, onData: (data: StatsData) => void): Promise<void> {
+    const { from, to } = rangeToParameters(range);
+
+    const response = await fetch(`/api/stats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
+
+    if (!response.ok) {
+        return;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- data from trusted backend
+    const rows = (await response.json()) as StatsRow[];
+
+    onData({ rows, from: new Date(from), to: new Date(to) });
+}
+
 interface Properties {
     onData: (data: StatsData) => void;
 }
@@ -54,17 +69,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     const doFetch = useCallback(
         async (range: Range) => {
             try {
-                const { from, to } = rangeToParameters(range);
-                const fromDate = new Date(from);
-                const toDate = new Date(to);
-                const response = await fetch(
-                    `/api/stats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
-                );
-                if (response.ok) {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- data from trusted backend
-                    const rows = (await response.json()) as StatsRow[];
-                    onData({ rows, from: fromDate, to: toDate });
-                }
+                await fetchStats(range, onData);
             } finally {
                 setIsLoading(false);
             }
