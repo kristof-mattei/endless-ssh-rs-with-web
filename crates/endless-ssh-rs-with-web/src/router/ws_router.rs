@@ -65,6 +65,7 @@ async fn send_connection_record(
     let ws_event = WsEvent::Disconnected {
         sequence: record.id,
         ip: record.ip_address.into(),
+        port: record.port.into(),
         connected_at: record.connected_at,
         disconnected_at: record.disconnected_at,
         time_spent: record.time_spent.into(),

@@ -6,17 +6,35 @@
       {
         "ordinal": 0,
         "name": "total_connections!: i64",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "totals",
+            "name": "total_connections"
+          }
+        }
       },
       {
         "ordinal": 1,
         "name": "total_bytes_sent!: i64",
-        "type_info": "Int8"
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "totals",
+            "name": "total_bytes_sent"
+          }
+        }
       },
       {
         "ordinal": 2,
         "name": "total_time_spent!: DbDuration",
-        "type_info": "Interval"
+        "type_info": "Interval",
+        "origin": {
+          "Table": {
+            "table": "totals",
+            "name": "total_time_spent"
+          }
+        }
       }
     ],
     "parameters": {

@@ -26,7 +26,11 @@ export const WorldMap: React.FC<Properties> = ({ activeConnections }) => {
             >
                 {dots.map((dot) => {
                     return (
-                        <Marker key={`${dot.ip}-${dot.connected_at}`} longitude={dot.longitude} latitude={dot.latitude}>
+                        <Marker
+                            key={`${dot.ip}:${dot.port.toString()}`}
+                            longitude={dot.longitude}
+                            latitude={dot.latitude}
+                        >
                             <div
                                 style={{
                                     width: "8px",

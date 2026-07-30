@@ -26,10 +26,11 @@ function init(overrides?: Partial<Omit<InitEvent, "type">>): InitEvent {
 
 const READY: ReadyEvent = { type: "ready" };
 
-function connected(ip: string): ConnectedEvent {
+function connected(ip: string, port: number): ConnectedEvent {
     return {
         type: "connected",
         ip,
+        port,
         connected_at: "2026-07-27T10:00:00Z",
         country_code: null,
         country_name: null,
@@ -47,6 +48,7 @@ function disconnected(
         type: "disconnected",
         sequence,
         ip: `192.0.2.${sequence.toString()}`,
+        port: 50_000,
         connected_at: "2026-07-27T10:00:00Z",
         disconnected_at: "2026-07-27T10:01:00Z",
         time_spent: 60,
@@ -60,13 +62,15 @@ function disconnected(
     };
 }
 
-function activeConnection(ip: string): ActiveConnection {
+function activeConnection(ip: string, overrides?: Partial<Omit<ActiveConnection, "ip">>): ActiveConnection {
     return {
         ip,
+        port: 50_000,
         connected_at: "2026-07-27T09:00:00Z",
         latitude: null,
         longitude: null,
         country_code: null,
+        ...overrides,
     };
 }
 
@@ -109,7 +113,7 @@ describe("wsReducer", () => {
 
     describe("connected", () => {
         it("adds a new connection", () => {
-            const state = applyEvents(INITIAL_WS_STATE, [init(), READY, connected("198.51.100.7")]);
+            const state = applyEvents(INITIAL_WS_STATE, [init(), READY, connected("198.51.100.7", 50_000)]);
 
             expect(
                 state.activeConnections.map((c) => {
@@ -118,11 +122,26 @@ describe("wsReducer", () => {
             ).toEqual(["198.51.100.7"]);
         });
 
-        it("ignores a duplicate ip", () => {
-            const before = applyEvents(INITIAL_WS_STATE, [init(), READY, connected("198.51.100.7")]);
-            const after = wsReducer(before, connected("198.51.100.7"));
+        it("ignores a duplicate ip and port", () => {
+            const before = applyEvents(INITIAL_WS_STATE, [init(), READY, connected("198.51.100.7", 50_000)]);
+            const after = wsReducer(before, connected("198.51.100.7", 50_000));
 
             expect(after).toBe(before);
+        });
+
+        it("tracks simultaneous connections from the same ip on different ports", () => {
+            const state = applyEvents(INITIAL_WS_STATE, [
+                init(),
+                READY,
+                connected("198.51.100.7", 1111),
+                connected("198.51.100.7", 2222),
+            ]);
+
+            expect(
+                state.activeConnections.map((c) => {
+                    return c.port;
+                }),
+            ).toEqual([1111, 2222]);
         });
     });
 
@@ -131,8 +150,8 @@ describe("wsReducer", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
                 init(),
                 READY,
-                connected("198.51.100.7"),
-                connected("198.51.100.8"),
+                connected("198.51.100.7", 50_000),
+                connected("198.51.100.8", 50_000),
                 disconnected(1, { ip: "198.51.100.7" }),
             ]);
 
@@ -148,12 +167,47 @@ describe("wsReducer", () => {
             ).toEqual([1]);
         });
 
+        it("removes only the connection on the matching port", () => {
+            const state = applyEvents(INITIAL_WS_STATE, [
+                init(),
+                READY,
+                connected("198.51.100.7", 1111),
+                connected("198.51.100.7", 2222),
+                disconnected(1, { ip: "198.51.100.7", port: 1111 }),
+            ]);
+
+            expect(
+                state.activeConnections.map((c) => {
+                    return c.port;
+                }),
+            ).toEqual([2222]);
+        });
+
+        it("keeps a newer connection when a replayed disconnect matches a reused ip and port", () => {
+            const state = applyEvents(INITIAL_WS_STATE, [
+                init({
+                    active_connections: [
+                        activeConnection("198.51.100.7", { port: 1111, connected_at: "2026-07-27T11:00:00Z" }),
+                    ],
+                }),
+                disconnected(1, { ip: "198.51.100.7", port: 1111, disconnected_at: "2026-07-27T10:30:00Z" }),
+                READY,
+            ]);
+
+            expect(state.activeConnections).toHaveLength(1);
+            expect(
+                state.events.map((event) => {
+                    return event.sequence;
+                }),
+            ).toEqual([1]);
+        });
+
         it("matches IPv6 connections by exact string", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
                 init(),
                 READY,
-                connected("2001:db8::1"),
-                connected("2001:db8::2"),
+                connected("2001:db8::1", 50_000),
+                connected("2001:db8::2", 50_000),
                 disconnected(1, { ip: "2001:db8::1" }),
             ]);
 

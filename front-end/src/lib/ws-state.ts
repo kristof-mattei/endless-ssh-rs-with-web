@@ -22,6 +22,15 @@ export const INITIAL_WS_STATE: WsState = {
     totalTimeSeconds: 0,
 };
 
+function isSameConnection(active: ActiveConnection, event: DisconnectedEvent): boolean {
+    if (active.ip !== event.ip || active.port !== event.port) {
+        return false;
+    }
+
+    // a disconnect dated before this entry connected belongs to an earlier connection on the same ip and port
+    return Temporal.Instant.compare(active.connected_at, event.disconnected_at) < 0;
+}
+
 export function wsReducer(state: WsState, event: WsEvent): WsState {
     switch (event.type) {
         case "init": {
@@ -39,7 +48,7 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
         }
         case "connected": {
             const isKnown = state.activeConnections.some((c) => {
-                return c.ip === event.ip;
+                return c.ip === event.ip && c.port === event.port;
             });
 
             if (isKnown) {
@@ -52,6 +61,7 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
                     ...state.activeConnections,
                     {
                         ip: event.ip,
+                        port: event.port,
                         connected_at: event.connected_at,
                         latitude: event.latitude,
                         longitude: event.longitude,
@@ -70,7 +80,7 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
             const next: WsState = {
                 ...state,
                 activeConnections: state.activeConnections.filter((c) => {
-                    return c.ip !== event.ip;
+                    return !isSameConnection(c, event);
                 }),
                 events: [...state.events, event].slice(-MAX_EVENTS),
                 maxSeenSequence: event.sequence,
