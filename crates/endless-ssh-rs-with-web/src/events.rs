@@ -84,7 +84,7 @@ pub struct ActiveConnectionInfo {
 pub async fn database_listen_forever(
     cancellation_token: CancellationToken,
     db_pool: sqlx::PgPool,
-    geo_ip: Arc<Option<GeoIpReader>>,
+    geo_ip_reader: Arc<GeoIpReader>,
     mut internal_events_rx: tokio::sync::mpsc::Receiver<ClientEvent>,
     ws_broadcast_tx: broadcast::Sender<WsEvent>,
     active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
@@ -105,7 +105,7 @@ pub async fn database_listen_forever(
             handle_event(
                 client_event,
                 &db_pool,
-                &geo_ip,
+                &geo_ip_reader,
                 &ws_broadcast_tx,
                 &active_connections,
             )
@@ -120,15 +120,13 @@ pub async fn database_listen_forever(
 async fn handle_event(
     client_event: ClientEvent,
     db_pool: &sqlx::PgPool,
-    geoip: &Arc<Option<GeoIpReader>>,
+    geo_ip_reader: &GeoIpReader,
     ws_broadcast_tx: &broadcast::Sender<WsEvent>,
     active_connections: &Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 ) {
     match client_event {
         ClientEvent::Connected { addr, connected_at } => {
-            let mut geo = (**geoip)
-                .as_ref()
-                .and_then(|reader| reader.lookup(addr.ip()));
+            let mut geo = (*geo_ip_reader).lookup(addr.ip());
 
             let info = ActiveConnectionInfo {
                 ip: addr.ip(),
@@ -167,9 +165,7 @@ async fn handle_event(
         } => {
             active_connections.remove(&addr);
 
-            let mut geo = (**geoip)
-                .as_ref()
-                .and_then(|reader| reader.lookup(addr.ip()));
+            let mut geo = (*geo_ip_reader).lookup(addr.ip());
 
             match db::insert_connection(
                 db_pool,

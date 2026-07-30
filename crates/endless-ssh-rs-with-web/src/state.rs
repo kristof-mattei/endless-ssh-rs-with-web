@@ -29,7 +29,7 @@ impl FromRef<ApplicationState> for Arc<Config> {
 pub struct ApplicationState {
     pub config: Arc<Config>,
     pub db_pool: PgPool,
-    pub geo_ip: Arc<Option<GeoIpReader>>,
+    pub geo_ip_reader: Arc<GeoIpReader>,
     pub ws_broadcast: broadcast::Sender<WsEvent>,
     pub active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 }
@@ -38,14 +38,14 @@ impl ApplicationState {
     pub fn new(
         config: Config,
         db_pool: PgPool,
-        geo_ip: Arc<Option<GeoIpReader>>,
+        geo_ip_reader: Arc<GeoIpReader>,
         ws_broadcast: broadcast::Sender<WsEvent>,
         active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
     ) -> Self {
         ApplicationState {
             config: Arc::new(config),
             db_pool,
-            geo_ip,
+            geo_ip_reader,
             ws_broadcast,
             active_connections,
         }

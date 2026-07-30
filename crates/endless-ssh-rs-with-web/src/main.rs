@@ -46,6 +46,7 @@ use crate::build_env::get_build_env;
 use crate::cli::parse_cli;
 use crate::config::Config;
 use crate::events::{ActiveConnectionInfo, ClientEvent, WsEvent, database_listen_forever};
+use crate::geoip::GeoIpReader;
 use crate::listener::listen_for_new_connections;
 use crate::router::build_router;
 use crate::server::setup_server;
@@ -196,14 +197,14 @@ async fn start_tasks() -> Shutdown {
     event!(Level::INFO, "Database ready");
 
     let geo_ip = match std::env::var("MAXMIND_LICENSE_KEY") {
-        Ok(key) if !key.is_empty() => Arc::new(geoip::try_init(&key).await),
+        Ok(key) if !key.is_empty() => Arc::new(GeoIpReader::try_init(&key).await),
         _ => {
             event!(
                 Level::INFO,
                 "`MAXMIND_LICENSE_KEY` not set, GeoIP lookup will be disabled"
             );
 
-            Arc::new(None)
+            Arc::new(GeoIpReader::empty())
         },
     };
 
