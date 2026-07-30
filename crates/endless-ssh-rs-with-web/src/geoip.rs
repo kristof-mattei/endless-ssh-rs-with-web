@@ -34,47 +34,90 @@ pub struct GeoInfo {
     pub longitude: Option<f64>,
 }
 
-const GEO_IP_PATH: &str = "./.local/ip-database/GeoLite2-City.mmdb";
-
 pub struct GeoIpReader {
-    db: maxminddb::Reader<Mmap>,
-}
-
-pub async fn try_init(license_key: &str) -> Option<GeoIpReader> {
-    // TODO exponential back-off
-    for _ in 0..5 {
-        // TODO print try number
-        if let Some(geo_ip_reader) = GeoIpReader::init(license_key).await {
-            return Some(geo_ip_reader);
-        } else {
-            let geo_ip_path = Path::new(GEO_IP_PATH);
-
-            // remove files so that the download will trigger again
-            if let Err(db_removal) = std::fs::remove_file(geo_ip_path) {
-                event!(
-                    Level::ERROR,
-                    ?db_removal,
-                    path = %geo_ip_path.display(),
-                    "Failed to delete the GeoLite2 database"
-                );
-            }
-
-            if let Err(etag_removal) = std::fs::remove_file(geo_ip_path.with_extension("etag")) {
-                event!(
-                    Level::ERROR,
-                    ?etag_removal,
-                    path = %geo_ip_path.with_extension("etag").display(),
-                    "Failed to delete the GeoLite2 ETAG file"
-                );
-            }
-        }
-    }
-
-    None
+    reader: Option<GeoIpDbWrapper>,
 }
 
 impl GeoIpReader {
-    pub async fn init(license_key: &str) -> Option<GeoIpReader> {
+    pub async fn try_init(license_key: &str) -> GeoIpReader {
+        // TODO exponential back-off
+        for _ in 0..5 {
+            // TODO print try number
+            if let Some(geo_ip_reader) = GeoIpDbWrapper::init(license_key).await {
+                return Self {
+                    reader: Some(geo_ip_reader),
+                };
+            } else {
+                let geo_ip_path = Path::new(GEO_IP_PATH);
+
+                // remove files so that the download will trigger again
+                if let Err(db_removal) = std::fs::remove_file(geo_ip_path) {
+                    event!(
+                        Level::ERROR,
+                        ?db_removal,
+                        path = %geo_ip_path.display(),
+                        "Failed to delete the GeoLite2 database"
+                    );
+                }
+
+                if let Err(etag_removal) = std::fs::remove_file(geo_ip_path.with_extension("etag"))
+                {
+                    event!(
+                        Level::ERROR,
+                        ?etag_removal,
+                        path = %geo_ip_path.with_extension("etag").display(),
+                        "Failed to delete the GeoLite2 ETAG file"
+                    );
+                }
+            }
+        }
+
+        Self { reader: None }
+    }
+
+    pub fn lookup(&self, ip: IpAddr) -> Option<GeoInfo> {
+        let city: geoip2::City<'_> = self
+            .reader
+            .as_ref()?
+            .db
+            .lookup(ip)
+            .ok()?
+            .decode::<geoip2::City>()
+            .ok()??;
+
+        let country_code = city.country.iso_code.map(str::to_owned);
+
+        let country_name = city.country.names.english.map(|s| (*s).to_owned());
+
+        let city_name = city.city.names.english.map(|s| (*s).to_owned());
+
+        let latitude = city.location.latitude;
+        let longitude = city.location.longitude;
+
+        Some(GeoInfo {
+            country_code,
+            country_name,
+            city: city_name,
+            latitude,
+            longitude,
+        })
+    }
+
+    pub fn empty() -> Self {
+        Self { reader: None }
+    }
+
+    // TODO create replacer task
+}
+
+const GEO_IP_PATH: &str = "./.local/ip-database/GeoLite2-City.mmdb";
+
+struct GeoIpDbWrapper {
+    db: maxminddb::Reader<Mmap>,
+}
+
+impl GeoIpDbWrapper {
+    async fn init(license_key: &str) -> Option<GeoIpDbWrapper> {
         let geo_ip_path = Path::new(GEO_IP_PATH);
         let geo_ip_path =
             std::path::absolute(geo_ip_path).unwrap_or_else(|_err| geo_ip_path.to_path_buf());
@@ -116,7 +159,7 @@ impl GeoIpReader {
             Ok(reader) => {
                 event!(Level::INFO, geoip_path = %geo_ip_path.display(), "Loaded GeoLite2 database");
 
-                Some(GeoIpReader { db: reader })
+                Some(GeoIpDbWrapper { db: reader })
             },
             Err(error) => {
                 event!(
@@ -129,29 +172,6 @@ impl GeoIpReader {
             },
         }
     }
-
-    pub fn lookup(&self, ip: IpAddr) -> Option<GeoInfo> {
-        let city: geoip2::City<'_> = self.db.lookup(ip).ok()?.decode::<geoip2::City>().ok()??;
-
-        let country_code = city.country.iso_code.map(str::to_owned);
-
-        let country_name = city.country.names.english.map(|s| (*s).to_owned());
-
-        let city_name = city.city.names.english.map(|s| (*s).to_owned());
-
-        let latitude = city.location.latitude;
-        let longitude = city.location.longitude;
-
-        Some(GeoInfo {
-            country_code,
-            country_name,
-            city: city_name,
-            latitude,
-            longitude,
-        })
-    }
-
-    // TODO create replacer task
 }
 
 async fn should_download_database(license_key: &str, geo_ip_path: &Path) -> bool {
