@@ -31,6 +31,9 @@ function connected(ip: string): ConnectedEvent {
         type: "connected",
         ip,
         connected_at: "2026-07-27T10:00:00Z",
+        country_code: null,
+        country_name: null,
+        city: null,
         latitude: 51.2,
         longitude: 4.4,
     };

@@ -4,6 +4,9 @@ export interface ConnectedEvent {
     type: "connected";
     ip: string;
     connected_at: string;
+    country_code: null | string;
+    country_name: null | string;
+    city: null | string;
     latitude: null | number;
     longitude: null | number;
 }
