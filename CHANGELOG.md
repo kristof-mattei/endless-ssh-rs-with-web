@@ -1,4 +1,47 @@
 <!-- header goes here -->
+## [0.11.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.8..v0.11.0) - 2026-07-30
+
+### 🚀 Features
+
+- Expose country code, name and city for new connections as well by [@kristof-mattei](https://github.com/kristof-mattei) ([`1f259c4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1f259c459e9309aa851af2f97b25fc054af676fd))
+- Hide the optionality IN the reader so consumers don't have to do `as_ref()` by [@kristof-mattei](https://github.com/kristof-mattei) ([`500c3d4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/500c3d481c87094bbf55e765c9b42d6c9b1a4936))
+- Store port so we can differentiate between the same connection happening again by [@kristof-mattei](https://github.com/kristof-mattei) ([`a582d04`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a582d0437f76e440c237b497fbe1699093772a5c))
+- Expose for `country_name` & `city` for active connections by [@kristof-mattei](https://github.com/kristof-mattei) ([`8668be1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8668be1d7bc8f7f8c3bac41c5ef0dc211e5c7e0d))
+
+### 🐛 Bug Fixes
+
+- *(ci)* Merge the PR based on the branch name, not the url by [@kristof-mattei](https://github.com/kristof-mattei) ([`b0af60a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b0af60a01b2f10665e3d2ffaf658fc5e9f4c1cff))
+- *(deps)* Update ip-address (npm) to v10.3.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`3880928`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/38809286979def2374ed189876bfa31b008d1244))
+- *(deps)* Update ip-address (npm) to v10.2.2 (#3043) by [@renovate[bot]](https://github.com/renovate[bot]) in #3043 ([`b9e2a5f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b9e2a5f0888dd58156641e7b21a165c678030e9c))
+- *(deps)* Update recharts (npm) to v3.10.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`9db1d7c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9db1d7c800c8864e15c51ea18f63abebb5d00539))
+- *(deps)* Update recharts (npm) to v3.10.1 (#3045) by [@renovate[bot]](https://github.com/renovate[bot]) in #3045 ([`c674c24`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c674c24fa4ec2300e305ca390d4f4bd43af23ed7))
+- *(deps)* Update rust crate http to v1.5.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d0deab4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d0deab4278339197f73a45f3884906aa53130652))
+- *(deps)* Update rust crate http to v1.5.0 (#3066) by [@renovate[bot]](https://github.com/renovate[bot]) in #3066 ([`1a4015c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1a4015cb08c10813601f31f510c18c1375324457))
+- *(deps)* Update @recharts/devtools (npm) to v0.0.16 by [@renovate[bot]](https://github.com/renovate[bot]) ([`0204053`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0204053fe9a80bd2a83ba3f37aecee4ec297d816))
+- *(deps)* Update @recharts/devtools (npm) to v0.0.16 (#3069) by [@renovate[bot]](https://github.com/renovate[bot]) in #3069 ([`33dd5c0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/33dd5c0a1032d3946509a3401ec29361a31d7fa0))
+- *(deps)* Update react-map-gl (npm) to v8.1.2 by [@renovate[bot]](https://github.com/renovate[bot]) ([`4505a67`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4505a67608ba28f7379a8ce61c4b3bdd570320bf))
+- *(deps)* Update react-map-gl (npm) to v8.1.2 (#3083) by [@renovate[bot]](https://github.com/renovate[bot]) in #3083 ([`d903f8f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d903f8f137d4c719eddde8cb73a27ad94da75731))
+- *(deps)* Update maplibre-gl (npm) to v6 by [@renovate[bot]](https://github.com/renovate[bot]) ([`6fd2834`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6fd28343eee7809bfbf2ac630a769b547091530c))
+- Strict mode by [@kristof-mattei](https://github.com/kristof-mattei) ([`ea21f6a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ea21f6a616d3a47ce29c16bdf8da370823fff7d9))
+- Don't try to reconnect the websocket when we're walking away by [@kristof-mattei](https://github.com/kristof-mattei) ([`5b50fd1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5b50fd157975683349f3fcfb4ea671ab03d595e9))
+- Long form names by [@kristof-mattei](https://github.com/kristof-mattei) ([`e971ac9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e971ac959e6a24e1d12ad04394a49679e3fac216))
+- Prettier config typescript version by [@kristof-mattei](https://github.com/kristof-mattei) ([`9a04bc8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9a04bc814c428efb9b1af82b6395e8a08fb69caa))
+- For markdown, decrease tabwidth by [@kristof-mattei](https://github.com/kristof-mattei) ([`775286c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/775286c57e10452aa3580f168399f48f50066e40))
+- Move ip formatting out, add tests by [@kristof-mattei](https://github.com/kristof-mattei) ([`1a1d972`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1a1d9728985e68a53cccd8874c7b30205351aa95))
+- Rename variables by [@kristof-mattei](https://github.com/kristof-mattei) ([`c61df36`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c61df36ee2d12a8d85e4a940272d8b583b412c86))
+- Move whole state to reducer by [@kristof-mattei](https://github.com/kristof-mattei) ([`90e3e7d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/90e3e7dbc19c34ab255c4d9fe082f28b1918c2ea))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Create release commits with the api so they're signed by [@kristof-mattei](https://github.com/kristof-mattei) ([`0cacc4c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0cacc4cfff7e3e44eaaa27a9fcdf0d7006720c8b))
+- *(ci)* Let release runs finish and clean up stranded branches by [@kristof-mattei](https://github.com/kristof-mattei) ([`09c302f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/09c302fef81815f523c7a8fa2b849b02222d3bdc))
+- *(ci)* Pass the github token to git-cliff via the environment by [@kristof-mattei](https://github.com/kristof-mattei) ([`73fe1c0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/73fe1c0d32e7de5d97b90a7ee7433ef7edb75959))
+- *(ci)* Only mark stable releases as latest by [@kristof-mattei](https://github.com/kristof-mattei) ([`357e974`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/357e974a1e321345048fc53d805da083c191149e))
+- Remove copilot instructions as copilot is now behind a paywall by [@kristof-mattei](https://github.com/kristof-mattei) ([`8a34ae2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8a34ae290dfdb5ddf5d2b73eeca90a14146f3e9b))
+- Bump up eslint by [@kristof-mattei](https://github.com/kristof-mattei) ([`96a747e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/96a747ebdcda643de2faf51ad282a2ffd16fc823))
+- Address unicorn/try-complexity by [@kristof-mattei](https://github.com/kristof-mattei) ([`852b1be`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/852b1bea4bccdc6673ad12da35e5551d2c3a0d3c))
+- Temp disable temporal requirement by [@kristof-mattei](https://github.com/kristof-mattei) ([`b335f65`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b335f65d0bf3589e811520474f54b3f48e989471))
+- Remove tailwind's config file, it's unused in v4 by [@kristof-mattei](https://github.com/kristof-mattei) ([`bc3d957`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bc3d95725faf81ae9ae18795ba8a3ed49f61b26b))
 ## [0.10.8](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.7..v0.10.8) - 2026-07-23
 
 ### 🐛 Bug Fixes
