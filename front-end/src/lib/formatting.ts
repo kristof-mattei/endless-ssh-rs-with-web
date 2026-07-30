@@ -1,3 +1,4 @@
+import { Address4, Address6 } from "ip-address";
 import prettyBytes from "pretty-bytes";
 
 export function formatBytes(bytes: number): string {
@@ -31,4 +32,17 @@ export function formatDuration(secs: number): string {
 
     parts.push(`${s.toString()}s`);
     return parts.join(" ");
+}
+
+export function formatIp(ip: string): string {
+    // every textual IPv6 form contains a colon, no IPv4 form does
+    if (!ip.includes(":")) {
+        const parsed = new Address4(ip);
+
+        return parsed.correctForm();
+    }
+
+    const parsed = new Address6(ip);
+
+    return parsed.is4() ? parsed.to4().correctForm() : parsed.correctForm();
 }
