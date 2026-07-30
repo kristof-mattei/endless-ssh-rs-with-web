@@ -4,6 +4,7 @@ pub mod types;
 use std::net::IpAddr;
 
 use futures::stream::Stream;
+use serde::Serialize;
 use sqlx::migrate::MigrateError;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{AssertSqlSafe, PgPool, Row as _};
@@ -184,7 +185,7 @@ pub async fn get_totals(pool: &PgPool) -> Result<AllTimeTotals, sqlx::Error> {
 }
 
 /// Aggregated stats returned by the `/api/stats` endpoint.
-#[derive(Debug, serde::Serialize)]
+#[derive(Debug, Serialize)]
 pub struct StatsRow {
     #[serde(serialize_with = "time::serde::iso8601::serialize")]
     pub bucket: OffsetDateTime,
