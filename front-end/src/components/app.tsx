@@ -1,9 +1,8 @@
 import type * as React from "react";
-import { useCallback, useRef, useState } from "react";
-
-import type { ActiveConnection, DisconnectedEvent, WsEvent } from "../hooks/use-web-sockets";
+import { useReducer, useState } from "react";
 
 import { useWebSocket } from "../hooks/use-web-sockets";
+import { INITIAL_WS_STATE, wsReducer } from "../lib/ws-state";
 
 import { EventFeed } from "./event-feed";
 import { StatsChart } from "./stats-chart";
@@ -11,8 +10,6 @@ import { StatsPanel } from "./stats-panel";
 import { TimeRangeSelector } from "./time-range-selector";
 import type { StatsData } from "./time-range-selector";
 import { WorldMap } from "./world-map";
-
-const MAX_EVENTS = 100;
 
 function getTimezone(): string {
     const now: Temporal.ZonedDateTime = Temporal.Now.zonedDateTimeISO();
@@ -39,96 +36,13 @@ function getTimezone(): string {
 }
 
 export const App: React.FC = () => {
-    const [activeConnections, setActiveConnections] = useState<ActiveConnection[]>([]);
-    const [events, setEvents] = useState<DisconnectedEvent[]>([]);
-    const [totalConnections, setTotalConnections] = useState(0);
-    const [totalBytes, setTotalBytes] = useState(0);
-    const [totalTimeSeconds, setTotalTimeSeconds] = useState(0);
+    const [{ activeConnections, events, totalBytes, totalConnections, totalTimeSeconds }, dispatch] = useReducer(
+        wsReducer,
+        INITIAL_WS_STATE,
+    );
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
-    const seenSequenceReference = useRef(new Set());
-    const isLiveReference = useRef(false);
-
-    const handleEvent = useCallback((wsEvent: WsEvent) => {
-        switch (wsEvent.type) {
-            case "init": {
-                isLiveReference.current = false;
-                setActiveConnections(wsEvent.active_connections);
-                setTotalConnections(wsEvent.total_connections);
-                setTotalBytes(wsEvent.total_bytes_sent);
-                setTotalTimeSeconds(wsEvent.total_time_spent);
-                break;
-            }
-            case "ready": {
-                isLiveReference.current = true;
-                break;
-            }
-            case "connected": {
-                setActiveConnections((previous) => {
-                    // eslint-disable-next-line unicorn/consistent-boolean-name -- doesn't make sense here
-                    const exists = previous.some((c) => {
-                        return c.ip === wsEvent.ip;
-                    });
-
-                    if (exists) {
-                        return previous;
-                    }
-
-                    return [
-                        ...previous,
-                        {
-                            ip: wsEvent.ip,
-                            connected_at: wsEvent.connected_at,
-                            latitude: wsEvent.latitude,
-                            longitude: wsEvent.longitude,
-                            country_code: null,
-                        },
-                    ];
-                });
-                break;
-            }
-            case "disconnected": {
-                // deduplicate across history replay + live stream
-                if (seenSequenceReference.current.has(wsEvent.sequence)) {
-                    break;
-                }
-                seenSequenceReference.current.add(wsEvent.sequence);
-
-                setActiveConnections((previous) => {
-                    return previous.filter((c) => {
-                        return c.ip !== wsEvent.ip;
-                    });
-                });
-
-                setEvents((previous) => {
-                    if (previous.length >= MAX_EVENTS) {
-                        // +1 because we're making space for our new event
-                        return [...previous.slice(previous.length - MAX_EVENTS + 1), wsEvent];
-                    }
-
-                    return [...previous, wsEvent];
-                });
-
-                if (isLiveReference.current) {
-                    setTotalConnections((n) => {
-                        return n + 1;
-                    });
-
-                    setTotalBytes((n) => {
-                        return n + wsEvent.bytes_sent;
-                    });
-
-                    setTotalTimeSeconds((n) => {
-                        return n + wsEvent.time_spent;
-                    });
-                }
-
-                break;
-            }
-        }
-    }, []);
-
-    useWebSocket({ onEvent: handleEvent });
+    useWebSocket({ onEvent: dispatch });
 
     return (
         <div className="min-h-screen bg-gray-950 p-4 text-white">
