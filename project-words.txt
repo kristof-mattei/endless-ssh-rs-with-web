@@ -66,8 +66,10 @@ mypy
 nextest
 nsec
 nvmrc
+ossdata
 pathbuf
 pgadmin
+pgsql
 pids
 possiblities
 postprocessors

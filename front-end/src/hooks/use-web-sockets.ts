@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 export interface ConnectedEvent {
     type: "connected";
     ip: string;
+    port: number;
     connected_at: string;
     country_code: null | string;
     country_name: null | string;
@@ -15,6 +16,7 @@ export interface DisconnectedEvent {
     type: "disconnected";
     sequence: number;
     ip: string;
+    port: number;
     connected_at: string;
     disconnected_at: string;
     time_spent: number;
@@ -40,6 +42,7 @@ export interface ReadyEvent {
 
 export interface ActiveConnection {
     ip: string;
+    port: number;
     connected_at: string;
     latitude: null | number;
     longitude: null | number;

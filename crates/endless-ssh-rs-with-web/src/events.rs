@@ -41,6 +41,7 @@ pub enum WsEvent {
     Ready,
     Connected {
         ip: IpAddr,
+        port: u16,
         #[serde(with = "time::serde::rfc3339")]
         connected_at: OffsetDateTime,
         country_code: Option<String>,
@@ -52,6 +53,7 @@ pub enum WsEvent {
     Disconnected {
         sequence: i64,
         ip: IpAddr,
+        port: u16,
         #[serde(with = "time::serde::rfc3339")]
         connected_at: OffsetDateTime,
         #[serde(with = "time::serde::rfc3339")]
@@ -73,6 +75,7 @@ pub enum WsEvent {
 #[derive(Clone, serde::Serialize)]
 pub struct ActiveConnectionInfo {
     pub ip: IpAddr,
+    pub port: u16,
     #[serde(with = "time::serde::rfc3339")]
     pub connected_at: OffsetDateTime,
     pub latitude: Option<f64>,
@@ -130,6 +133,7 @@ async fn handle_event(
 
             let info = ActiveConnectionInfo {
                 ip: addr.ip(),
+                port: addr.port(),
                 connected_at,
                 latitude: geo.as_ref().and_then(|g| g.latitude),
                 longitude: geo.as_ref().and_then(|g| g.longitude),
@@ -142,6 +146,7 @@ async fn handle_event(
 
             let ws_event = WsEvent::Connected {
                 ip: info.ip,
+                port: info.port,
                 connected_at,
                 country_code,
                 country_name,
@@ -170,6 +175,7 @@ async fn handle_event(
             match db::insert_connection(
                 db_pool,
                 addr.ip(),
+                addr.port(),
                 connected_at,
                 disconnected_at,
                 time_spent,
@@ -186,6 +192,7 @@ async fn handle_event(
                     let ws_event = WsEvent::Disconnected {
                         sequence,
                         ip: addr.ip(),
+                        port: addr.port(),
                         connected_at,
                         disconnected_at,
                         time_spent,

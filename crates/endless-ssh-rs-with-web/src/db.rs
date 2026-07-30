@@ -10,7 +10,7 @@ use sqlx::{AssertSqlSafe, PgPool, Row as _};
 use time::{Duration, OffsetDateTime};
 use tracing::{Level, event};
 
-use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, Limit};
+use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, DbPort, Limit};
 use crate::geoip::GeoInfo;
 use crate::utils::serde::as_seconds;
 
@@ -25,9 +25,11 @@ pub async fn run_migrations(pool: &PgPool) -> Result<(), MigrateError> {
     sqlx::migrate!().run(pool).await
 }
 
+#[expect(clippy::too_many_arguments, reason = "One argument per column")]
 pub async fn insert_connection(
     pool: &PgPool,
     ip_address: IpAddr,
+    port: u16,
     connected_at: OffsetDateTime,
     disconnected_at: OffsetDateTime,
     time_spent: time::Duration,
@@ -55,6 +57,7 @@ pub async fn insert_connection(
             , time_spent
             , bytes_sent
             , ip_address
+            , port
             , country_code
             , country_name
             , city
@@ -71,6 +74,7 @@ pub async fn insert_connection(
             , $8
             , $9
             , $10
+            , $11
         ) RETURNING id
         "#,
         connected_at,
@@ -78,6 +82,7 @@ pub async fn insert_connection(
         DbDuration(time_spent) as _,
         bytes_sent,
         DbIpAddr(ip_address) as _,
+        i32::from(port),
         geo.and_then(|g| g.country_code.clone()),
         geo.and_then(|g| g.country_name.clone()),
         geo.and_then(|g| g.city.clone()),
@@ -119,6 +124,7 @@ pub fn get_connections_since(
         SELECT
             id
             , ip_address as "ip_address: DbIpAddr"
+            , port as "port: DbPort"
             , connected_at
             , disconnected_at
             , time_spent as "time_spent: DbDuration"
@@ -132,6 +138,7 @@ pub fn get_connections_since(
             SELECT
                 id
                 , ip_address
+                , port
                 , connected_at
                 , disconnected_at
                 , time_spent

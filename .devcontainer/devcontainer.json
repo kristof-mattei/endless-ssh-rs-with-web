@@ -9,9 +9,10 @@
     "customizations": {
         "vscode": {
             "extensions": [
+                "ms-ossdata.vscode-pgsql",
                 "rust-lang.rust-analyzer",
-                "vadimcn.vscode-lldb",
-                "usernamehw.errorlens"
+                "usernamehw.errorlens",
+                "vadimcn.vscode-lldb"
             ],
             "settings": {
                 "window.title": "endless-ssh-rs-with-web [${remoteName}]"

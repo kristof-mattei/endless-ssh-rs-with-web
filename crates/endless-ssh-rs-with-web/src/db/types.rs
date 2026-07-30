@@ -67,6 +67,31 @@ impl From<DbIpAddr> for IpAddr {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct DbPort(pub u16);
+
+impl Type<Postgres> for DbPort {
+    fn type_info() -> PgTypeInfo {
+        <i32 as Type<Postgres>>::type_info()
+    }
+}
+
+impl<'r> Decode<'r, Postgres> for DbPort {
+    fn decode(
+        value: PgValueRef<'r>,
+    ) -> Result<Self, Box<dyn std::error::Error + 'static + Send + Sync>> {
+        let port = <i32 as Decode<'r, Postgres>>::decode(value)?;
+
+        Ok(DbPort(u16::try_from(port)?))
+    }
+}
+
+impl From<DbPort> for u16 {
+    fn from(value: DbPort) -> Self {
+        value.0
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct DbDuration(pub Duration);
 
@@ -101,6 +126,7 @@ impl From<DbDuration> for Duration {
 pub struct ConnectionRecord {
     pub id: i64,
     pub ip_address: DbIpAddr,
+    pub port: DbPort,
     pub connected_at: OffsetDateTime,
     pub disconnected_at: OffsetDateTime,
     pub time_spent: DbDuration,

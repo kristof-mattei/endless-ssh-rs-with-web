@@ -1,0 +1,161 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            id\n            , ip_address as \"ip_address: DbIpAddr\"\n            , port as \"port: DbPort\"\n            , connected_at\n            , disconnected_at\n            , time_spent as \"time_spent: DbDuration\"\n            , bytes_sent\n            , country_code\n            , country_name\n            , city\n            , latitude\n            , longitude\n        FROM (\n            SELECT\n                id\n                , ip_address\n                , port\n                , connected_at\n                , disconnected_at\n                , time_spent\n                , bytes_sent\n                , country_code\n                , country_name\n                , city\n                , latitude\n                , longitude\n            FROM\n                connections\n            WHERE\n                id > $1\n            ORDER BY\n                id DESC\n            LIMIT $2\n        ) AS subquery\n        ORDER BY\n            id ASC\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "id"
+          }
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "ip_address: DbIpAddr",
+        "type_info": "Inet",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "ip_address"
+          }
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "port: DbPort",
+        "type_info": "Int4",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "port"
+          }
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "connected_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "connected_at"
+          }
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "disconnected_at",
+        "type_info": "Timestamptz",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "disconnected_at"
+          }
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "time_spent: DbDuration",
+        "type_info": "Interval",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "time_spent"
+          }
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "bytes_sent",
+        "type_info": "Int8",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "bytes_sent"
+          }
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "country_code",
+        "type_info": "Bpchar",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "country_code"
+          }
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "country_name",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "country_name"
+          }
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "city",
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "city"
+          }
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "latitude",
+        "type_info": "Float8",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "latitude"
+          }
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "longitude",
+        "type_info": "Float8",
+        "origin": {
+          "Table": {
+            "table": "connections",
+            "name": "longitude"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "c9e17651b51fde8e6793394487976a1fe32042bd21c7d4acbd511a6c0cf4c583"
+}
