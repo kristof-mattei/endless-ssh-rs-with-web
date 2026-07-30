@@ -43,6 +43,9 @@ pub enum WsEvent {
         ip: IpAddr,
         #[serde(with = "time::serde::rfc3339")]
         connected_at: OffsetDateTime,
+        country_code: Option<String>,
+        country_name: Option<String>,
+        city: Option<String>,
         latitude: Option<f64>,
         longitude: Option<f64>,
     },
@@ -123,7 +126,7 @@ async fn handle_event(
 ) {
     match client_event {
         ClientEvent::Connected { addr, connected_at } => {
-            let geo = (**geoip)
+            let mut geo = (**geoip)
                 .as_ref()
                 .and_then(|reader| reader.lookup(addr.ip()));
 
@@ -132,12 +135,19 @@ async fn handle_event(
                 connected_at,
                 latitude: geo.as_ref().and_then(|g| g.latitude),
                 longitude: geo.as_ref().and_then(|g| g.longitude),
-                country_code: geo.and_then(|g| g.country_code),
+                country_code: geo.as_ref().and_then(|g| g.country_code.clone()),
             };
+
+            let country_code = geo.as_mut().and_then(|geo| geo.country_code.take());
+            let country_name = geo.as_mut().and_then(|geo| geo.country_name.take());
+            let city = geo.as_mut().and_then(|geo| geo.city.take());
 
             let ws_event = WsEvent::Connected {
                 ip: info.ip,
                 connected_at,
+                country_code,
+                country_name,
+                city,
                 latitude: info.latitude,
                 longitude: info.longitude,
             };
@@ -145,7 +155,6 @@ async fn handle_event(
             active_connections.insert(addr, info);
 
             // ignore send errors, no WS clients connected is fine
-            // TODO I'd want to send a little bit more here for the FE to see more than just a dot on a map.
             let _r = ws_broadcast_tx.send(ws_event);
         },
 
