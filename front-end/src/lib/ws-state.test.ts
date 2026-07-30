@@ -70,6 +70,8 @@ function activeConnection(ip: string, overrides?: Partial<Omit<ActiveConnection,
         latitude: null,
         longitude: null,
         country_code: null,
+        country_name: null,
+        city: null,
         ...overrides,
     };
 }

@@ -65,7 +65,9 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
                         connected_at: event.connected_at,
                         latitude: event.latitude,
                         longitude: event.longitude,
-                        country_code: null,
+                        country_code: event.country_code,
+                        country_name: event.country_name,
+                        city: event.city,
                     },
                 ],
             };

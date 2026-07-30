@@ -47,6 +47,8 @@ export interface ActiveConnection {
     latitude: null | number;
     longitude: null | number;
     country_code: null | string;
+    country_name: null | string;
+    city: null | string;
 }
 
 export type WsEvent = ConnectedEvent | DisconnectedEvent | InitEvent | ReadyEvent;

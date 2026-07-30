@@ -2,6 +2,7 @@ use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
 
 use dashmap::DashMap;
+use serde::Serialize;
 use time::{Duration, OffsetDateTime};
 use tokio::sync::broadcast;
 use tokio_util::sync::CancellationToken;
@@ -28,7 +29,7 @@ pub enum ClientEvent {
 }
 
 /// WebSocket broadcast.
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone, Serialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum WsEvent {
     Init {
@@ -72,7 +73,7 @@ pub enum WsEvent {
 /// In-memory representation of currently connected clients.
 /// # Considerations
 /// We might merge this with the actual Client.
-#[derive(Clone, serde::Serialize)]
+#[derive(Clone, Serialize)]
 pub struct ActiveConnectionInfo {
     pub ip: IpAddr,
     pub port: u16,
@@ -81,6 +82,8 @@ pub struct ActiveConnectionInfo {
     pub latitude: Option<f64>,
     pub longitude: Option<f64>,
     pub country_code: Option<String>,
+    pub country_name: Option<String>,
+    pub city: Option<String>,
 }
 
 /// Main event-processing loop.
@@ -138,6 +141,8 @@ async fn handle_event(
                 latitude: geo.as_ref().and_then(|g| g.latitude),
                 longitude: geo.as_ref().and_then(|g| g.longitude),
                 country_code: geo.as_ref().and_then(|g| g.country_code.clone()),
+                country_name: geo.as_ref().and_then(|g| g.country_name.clone()),
+                city: geo.as_ref().and_then(|g| g.city.clone()),
             };
 
             let country_code = geo.as_mut().and_then(|geo| geo.country_code.take());
