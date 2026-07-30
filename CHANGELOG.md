@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.11.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.11.0..v0.11.1) - 2026-07-30
+
+### 🐛 Bug Fixes
+
+- Register bundled maplibre-gl v6 worker URL by [@kristof-mattei](https://github.com/kristof-mattei) ([`78fb83f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/78fb83f91d0717f75b73e64aecd4a2f4503e397a))
 ## [0.11.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.10.8..v0.11.0) - 2026-07-30
 
 ### 🚀 Features
