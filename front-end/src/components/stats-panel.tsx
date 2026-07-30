@@ -4,9 +4,9 @@ import { formatBytes, formatDuration } from "../lib/formatting";
 
 interface Properties {
     totalConnections: number;
-    totalByteSent: number;
-    totalTimeWastedSecs: number;
-    activeCount: number;
+    totalBytesSent: number;
+    totalSecondsWasted: number;
+    activeConnectionsCount: number;
 }
 
 const Stat: React.FC<{ label: string; value: string }> = ({ label, value }) => {
@@ -20,16 +20,16 @@ const Stat: React.FC<{ label: string; value: string }> = ({ label, value }) => {
 
 export const StatsPanel: React.FC<Properties> = ({
     totalConnections,
-    totalByteSent,
-    totalTimeWastedSecs,
-    activeCount,
+    totalBytesSent,
+    totalSecondsWasted,
+    activeConnectionsCount: activeCount,
 }) => {
     return (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Stat label="Total connections" value={totalConnections.toLocaleString()} />
             <Stat label="Active now" value={activeCount.toLocaleString()} />
-            <Stat label="Bytes wasted" value={formatBytes(totalByteSent)} />
-            <Stat label="Time wasted" value={formatDuration(totalTimeWastedSecs)} />
+            <Stat label="Bytes wasted" value={formatBytes(totalBytesSent)} />
+            <Stat label="Time wasted" value={formatDuration(totalSecondsWasted)} />
         </div>
     );
 };

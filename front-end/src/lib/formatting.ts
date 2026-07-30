@@ -5,11 +5,11 @@ export function formatBytes(bytes: number): string {
     return prettyBytes(bytes);
 }
 
-export function formatDuration(secs: number): string {
-    const d = Math.floor(secs / 86_400);
-    const h = Math.floor((secs % 86_400) / 3600);
-    const m = Math.floor((secs % 3600) / 60);
-    const s = Math.floor(secs % 60);
+export function formatDuration(seconds: number): string {
+    const d = Math.floor(seconds / 86_400);
+    const h = Math.floor((seconds % 86_400) / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
 
     const parts: string[] = [];
 

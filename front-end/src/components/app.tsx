@@ -43,7 +43,7 @@ export const App: React.FC = () => {
     const [events, setEvents] = useState<DisconnectedEvent[]>([]);
     const [totalConnections, setTotalConnections] = useState(0);
     const [totalBytes, setTotalBytes] = useState(0);
-    const [totalTimeSecs, setTotalTimeSecs] = useState(0);
+    const [totalTimeSeconds, setTotalTimeSeconds] = useState(0);
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
     const seenSequenceReference = useRef(new Set());
@@ -56,7 +56,7 @@ export const App: React.FC = () => {
                 setActiveConnections(wsEvent.active_connections);
                 setTotalConnections(wsEvent.total_connections);
                 setTotalBytes(wsEvent.total_bytes_sent);
-                setTotalTimeSecs(wsEvent.total_time_spent);
+                setTotalTimeSeconds(wsEvent.total_time_spent);
                 break;
             }
             case "ready": {
@@ -118,7 +118,7 @@ export const App: React.FC = () => {
                         return n + wsEvent.bytes_sent;
                     });
 
-                    setTotalTimeSecs((n) => {
+                    setTotalTimeSeconds((n) => {
                         return n + wsEvent.time_spent;
                     });
                 }
@@ -141,9 +141,9 @@ export const App: React.FC = () => {
 
                 <StatsPanel
                     totalConnections={totalConnections}
-                    totalByteSent={totalBytes}
-                    totalTimeWastedSecs={totalTimeSecs}
-                    activeCount={activeConnections.length}
+                    totalBytesSent={totalBytes}
+                    totalSecondsWasted={totalTimeSeconds}
+                    activeConnectionsCount={activeConnections.length}
                 />
 
                 <WorldMap activeConnections={activeConnections} />
