@@ -19,8 +19,6 @@ overrides:
   eslint-plugin-import>eslint: 10.8.0
   eslint-plugin-react>eslint: 10.8.0
 
-packageExtensionsChecksum: sha256-dVz3r/L5LbiNiPVoUOFxpk2wrLMNv3zFawSxjIKi38E=
-
 importers:
 
   .:
