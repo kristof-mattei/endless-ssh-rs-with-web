@@ -38,7 +38,6 @@ EPOLLRDHUP
 EPROTO
 errorlens
 EWOULDBLOCK
-existance
 geoip
 geolocation
 grcov
@@ -70,16 +69,12 @@ ossdata
 pathbuf
 pgadmin
 pgsql
-pids
-possiblities
 postprocessors
 prereleased
 profraw
 psql
 randline
 RCVBUF
-recieve
-reprentation
 Retag
 Retagging
 rewatched

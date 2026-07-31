@@ -183,7 +183,7 @@ async fn should_download_database(license_key: &str, geo_ip_path: &Path) -> bool
 
     let etag_file = geo_ip_path.with_extension("etag");
 
-    // file exists, verify existance of etag file
+    // file exists, verify existence of etag file
     let etag = match std::fs::read_to_string(&etag_file) {
         Ok(contents) => contents,
         Err(error) => {

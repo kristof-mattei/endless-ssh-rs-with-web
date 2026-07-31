@@ -23,7 +23,7 @@ pub fn to_interval(duration: Duration) -> PgInterval {
     // * internet outage
     // * thermonuclear war
     // any, I watched Terminator 2 at least 10 times, and played a lot of Fallout
-    // (not to mention I rewatched the show 3 times), so I'm prepared for all possiblities.
+    // (not to mention I rewatched the show 3 times), so I'm prepared for all possibilities.
     // and in the case I'm wrong, we'll cap the value to `i64::MAX`, which is good enough for now
     let microseconds = duration.whole_microseconds().try_into().unwrap_or(i64::MAX);
 

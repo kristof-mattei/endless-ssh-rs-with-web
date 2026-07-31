@@ -67,7 +67,7 @@ function formatBucket(bucket: Date): string {
     return bucket.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-// Mirrors the bucket selections buttons, and thus the backend's reprentation.
+// Mirrors the bucket selections buttons, and thus the backend's representation.
 function getBucketIntervalMs(from: Date, to: Date): number {
     const MILLISECONDS_IN_SECOND = 1000;
     const SECONDS_IN_MINUTE = 60;
