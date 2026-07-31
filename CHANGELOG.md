@@ -1,4 +1,23 @@
 <!-- header goes here -->
+## [0.11.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.11.1..v0.11.2) - 2026-07-31
+
+### 🐛 Bug Fixes
+
+- *(ci)* Address actionlint by [@kristof-mattei](https://github.com/kristof-mattei) ([`3d8e464`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3d8e4648ec20159a31b930c0a6a6f39fa5b0eb6e))
+- *(deps)* Update rust crate clap to v4.6.5 by [@renovate[bot]](https://github.com/renovate[bot]) ([`6947c81`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6947c8164d566e23782fc01556686db2c48f9c22))
+- *(deps)* Update rust crate clap to v4.6.5 (#3097) by [@renovate[bot]](https://github.com/renovate[bot]) in #3097 ([`3d775cd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3d775cdde19d0aec2d805cd986d47f9a2b7168df))
+
+### 💼 Other
+
+- Generate SBOM & provenance attestations, embedding the actual crate list via cargo-auditable by [@kristof-mattei](https://github.com/kristof-mattei) ([`26633d5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/26633d56feef4182cb37eef8df2394e1ced75939))
+- Generate SBOM & provenance attestations, embedding the actual crate list via cargo-auditable by [@kristof-mattei](https://github.com/kristof-mattei) ([`7069ac7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7069ac7c50b8a9c3eab63e1b31ebf77164141d7c))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Update the release PR body via the rest api by [@kristof-mattei](https://github.com/kristof-mattei) ([`0358506`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/035850687f39ce852128a059f83f596cba9fab40))
+- *(ci)* Upload images sequentially by [@kristof-mattei](https://github.com/kristof-mattei) ([`128f6d4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/128f6d4a0436cec8aeba4754262307ff0274b9df))
+- Remove unused word by [@kristof-mattei](https://github.com/kristof-mattei) ([`4cf5b2d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4cf5b2dbd13e7d5f8143634ffaa773f10175141c))
+- Update dictionary by [@kristof-mattei](https://github.com/kristof-mattei) ([`e7f3adf`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e7f3adf73bd90fcf5c8312052e247aafa3bb5dea))
 ## [0.11.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.11.0..v0.11.1) - 2026-07-30
 
 ### 🐛 Bug Fixes
