@@ -60,6 +60,28 @@ interface Options {
 const BASE_BACKOFF_MS = 500;
 const MAX_BACKOFF_MS = 30_000;
 
+// RFC 6455 close code 1000, Normal Closure
+const NORMAL_CLOSURE_CODE = 1000;
+
+// per spec, close() on a CONNECTING socket fails the connection without a close handshake, so defer until open
+function closeSocket(ws: WebSocket): void {
+    if (ws.readyState === WebSocket.CONNECTING) {
+        ws.addEventListener(
+            "open",
+            () => {
+                ws.close(NORMAL_CLOSURE_CODE);
+            },
+            { once: true },
+        );
+
+        return;
+    }
+
+    if (ws.readyState === WebSocket.OPEN) {
+        ws.close(NORMAL_CLOSURE_CODE);
+    }
+}
+
 export function useWebSocket({ onEvent }: Options): void {
     const lastSequenceReference = useRef(0);
 
@@ -136,7 +158,9 @@ export function useWebSocket({ onEvent }: Options): void {
                 clearTimeout(retryTimer);
             }
 
-            socket?.close();
+            if (socket !== null) {
+                closeSocket(socket);
+            }
         };
     }, []);
 }
