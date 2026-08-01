@@ -227,7 +227,10 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
 
     const points = aggregate(rows, from, to);
 
-    const Typed = createHorizontalChart<BucketPoint, Temporal.Instant>()({
+    // recharts hands axis values to d3, which coerces object keys via `valueOf()`.
+    // `Temporal.Instant.prototype.valueOf` throws by design, so the axis carries
+    // epoch milliseconds and formatters convert back to `Temporal.Instant`.
+    const Typed = createHorizontalChart<BucketPoint, number>()({
         XAxis,
         YAxis,
         Tooltip,
@@ -266,10 +269,12 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                         <Typed.XAxis
                             axisLine={{ stroke: "#4b5563" }}
                             dataKey={(bp: BucketPoint) => {
-                                return bp.bucket;
+                                return bp.bucket.epochMilliseconds;
                             }}
                             tick={{ fill: "#6b7280", fontSize: 10 }}
-                            tickFormatter={formatBucket}
+                            tickFormatter={(ms: number) => {
+                                return formatBucket(Temporal.Instant.fromEpochMilliseconds(ms));
+                            }}
                             tickLine={true}
                         />
                         <Typed.YAxis
@@ -296,7 +301,9 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                                 return <CustomTooltipContent {...properties} />;
                             }}
                             labelFormatter={(label: ReactNode) => {
-                                return label instanceof Temporal.Instant ? formatBucket(label) : label;
+                                return typeof label === "number"
+                                    ? formatBucket(Temporal.Instant.fromEpochMilliseconds(label))
+                                    : label;
                             }}
                         />
                         {METRICS.map((m) => {
