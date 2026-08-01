@@ -59,6 +59,7 @@ interface Options {
 
 const BASE_BACKOFF_MS = 500;
 const MAX_BACKOFF_MS = 30_000;
+const STABLE_CONNECTION_MS = 5000;
 
 // RFC 6455 close code 1000, Normal Closure
 const NORMAL_CLOSURE_CODE = 1000;
@@ -96,6 +97,7 @@ export function useWebSocket({ onEvent }: Options): void {
         let isDisposed = false;
         let socket: null | WebSocket = null;
         let retryTimer: null | ReturnType<typeof setTimeout> = null;
+        let stableTimer: null | ReturnType<typeof setTimeout> = null;
         let backoff = BASE_BACKOFF_MS;
 
         function connect(): void {
@@ -111,7 +113,10 @@ export function useWebSocket({ onEvent }: Options): void {
                     return;
                 }
 
-                backoff = BASE_BACKOFF_MS;
+                // reset only once the connection proves stable, an accept-then-drop loop must keep growing the backoff
+                stableTimer = setTimeout(() => {
+                    backoff = BASE_BACKOFF_MS;
+                }, STABLE_CONNECTION_MS);
             });
 
             ws.addEventListener("message", (message: MessageEvent<string>) => {
@@ -141,6 +146,11 @@ export function useWebSocket({ onEvent }: Options): void {
             });
 
             ws.addEventListener("close", () => {
+                if (stableTimer !== null) {
+                    clearTimeout(stableTimer);
+                    stableTimer = null;
+                }
+
                 if (isDisposed) {
                     return;
                 }
@@ -160,6 +170,10 @@ export function useWebSocket({ onEvent }: Options): void {
 
             if (retryTimer !== null) {
                 clearTimeout(retryTimer);
+            }
+
+            if (stableTimer !== null) {
+                clearTimeout(stableTimer);
             }
 
             if (socket !== null) {
