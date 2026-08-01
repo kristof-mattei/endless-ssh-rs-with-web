@@ -1,4 +1,10 @@
 <!-- header goes here -->
+## [0.12.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.12.0..v0.12.1) - 2026-08-01
+
+### 🐛 Bug Fixes
+
+- Serialize stats buckets as RFC 3339 by [@kristof-mattei](https://github.com/kristof-mattei) ([`7e637e5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7e637e59f8e21c998992a5cbe034bd793493e608))
+- Key the stats chart off epoch milliseconds instead of Temporal.Instant by [@kristof-mattei](https://github.com/kristof-mattei) ([`add589f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/add589f99bc199946b961f10951c446aae1d0cd0))
 ## [0.12.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.11.2..v0.12.0) - 2026-08-01
 
 ### 🚀 Features
