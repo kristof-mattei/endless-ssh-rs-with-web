@@ -1,5 +1,6 @@
 import type * as React from "react";
 import { useCallback, useEffect, useState } from "react";
+import { Temporal } from "temporal-polyfill";
 
 export interface StatsRow {
     bucket: string;
@@ -11,8 +12,8 @@ export interface StatsRow {
 
 export interface StatsData {
     rows: StatsRow[];
-    from: Date;
-    to: Date;
+    from: Temporal.Instant;
+    to: Temporal.Instant;
 }
 
 type Range = "1h" | "24h" | "30d" | "7d" | "all";
@@ -26,8 +27,8 @@ const RANGES: Array<{ label: string; value: Range }> = [
 ];
 
 function rangeToParameters(range: Range): { from: string; to: string } {
-    const now = new Date();
-    const to = now.toISOString();
+    const now = Temporal.Now.instant();
+    const to = now.toString();
 
     const msMap: Record<Range, number> = {
         "1h": 60 * 60 * 1000,
@@ -38,9 +39,9 @@ function rangeToParameters(range: Range): { from: string; to: string } {
         all: 365 * 24 * 60 * 60 * 1000,
     };
 
-    const from = new Date(now.getTime() - msMap[range]);
+    const from = now.subtract({ milliseconds: msMap[range] });
 
-    return { from: from.toISOString(), to };
+    return { from: from.toString(), to };
 }
 
 async function fetchStats(range: Range, onData: (data: StatsData) => void): Promise<void> {
@@ -55,7 +56,7 @@ async function fetchStats(range: Range, onData: (data: StatsData) => void): Prom
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- data from trusted backend
     const rows = (await response.json()) as StatsRow[];
 
-    onData({ rows, from: new Date(from), to: new Date(to) });
+    onData({ rows, from: Temporal.Instant.from(from), to: Temporal.Instant.from(to) });
 }
 
 interface Properties {

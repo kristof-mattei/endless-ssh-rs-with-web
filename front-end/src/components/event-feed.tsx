@@ -1,4 +1,5 @@
 import type * as React from "react";
+import { Temporal } from "temporal-polyfill";
 
 import type { DisconnectedEvent } from "../hooks/use-web-sockets";
 import { formatBytes, formatDuration, formatIp } from "../lib/formatting";

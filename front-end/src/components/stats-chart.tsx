@@ -14,6 +14,8 @@ import {
 
 import type { Payload } from "recharts/types/component/DefaultTooltipContent";
 
+import { Temporal } from "temporal-polyfill";
+
 import { formatBytes, formatDuration } from "../lib/formatting";
 
 import type { StatsRow } from "./time-range-selector";
@@ -27,7 +29,7 @@ interface BucketPointValues {
 type Metric = keyof BucketPointValues;
 
 type BucketPoint = {
-    bucket: Date;
+    bucket: Temporal.Instant;
 } & BucketPointValues;
 
 const METRICS: ReadonlyArray<{ value: Metric; label: string }> = [
@@ -56,25 +58,27 @@ function formatYLabel(metric: Metric, value: number): string {
     }
 }
 
-function formatBucket(bucket: Date): string {
+function formatBucket(bucket: Temporal.Instant): string {
     // midnight == day-level bucket == show date only
     // this is actually bad, we want to know the scale we're working with, as passed on by the `rangeSelector`
     // because this heuristic is not always correct
-    if (bucket.getUTCHours() === 0 && bucket.getUTCMinutes() === 0) {
-        return bucket.toLocaleDateString([], { day: "numeric", month: "short" });
+    const utc = bucket.toZonedDateTimeISO("UTC");
+
+    if (utc.hour === 0 && utc.minute === 0) {
+        return bucket.toLocaleString([], { day: "numeric", month: "short" });
     }
 
-    return bucket.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return bucket.toLocaleString([], { hour: "2-digit", minute: "2-digit" });
 }
 
 // Mirrors the bucket selections buttons, and thus the backend's representation.
-function getBucketIntervalMs(from: Date, to: Date): number {
+function getBucketIntervalMs(from: Temporal.Instant, to: Temporal.Instant): number {
     const MILLISECONDS_IN_SECOND = 1000;
     const SECONDS_IN_MINUTE = 60;
     const MINUTES_IN_HOUR = 60;
     const HOURS_IN_DAY = 24;
 
-    const spanHours = (to.getTime() - from.getTime()) / (MILLISECONDS_IN_SECOND * SECONDS_IN_MINUTE * 60);
+    const spanHours = from.until(to).total("hours");
 
     // last hour & last 24 hours
     if (spanHours <= 24) {
@@ -99,12 +103,12 @@ function getBucketIntervalMs(from: Date, to: Date): number {
     return HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND;
 }
 
-function aggregate(rows: StatsRow[], from: Date, to: Date): BucketPoint[] {
+function aggregate(rows: StatsRow[], from: Temporal.Instant, to: Temporal.Instant): BucketPoint[] {
     const map = new Map<number, BucketPoint>();
 
     for (const row of rows) {
-        const bucket = new Date(row.bucket);
-        const key = bucket.getTime();
+        const bucket = Temporal.Instant.from(row.bucket);
+        const key = bucket.epochMilliseconds;
         const existing = map.get(key);
 
         if (existing === undefined) {
@@ -124,11 +128,16 @@ function aggregate(rows: StatsRow[], from: Date, to: Date): BucketPoint[] {
     // Fill in zero-value entries for every bucket in [from, to) that has no data.
     // TimescaleDB aligns buckets to the Unix epoch, so rounding to intervalMs works.
     const intervalMs = getBucketIntervalMs(from, to);
-    const startMs = Math.ceil(from.getTime() / intervalMs) * intervalMs;
+    const startMs = Math.ceil(from.epochMilliseconds / intervalMs) * intervalMs;
 
-    for (let ms = startMs; ms < to.getTime(); ms += intervalMs) {
+    for (let ms = startMs; ms < to.epochMilliseconds; ms += intervalMs) {
         if (!map.has(ms)) {
-            map.set(ms, { bucket: new Date(ms), bytes_sent: 0, connects: 0, time_spent: 0 });
+            map.set(ms, {
+                bucket: Temporal.Instant.fromEpochMilliseconds(ms),
+                bytes_sent: 0,
+                connects: 0,
+                time_spent: 0,
+            });
         }
     }
 
@@ -136,14 +145,14 @@ function aggregate(rows: StatsRow[], from: Date, to: Date): BucketPoint[] {
         .values()
         .toArray()
         .sort((a, b) => {
-            return a.bucket.getTime() - b.bucket.getTime();
+            return Temporal.Instant.compare(a.bucket, b.bucket);
         });
 }
 
 interface Properties {
     rows: StatsRow[];
-    from: Date;
-    to: Date;
+    from: Temporal.Instant;
+    to: Temporal.Instant;
 }
 
 export const CustomTooltipContent: (properties: TooltipContentProps<number, keyof BucketPoint>) => React.JSX.Element = (
@@ -218,7 +227,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
 
     const points = aggregate(rows, from, to);
 
-    const Typed = createHorizontalChart<BucketPoint, Date>()({
+    const Typed = createHorizontalChart<BucketPoint, Temporal.Instant>()({
         XAxis,
         YAxis,
         Tooltip,
@@ -287,7 +296,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                                 return <CustomTooltipContent {...properties} />;
                             }}
                             labelFormatter={(label: ReactNode) => {
-                                return label instanceof Date ? formatBucket(label) : label;
+                                return label instanceof Temporal.Instant ? formatBucket(label) : label;
                             }}
                         />
                         {METRICS.map((m) => {
