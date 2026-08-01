@@ -119,8 +119,14 @@ export function useWebSocket({ onEvent }: Options): void {
                 }, STABLE_CONNECTION_MS);
             });
 
-            ws.addEventListener("message", (message: MessageEvent<string>) => {
+            ws.addEventListener("message", (message: MessageEvent<unknown>) => {
                 if (isDisposed) {
+                    return;
+                }
+
+                if (typeof message.data !== "string") {
+                    console.error("Ignoring non-text WebSocket frame", message.data);
+
                     return;
                 }
 
@@ -128,7 +134,9 @@ export function useWebSocket({ onEvent }: Options): void {
                     try {
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- trusted source
                         return JSON.parse(message.data) as WsEvent;
-                    } catch {
+                    } catch (error) {
+                        console.error("Ignoring malformed WebSocket frame", error);
+
                         return undefined;
                     }
                 })();
@@ -137,7 +145,9 @@ export function useWebSocket({ onEvent }: Options): void {
                     return;
                 }
 
-                // track last sequence for reconnect no-gap
+                // "disconnected" is the only sequenced event, sequence is the id of the
+                // persisted connection record, and reconnecting with ?since= replays every
+                // record after it. Live connections are rebuilt from the init snapshot instead.
                 if (event.type === "disconnected") {
                     lastSequenceReference.current = event.sequence;
                 }
