@@ -19,6 +19,9 @@ overrides:
   eslint-plugin-import>eslint: 10.8.0
   eslint-plugin-react>eslint: 10.8.0
 
+patchedDependencies:
+  country-flag-emoji-polyfill@0.1.8: 62e8e21b08e806174417391c7d19216700fd09cf8e742cb96779033a65045891
+
 importers:
 
   .:
@@ -28,7 +31,7 @@ importers:
         version: 0.0.16(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@16.13.1)(react@19.2.8)(redux@5.0.1))
       country-flag-emoji-polyfill:
         specifier: 0.1.8
-        version: 0.1.8
+        version: 0.1.8(patch_hash=62e8e21b08e806174417391c7d19216700fd09cf8e742cb96779033a65045891)
       ip-address:
         specifier: 10.3.1
         version: 10.3.1
@@ -5397,7 +5400,7 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  country-flag-emoji-polyfill@0.1.8: {}
+  country-flag-emoji-polyfill@0.1.8(patch_hash=62e8e21b08e806174417391c7d19216700fd09cf8e742cb96779033a65045891): {}
 
   cross-spawn@7.0.6:
     dependencies:
