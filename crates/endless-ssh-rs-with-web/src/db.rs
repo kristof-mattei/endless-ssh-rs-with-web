@@ -187,7 +187,7 @@ pub async fn get_totals(pool: &PgPool) -> Result<AllTimeTotals, sqlx::Error> {
 /// Aggregated stats returned by the `/api/stats` endpoint.
 #[derive(Debug, Serialize)]
 pub struct StatsRow {
-    #[serde(serialize_with = "time::serde::iso8601::serialize")]
+    #[serde(serialize_with = "time::serde::rfc3339::serialize")]
     pub bucket: OffsetDateTime,
     pub country_code: Option<String>,
     pub connects: i64,
