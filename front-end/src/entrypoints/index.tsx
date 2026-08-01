@@ -1,4 +1,5 @@
 import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
+import countryFlagsFontUrl from "country-flag-emoji-polyfill/dist/TwemojiCountryFlags.woff2";
 import { setWorkerUrl } from "maplibre-gl";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { StrictMode } from "react";
@@ -6,7 +7,7 @@ import { createRoot } from "react-dom/client";
 
 import { App } from "../components/app";
 
-polyfillCountryFlagEmojis();
+polyfillCountryFlagEmojis(undefined, countryFlagsFontUrl);
 setWorkerUrl(maplibreWorkerUrl);
 
 const container = document.querySelector("#root");

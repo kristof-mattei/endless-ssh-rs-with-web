@@ -9,3 +9,5 @@ overrides:
   "eslint-config-love>eslint": "catalog:default"
   "eslint-plugin-import>eslint": "catalog:default"
   "eslint-plugin-react>eslint": "catalog:default"
+patchedDependencies:
+  country-flag-emoji-polyfill@0.1.8: patches/country-flag-emoji-polyfill@0.1.8.patch
