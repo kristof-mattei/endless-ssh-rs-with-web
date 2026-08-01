@@ -1,4 +1,19 @@
 <!-- header goes here -->
+## [0.12.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.11.2..v0.12.0) - 2026-08-01
+
+### 🚀 Features
+
+- Use a Temporal polyfill so the code works on iOS too by [@kristof-mattei](https://github.com/kristof-mattei) ([`4e6a319`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4e6a319ccc9694d065d3fd1f22edfee291338957))
+- Front-end sbom by [@kristof-mattei](https://github.com/kristof-mattei) ([`645c095`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/645c095a91b69171e1dbf3f2051b35618b06eb6b))
+
+### 🐛 Bug Fixes
+
+- *(ci)* Poll for the release source tag instead of racing the push retag by [@kristof-mattei](https://github.com/kristof-mattei) ([`c0be1d5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c0be1d5486cbb92bf8772e4aff991b4da9861f99))
+- *(ci)* Skip Docker Hub tags that already exist with the expected digest by [@kristof-mattei](https://github.com/kristof-mattei) ([`784a607`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/784a607d54f6872e85ed0fc069377ae347530858))
+- *(ci)* Give untagged container versions a grace period before cleanup by [@kristof-mattei](https://github.com/kristof-mattei) ([`9ee8d74`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9ee8d74bd0d58c14a23d09343a26efe31527a8b7))
+- *(deps)* Update maplibre-gl (npm) to v6.1.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`409ecea`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/409eceaee513ebf4b425c2db3978f7c27bc081fa))
+- *(deps)* Update maplibre-gl (npm) to v6.1.0 (#3100) by [@renovate[bot]](https://github.com/renovate[bot]) in #3100 ([`a2339ad`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a2339adb06f2673f6f6c468e94bd233b1cc06175))
+- Self-host the country flag emoji font by [@kristof-mattei](https://github.com/kristof-mattei) ([`4abbe56`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4abbe56f692df405c19f62017d26a3007be7fc37))
 ## [0.11.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.11.1..v0.11.2) - 2026-07-31
 
 ### 🐛 Bug Fixes
