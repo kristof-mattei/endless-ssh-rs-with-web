@@ -1,18 +1,7 @@
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 import type { TooltipContentProps } from "recharts";
-import {
-    Bar,
-    CartesianGrid,
-    DefaultTooltipContent,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis,
-    createHorizontalChart,
-} from "recharts";
-
-import type { Payload } from "recharts/types/component/DefaultTooltipContent";
+import { Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, createHorizontalChart } from "recharts";
 
 import { Temporal } from "temporal-polyfill";
 
@@ -155,40 +144,52 @@ interface Properties {
     to: Temporal.Instant;
 }
 
-export const CustomTooltipContent: (properties: TooltipContentProps<number, keyof BucketPoint>) => React.JSX.Element = (
-    narrowProperties,
-) => {
-    // `createHorizontalChart` narrows the tooltip's `ValueType` to `number`, but `DefaultTooltipContent` and `Payload` below aren't generic, they're just `ValueType`.
-    // But since when we send in a `number` they just use it as a `number` this is fine.
-    // we really should copy over their `DefaultTooltipContent`...
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- underlying library is untyped
-    const properties = narrowProperties as unknown as TooltipContentProps;
+function isBucketPoint(value: unknown): value is BucketPoint {
+    return typeof value === "object" && value !== null && "bucket" in value;
+}
 
-    // `payload[0].payload` is the full `BucketPoint`
-    const payload = properties.payload as readonly Payload[];
+// recharts' `DefaultTooltipContent` is declared without generics, so rendering the
+// content ourselves is the only way to keep the chart's narrowed types. Markup and
+// base styles mirror theirs.
+export const CustomTooltipContent: (
+    properties: TooltipContentProps<number, keyof BucketPoint>,
+) => null | React.JSX.Element = ({ contentStyle, itemStyle, label, labelFormatter, labelStyle, payload }) => {
     const payload0 = payload[0];
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- underlying library is untyped
-    const bucketPoint = payload0?.payload as BucketPoint | undefined;
 
-    if (bucketPoint === undefined) {
-        // passthrough
-        return <DefaultTooltipContent {...properties} />;
+    if (payload0 === undefined || !isBucketPoint(payload0.payload)) {
+        return null;
     }
 
-    // @ts-expect-error Payload's types are { foo?: T}, not { foo?: T | undefined }
-    const allMetrics: readonly Payload[] = METRICS.map((m) => {
-        return {
-            ...payload0,
-            dataKey: m.value,
-            name: m.label,
-            value: bucketPoint[m.value],
-            formatter: (v: number | undefined) => {
-                return formatYLabel(m.value, v ?? 0);
-            },
-        };
-    });
+    const bucketPoint = payload0.payload;
+    const formattedLabel = labelFormatter === undefined ? label : labelFormatter(label, payload);
 
-    return <DefaultTooltipContent {...properties} payload={allMetrics} />;
+    return (
+        <div
+            className="recharts-default-tooltip"
+            style={{ margin: 0, padding: 10, whiteSpace: "nowrap", ...contentStyle }}
+        >
+            <p className="recharts-tooltip-label" style={{ margin: 0, ...labelStyle }}>
+                {formattedLabel}
+            </p>
+            <ul className="recharts-tooltip-item-list" style={{ margin: 0, padding: 0 }}>
+                {METRICS.map((metric) => {
+                    return (
+                        <li
+                            key={metric.value}
+                            className="recharts-tooltip-item"
+                            style={{ display: "block", paddingBottom: 4, paddingTop: 4, ...itemStyle }}
+                        >
+                            <span className="recharts-tooltip-item-name">{metric.label}</span>
+                            <span className="recharts-tooltip-item-separator">{" : "}</span>
+                            <span className="recharts-tooltip-item-value">
+                                {formatYLabel(metric.value, bucketPoint[metric.value])}
+                            </span>
+                        </li>
+                    );
+                })}
+            </ul>
+        </div>
+    );
 };
 
 type DevelopmentToolsState = {
