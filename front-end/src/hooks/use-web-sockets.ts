@@ -107,10 +107,18 @@ export function useWebSocket({ onEvent }: Options): void {
             socket = ws;
 
             ws.addEventListener("open", () => {
+                if (isDisposed) {
+                    return;
+                }
+
                 backoff = BASE_BACKOFF_MS;
             });
 
             ws.addEventListener("message", (message: MessageEvent<string>) => {
+                if (isDisposed) {
+                    return;
+                }
+
                 const event = ((): undefined | WsEvent => {
                     try {
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- trusted source
