@@ -143,10 +143,6 @@ export function useWebSocket({ onEvent }: Options): void {
                     connect();
                 }, backoff);
             });
-
-            ws.addEventListener("error", () => {
-                ws.close();
-            });
         }
 
         connect();
