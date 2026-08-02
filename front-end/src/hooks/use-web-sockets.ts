@@ -184,10 +184,33 @@ export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus }
             });
         }
 
+        // cut a pending backoff wait short when conditions change in our favor
+        function retryNow(): void {
+            if (retryTimer === null) {
+                return;
+            }
+
+            clearTimeout(retryTimer);
+            retryTimer = null;
+            connect();
+        }
+
+        function onVisibilityChange(): void {
+            if (document.visibilityState === "visible") {
+                retryNow();
+            }
+        }
+
         connect();
+
+        globalThis.addEventListener("online", retryNow);
+        document.addEventListener("visibilitychange", onVisibilityChange);
 
         return () => {
             isDisposed = true;
+
+            globalThis.removeEventListener("online", retryNow);
+            document.removeEventListener("visibilitychange", onVisibilityChange);
 
             if (retryTimer !== null) {
                 clearTimeout(retryTimer);
