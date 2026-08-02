@@ -1,4 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+export type ConnectionStatus = "connecting" | "live" | "reconnecting";
 
 export interface ConnectedEvent {
     type: "connected";
@@ -83,7 +85,9 @@ function closeSocket(ws: WebSocket): void {
     }
 }
 
-export function useWebSocket({ onEvent }: Options): void {
+export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus } {
+    const [status, setStatus] = useState<ConnectionStatus>("connecting");
+
     const lastSequenceReference = useRef(0);
 
     // stable callback reference
@@ -112,6 +116,8 @@ export function useWebSocket({ onEvent }: Options): void {
                 if (isDisposed) {
                     return;
                 }
+
+                setStatus("live");
 
                 // reset only once the connection proves stable, an accept-then-drop loop must keep growing the backoff
                 stableTimer = setTimeout(() => {
@@ -165,6 +171,11 @@ export function useWebSocket({ onEvent }: Options): void {
                     return;
                 }
 
+                // before the first open there is no stale data to flag, stay on "connecting"
+                setStatus((current) => {
+                    return current === "connecting" ? "connecting" : "reconnecting";
+                });
+
                 // exponential backoff reconnect
                 retryTimer = setTimeout(() => {
                     backoff = Math.min(backoff * 2, MAX_BACKOFF_MS);
@@ -191,4 +202,6 @@ export function useWebSocket({ onEvent }: Options): void {
             }
         };
     }, []);
+
+    return { status };
 }

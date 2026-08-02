@@ -3,6 +3,7 @@ import { useReducer, useState } from "react";
 import { Temporal } from "temporal-polyfill";
 
 import { useWebSocket } from "../hooks/use-web-sockets";
+import type { ConnectionStatus } from "../hooks/use-web-sockets";
 import { INITIAL_WS_STATE, wsReducer } from "../lib/ws-state";
 
 import { EventFeed } from "./event-feed";
@@ -36,6 +37,23 @@ function getTimezone(): string {
     return `${timeZoneName.value}, GMT ${offset}`;
 }
 
+const CONNECTION_STATUS_STYLES: Record<ConnectionStatus, { dot: string; text: string }> = {
+    connecting: { dot: "bg-gray-500", text: "text-gray-400" },
+    live: { dot: "bg-green-500", text: "text-green-400" },
+    reconnecting: { dot: "bg-amber-500", text: "text-amber-400" },
+};
+
+const ConnectionBadge: React.FC<{ status: ConnectionStatus }> = ({ status }) => {
+    const { dot, text } = CONNECTION_STATUS_STYLES[status];
+
+    return (
+        <span className={`flex items-center gap-1.5 text-sm ${text}`}>
+            <span aria-hidden="true" className={`h-2 w-2 rounded-full ${dot}`} />
+            {status}
+        </span>
+    );
+};
+
 export const App: React.FC = () => {
     const [{ activeConnections, events, totalBytes, totalConnections, totalTimeSeconds }, dispatch] = useReducer(
         wsReducer,
@@ -43,7 +61,7 @@ export const App: React.FC = () => {
     );
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
-    useWebSocket({ onEvent: dispatch });
+    const { status } = useWebSocket({ onEvent: dispatch });
 
     return (
         <div className="min-h-screen bg-gray-950 p-4 text-white">
@@ -52,7 +70,10 @@ export const App: React.FC = () => {
             </header>
 
             <section className="space-y-2 mb-6">
-                <h2 className="text-lg font-semibold text-gray-300">Live attack map</h2>
+                <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-gray-300">Live attack map</h2>
+                    <ConnectionBadge status={status} />
+                </div>
 
                 <StatsPanel
                     totalConnections={totalConnections}
