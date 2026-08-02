@@ -7,7 +7,7 @@ use futures::stream::Stream;
 use serde::Serialize;
 use sqlx::migrate::MigrateError;
 use sqlx::postgres::PgPoolOptions;
-use sqlx::{AssertSqlSafe, PgPool, Row as _};
+use sqlx::{AssertSqlSafe, PgExecutor, PgPool, Row as _};
 use time::{Duration, OffsetDateTime};
 use tracing::{Level, event};
 
@@ -114,11 +114,14 @@ pub async fn insert_connection(
 }
 
 /// Return up to `limit` of the most recent connection records with id > `since_id`, ordered by ascending id.
-pub fn get_connections_since(
-    pool: &PgPool,
+pub fn get_connections_since<'e, E>(
+    executor: E,
     since_id: i64,
     limit: Limit,
-) -> impl Stream<Item = Result<ConnectionRecord, sqlx::Error>> + Send + '_ {
+) -> impl Stream<Item = Result<ConnectionRecord, sqlx::Error>> + Send + 'e
+where
+    E: PgExecutor<'e> + 'e,
+{
     sqlx::query_as!(
         ConnectionRecord,
         r#"
@@ -163,10 +166,13 @@ pub fn get_connections_since(
         since_id,
         limit as _
     )
-    .fetch(pool)
+    .fetch(executor)
 }
 
-pub async fn get_totals(pool: &PgPool) -> Result<AllTimeTotals, sqlx::Error> {
+pub async fn get_totals<'e, E>(executor: E) -> Result<AllTimeTotals, sqlx::Error>
+where
+    E: PgExecutor<'e>,
+{
     let row = sqlx::query_as!(
         AllTimeTotals,
         r#"
@@ -178,7 +184,7 @@ pub async fn get_totals(pool: &PgPool) -> Result<AllTimeTotals, sqlx::Error> {
         WHERE id = 1
         "#
     )
-    .fetch_one(pool)
+    .fetch_one(executor)
     .await?;
 
     Ok(row)
