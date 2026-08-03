@@ -59,8 +59,8 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
             }),
         ],
         optimizeDeps: {
-            noDiscovery: true,
-            include: ["ip-address", "maplibre-gl", "react-dom/client", "recharts"],
+            // noDiscovery: true,
+            // include: ["ip-address", "maplibre-gl", "react-dom/client", "@visx/responsive", "@visx/xychart"],
         },
         root: "front-end/src",
         server: {

@@ -30,7 +30,9 @@
         ]
     },
     "dependencies": {
-        "@recharts/devtools": "0.0.16",
+        "@react-spring/web": "10.1.2",
+        "@visx/responsive": "4.0.0",
+        "@visx/xychart": "4.0.0",
         "country-flag-emoji-polyfill": "0.1.10",
         "ip-address": "10.4.0",
         "maplibre-gl": "6.1.0",
@@ -39,7 +41,6 @@
         "react-dom": "19.2.8",
         "react-map-gl": "8.1.2",
         "react": "19.2.8",
-        "recharts": "3.10.1",
         "temporal-polyfill": "1.0.2"
     },
     "devDependencies": {
