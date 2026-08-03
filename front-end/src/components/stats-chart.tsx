@@ -265,13 +265,14 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                 <p className="py-8 text-center text-gray-500">No data for selected range</p>
             ) : (
                 <ResponsiveContainer width="100%" height={220}>
-                    <Typed.BarChart data={points} margin={{ bottom: 52, left: 8, right: 16, top: 8 }}>
+                    <Typed.BarChart data={points} margin={{ bottom: 8, left: 8, right: 16, top: 8 }}>
                         <CartesianGrid stroke="#374151" strokeDasharray="3 3" vertical={false} />
                         <Typed.XAxis
                             axisLine={{ stroke: "#4b5563" }}
                             dataKey={(bp: BucketPoint) => {
                                 return bp.bucket.epochMilliseconds;
                             }}
+                            height="auto"
                             tick={{ fill: "#6b7280", fontSize: 10 }}
                             tickFormatter={(ms: number) => {
                                 return formatBucket(Temporal.Instant.fromEpochMilliseconds(ms));
@@ -283,7 +284,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                                 return formatYLabel(selectedMetric, v);
                             }}
                             tick={{ fill: "#9ca3af", fontSize: 11 }}
-                            width={72}
+                            width="auto"
                             axisLine={false}
                             tickLine={false}
                         />
