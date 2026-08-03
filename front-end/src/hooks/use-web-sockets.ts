@@ -36,6 +36,8 @@ export interface InitEvent {
     total_connections: number;
     total_bytes_sent: number;
     total_time_spent: number;
+    /** Totals cover exactly the connections with id at or below this. */
+    last_counted_id: number;
 }
 
 export interface ReadyEvent {

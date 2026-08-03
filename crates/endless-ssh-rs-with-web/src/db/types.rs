@@ -140,9 +140,10 @@ pub struct ConnectionRecord {
 }
 
 /// All-time aggregate totals for the WebSocket init payload.
-#[expect(clippy::struct_field_names, reason = "Clarity")]
 pub struct AllTimeTotals {
     pub total_connections: i64,
     pub total_bytes_sent: i64,
     pub total_time_spent: DbDuration,
+    /// Highest `id` in the `connections` table these totals cover, read in the same snapshot.
+    pub last_counted_id: i64,
 }
