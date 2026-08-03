@@ -60,7 +60,7 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
         ],
         optimizeDeps: {
             noDiscovery: true,
-            include: ["ip-address", "maplibre-gl", "react-dom/client", "recharts"],
+            include: ["ip-address", "maplibre-gl", "react-dom/client", "@unovis/react", "@unovis/ts"],
         },
         root: "front-end/src",
         server: {

@@ -1,7 +1,5 @@
-import type { Dispatch, ReactNode, SetStateAction } from "react";
-import { useEffect, useState } from "react";
-import type { TooltipContentProps } from "recharts";
-import { Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, createHorizontalChart } from "recharts";
+import { VisAxis, VisCrosshair, VisStackedBar, VisTooltip, VisXYContainer } from "@unovis/react";
+import { useState } from "react";
 
 import { Temporal } from "temporal-polyfill";
 
@@ -138,105 +136,40 @@ function aggregate(rows: StatsRow[], from: Temporal.Instant, to: Temporal.Instan
         });
 }
 
+const CHART_HEIGHT = 220;
+
+const CHART_STYLE: Record<`--${string}`, string> = {
+    "--vis-axis-domain-color": "#4b5563",
+    "--vis-axis-grid-color": "#374151",
+    "--vis-axis-tick-color": "#4b5563",
+    "--vis-axis-tick-label-color": "#9ca3af",
+    "--vis-axis-tick-label-font-size": "11px",
+    "--vis-crosshair-circle-stroke-color": "#1f2937",
+    "--vis-crosshair-line-stroke-color": "rgba(255,255,255,0.2)",
+    "--vis-tooltip-background-color": "#1f2937",
+    "--vis-tooltip-border-color": "#374151",
+    "--vis-tooltip-border-radius": "6px",
+    "--vis-tooltip-text-color": "#e5e7eb",
+};
+
 interface Properties {
     rows: StatsRow[];
     from: Temporal.Instant;
     to: Temporal.Instant;
 }
 
-function isBucketPoint(value: unknown): value is BucketPoint {
-    return typeof value === "object" && value !== null && "bucket" in value;
-}
-
-// recharts' `DefaultTooltipContent` is declared without generics, so rendering the
-// content ourselves is the only way to keep the chart's narrowed types. Markup and
-// base styles mirror theirs.
-export const CustomTooltipContent: (
-    properties: TooltipContentProps<number, keyof BucketPoint>,
-) => null | React.JSX.Element = ({ contentStyle, itemStyle, label, labelFormatter, labelStyle, payload }) => {
-    const payload0 = payload[0];
-
-    if (payload0 === undefined || !isBucketPoint(payload0.payload)) {
-        return null;
-    }
-
-    const bucketPoint = payload0.payload;
-    const formattedLabel = labelFormatter === undefined ? label : labelFormatter(label, payload);
-
-    return (
-        <div
-            className="recharts-default-tooltip"
-            style={{ margin: 0, padding: 10, whiteSpace: "nowrap", ...contentStyle }}
-        >
-            <p className="recharts-tooltip-label" style={{ margin: 0, ...labelStyle }}>
-                {formattedLabel}
-            </p>
-            <ul className="recharts-tooltip-item-list" style={{ margin: 0, padding: 0 }}>
-                {METRICS.map((metric) => {
-                    return (
-                        <li
-                            key={metric.value}
-                            className="recharts-tooltip-item"
-                            style={{ display: "block", paddingBottom: 4, paddingTop: 4, ...itemStyle }}
-                        >
-                            <span className="recharts-tooltip-item-name">{metric.label}</span>
-                            <span className="recharts-tooltip-item-separator">{" : "}</span>
-                            <span className="recharts-tooltip-item-value">
-                                {formatYLabel(metric.value, bucketPoint[metric.value])}
-                            </span>
-                        </li>
-                    );
-                })}
-            </ul>
-        </div>
-    );
-};
-
-type DevelopmentToolsState = {
-    Component: () => React.JSX.Element;
-    portalId: string;
-} | null;
-
-async function loadDevelopmentTools(setDevtools: Dispatch<SetStateAction<DevelopmentToolsState>>): Promise<void> {
-    const module = await import("@recharts/devtools");
-
-    setDevtools({
-        Component: module.RechartsDevtools,
-        portalId: module.RECHARTS_DEVTOOLS_PORTAL_ID,
-    });
-}
-
-function useRechartsDevtools(): {
-    Component: () => React.JSX.Element;
-    portalId: string;
-} | null {
-    const [devtools, setDevtools] = useState<DevelopmentToolsState>(null);
-
-    useEffect(() => {
-        if (import.meta.env.DEV) {
-            void loadDevelopmentTools(setDevtools);
-        }
-    }, []);
-
-    return devtools;
-}
-
 export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
-    const developmentTools = useRechartsDevtools();
-
     const [selectedMetric, setMetric] = useState<Metric>("connects");
 
     const points = aggregate(rows, from, to);
 
-    // recharts hands axis values to d3, which coerces object keys via `valueOf()`.
-    // `Temporal.Instant.prototype.valueOf` throws by design, so the axis carries
-    // epoch milliseconds and formatters convert back to `Temporal.Instant`.
-    const Typed = createHorizontalChart<BucketPoint, number>()({
-        XAxis,
-        YAxis,
-        Tooltip,
-        Bar,
-    });
+    const tooltipTemplate = (point: BucketPoint): string => {
+        const metricRows = METRICS.map((metric) => {
+            return `<div style="color:#9ca3af">${metric.label}: ${formatYLabel(metric.value, point[metric.value])}</div>`;
+        }).join("");
+
+        return `<div style="font-weight:600;margin-bottom:4px">${formatBucket(point.bucket)}</div>${metricRows}`;
+    };
 
     return (
         <div className="rounded-lg bg-gray-800 p-4">
@@ -264,68 +197,44 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
             {points.length === 0 ? (
                 <p className="py-8 text-center text-gray-500">No data for selected range</p>
             ) : (
-                <ResponsiveContainer width="100%" height={220}>
-                    <Typed.BarChart data={points} margin={{ bottom: 52, left: 8, right: 16, top: 8 }}>
-                        <CartesianGrid stroke="#374151" strokeDasharray="3 3" vertical={false} />
-                        <Typed.XAxis
-                            axisLine={{ stroke: "#4b5563" }}
-                            dataKey={(bp: BucketPoint) => {
-                                return bp.bucket.epochMilliseconds;
-                            }}
-                            tick={{ fill: "#6b7280", fontSize: 10 }}
-                            tickFormatter={(ms: number) => {
-                                return formatBucket(Temporal.Instant.fromEpochMilliseconds(ms));
-                            }}
-                            tickLine={true}
-                        />
-                        <Typed.YAxis
-                            tickFormatter={(v: number) => {
-                                return formatYLabel(selectedMetric, v);
-                            }}
-                            tick={{ fill: "#9ca3af", fontSize: 11 }}
-                            width={72}
-                            axisLine={false}
-                            tickLine={false}
-                        />
-                        <Typed.Tooltip
-                            cursor={{ fill: "rgba(255,255,255,0.04)" }}
-                            contentStyle={{
-                                background: "#1f2937",
-                                border: "1px solid #374151",
-                                borderRadius: "6px",
-                                color: "#e5e7eb",
-                                fontSize: "12px",
-                            }}
-                            labelStyle={{ fontWeight: 600, color: "#e5e7eb", marginBottom: "4px" }}
-                            itemStyle={{ color: "#9ca3af" }}
-                            content={(properties) => {
-                                return <CustomTooltipContent {...properties} />;
-                            }}
-                            labelFormatter={(label: ReactNode) => {
-                                return typeof label === "number"
-                                    ? formatBucket(Temporal.Instant.fromEpochMilliseconds(label))
-                                    : label;
-                            }}
-                        />
-                        {METRICS.map((m) => {
-                            return (
-                                <Typed.Bar
-                                    key={m.value}
-                                    dataKey={(p: BucketPoint) => {
-                                        return p[m.value];
-                                    }}
-                                    name={m.label}
-                                    fill="#2563eb"
-                                    hide={m.value !== selectedMetric}
-                                    radius={[2, 2, 0, 0]}
-                                />
-                            );
-                        })}
-                        {developmentTools !== null && <developmentTools.Component />}
-                    </Typed.BarChart>
-                </ResponsiveContainer>
+                <VisXYContainer<BucketPoint>
+                    data={points}
+                    height={CHART_HEIGHT}
+                    style={CHART_STYLE}
+                    yDomain={[0, undefined]}
+                >
+                    <VisStackedBar<BucketPoint>
+                        x={(point: BucketPoint) => {
+                            return point.bucket.epochMilliseconds;
+                        }}
+                        y={(point: BucketPoint) => {
+                            return point[selectedMetric];
+                        }}
+                        color="#2563eb"
+                        barPadding={0.15}
+                        roundedCorners={2}
+                    />
+                    <VisAxis<BucketPoint>
+                        type="x"
+                        numTicks={6}
+                        gridLine={false}
+                        tickFormat={(tick: Date | number) => {
+                            return formatBucket(Temporal.Instant.fromEpochMilliseconds(Number(tick)));
+                        }}
+                    />
+                    <VisAxis<BucketPoint>
+                        type="y"
+                        numTicks={4}
+                        domainLine={false}
+                        tickLine={false}
+                        tickFormat={(tick: Date | number) => {
+                            return formatYLabel(selectedMetric, Number(tick));
+                        }}
+                    />
+                    <VisCrosshair<BucketPoint> template={tooltipTemplate} color="#2563eb" />
+                    <VisTooltip />
+                </VisXYContainer>
             )}
-            {developmentTools !== null && <div id={developmentTools.portalId} />}
         </div>
     );
 };

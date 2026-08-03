@@ -30,7 +30,8 @@
         ]
     },
     "dependencies": {
-        "@recharts/devtools": "0.0.16",
+        "@unovis/react": "1.6.7",
+        "@unovis/ts": "1.6.7",
         "country-flag-emoji-polyfill": "0.1.10",
         "ip-address": "10.4.0",
         "maplibre-gl": "6.1.0",
@@ -39,7 +40,6 @@
         "react-dom": "19.2.8",
         "react-map-gl": "8.1.2",
         "react": "19.2.8",
-        "recharts": "3.10.1",
         "temporal-polyfill": "1.0.2"
     },
     "devDependencies": {
