@@ -31,7 +31,7 @@
     },
     "dependencies": {
         "@recharts/devtools": "0.0.16",
-        "country-flag-emoji-polyfill": "0.1.8",
+        "country-flag-emoji-polyfill": "0.1.10",
         "ip-address": "10.4.0",
         "maplibre-gl": "6.1.0",
         "pretty-bytes": "7.1.1",
