@@ -1,4 +1,36 @@
 <!-- header goes here -->
+## [0.13.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.12.1..v0.13.0) - 2026-08-03
+
+### 🚀 Features
+
+- Show the connection state in the UI by [@kristof-mattei](https://github.com/kristof-mattei) ([`3f80156`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3f801569a92b5cf1d88122af2318a603769374ed))
+- Reconnect immediately when the network returns or the tab is shown by [@kristof-mattei](https://github.com/kristof-mattei) ([`2376013`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2376013985a29c20c1a260e06f9dc9f23bcbc78a))
+
+### 🐛 Bug Fixes
+
+- *(ci)* Retry the PR number lookup when retagging the build cache by [@kristof-mattei](https://github.com/kristof-mattei) ([`0d2e88a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0d2e88a8e91d40e49896be88e8f9d9ecc25ee6ed))
+- *(deps)* Update ip-address (npm) to v10.4.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d1e9c24`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d1e9c2412238c85c1e126d51f12f3899c5a0ef60))
+- *(deps)* Update ip-address (npm) to v10.4.0 (#3103) by [@renovate[bot]](https://github.com/renovate[bot]) in #3103 ([`6337a89`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6337a89c819e2c2617a2c36008ad643bc622c493))
+- *(deps)* Update rust crate time to v0.3.55 by [@renovate[bot]](https://github.com/renovate[bot]) ([`871fa6a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/871fa6af7e7abf6b845023ac660b8667a366ea21))
+- *(deps)* Update rust crate time to v0.3.55 (#3114) by [@renovate[bot]](https://github.com/renovate[bot]) in #3114 ([`93f07d6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/93f07d648a33fc7ce9da2a225ee4b157e62af72b))
+- *(deps)* Update rust crate ipnet to v2.12.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`50de778`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/50de778e14d99559a6fcc59b35c4ab5ba4a9f320))
+- *(deps)* Update rust crate ipnet to v2.12.1 (#3126) by [@renovate[bot]](https://github.com/renovate[bot]) in #3126 ([`c8594b2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c8594b2d5741cb0ff0dbe91915110db9ac8abc90))
+- *(deps)* Update country-flag-emoji-polyfill (npm) to v0.1.10 by [@renovate[bot]](https://github.com/renovate[bot]) ([`5f5f7e0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5f5f7e0d6b6c09b985339d20a02a47931ef2e1d0))
+- *(deps)* Update country-flag-emoji-polyfill (npm) to v0.1.10 (#3134) by [@renovate[bot]](https://github.com/renovate[bot]) in #3134 ([`2570123`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2570123287a7febb74543daf6fa0ca892ba96bbd))
+- Fall back to port 4000 when VITE_PORT is unset or empty by [@kristof-mattei](https://github.com/kristof-mattei) ([`021332d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/021332d39d4ec1b4dae87fd78cc0b78247e2da43))
+- Defer WebSocket close until open when cleanup runs mid-handshake by [@kristof-mattei](https://github.com/kristof-mattei) ([`b133bb0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b133bb09c9edaa2108c9c344be3ea6515c13cd07))
+- Drop events arriving on a disposed WebSocket by [@kristof-mattei](https://github.com/kristof-mattei) ([`035043e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/035043e9ce94a2b1236c846e81b9f6775a23f531))
+- Only reset the reconnect backoff after the connection survives a while by [@kristof-mattei](https://github.com/kristof-mattei) ([`2ed371f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2ed371ff0c60cd1dc54511f4a4d6ac9b266ce86d))
+- Log dropped WebSocket frames instead of swallowing them by [@kristof-mattei](https://github.com/kristof-mattei) ([`0168e09`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0168e09e1d5c093a34c7722ccd81d17f282eb4ae))
+- Count replayed events that init's totals don't include yet by [@kristof-mattei](https://github.com/kristof-mattei) ([`5e0f8dd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5e0f8dd282db433a9862bc7ba3d50e2947e6efec))
+- Advance the lag catch-up cursor during replay by [@kristof-mattei](https://github.com/kristof-mattei) ([`77cf6d7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/77cf6d7d9c2d66c6bb241c2ad6bf87a585fbf282))
+- Remove patch, upstream has fix by [@kristof-mattei](https://github.com/kristof-mattei) ([`9f4716b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9f4716b6d9f54753f87a137fab2a367f08726155))
+
+### 🚜 Refactor
+
+- Render tooltip content ourselves instead of DefaultTooltipContent by [@kristof-mattei](https://github.com/kristof-mattei) ([`91bd99a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/91bd99afb69b1022e0f4450c718534a9371a3bc8))
+- Remove the no-op close() in the WebSocket error handler by [@kristof-mattei](https://github.com/kristof-mattei) ([`bcb7726`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bcb77264e85d6863049e8e507920911ac8290bf8))
+- Make the read queries generic over the executor by [@kristof-mattei](https://github.com/kristof-mattei) ([`809aed0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/809aed036368b6a72077d1fc5cc38c3ada122c6c))
 ## [0.12.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.12.0..v0.12.1) - 2026-08-01
 
 ### 🐛 Bug Fixes
