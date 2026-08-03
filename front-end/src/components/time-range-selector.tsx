@@ -79,6 +79,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     const [isRefreshing, setIsRefreshing] = useState(false);
 
     const abortReference = useRef<AbortController | null>(null);
+    const intervalReference = useRef<null | ReturnType<typeof setInterval>>(null);
     const autoRefreshId = useId();
 
     const doFetch = useCallback(
@@ -108,19 +109,32 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
         void doFetch(selected);
     }, [doFetch, selected]);
 
-    useEffect(() => {
+    const stopIntervalTimer = useCallback(() => {
+        if (intervalReference.current === null) {
+            return;
+        }
+
+        clearInterval(intervalReference.current);
+        intervalReference.current = null;
+    }, []);
+
+    const startIntervalTimer = useCallback(() => {
+        stopIntervalTimer();
+
         if (refreshSeconds === null) {
             return;
         }
 
-        const id = setInterval(() => {
+        intervalReference.current = setInterval(() => {
             void doFetch(selected);
         }, refreshSeconds * 1000);
+    }, [doFetch, refreshSeconds, selected, stopIntervalTimer]);
 
-        return () => {
-            clearInterval(id);
-        };
-    }, [doFetch, refreshSeconds, selected]);
+    useEffect(() => {
+        startIntervalTimer();
+
+        return stopIntervalTimer;
+    }, [startIntervalTimer, stopIntervalTimer]);
 
     const handleChange = useCallback(
         (range: Range) => {
@@ -137,12 +151,15 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     const refresh = useCallback(async () => {
         setIsRefreshing(true);
 
+        // re-anchor the auto-refresh countdown to this fetch
+        startIntervalTimer();
+
         try {
             await doFetch(selected);
         } finally {
             setIsRefreshing(false);
         }
-    }, [doFetch, selected]);
+    }, [doFetch, selected, startIntervalTimer]);
 
     return (
         <div className="flex items-center gap-2">
