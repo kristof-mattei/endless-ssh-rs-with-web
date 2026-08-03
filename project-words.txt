@@ -112,6 +112,8 @@ unrs
 unseparated
 usernamehw
 vadimcn
+visx
 vite
 Vitest
 wakeup
+xychart
