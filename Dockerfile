@@ -116,7 +116,6 @@ RUN npm uninstall --global corepack && npm install --global corepack
 # That means that if our dependencies don't change rebuilding is much faster
 WORKDIR /build
 COPY package.json pnpm-lock.yaml vite.config.ts tsconfig.json pnpm-workspace.yaml ./
-COPY ./patches ./patches
 
 # install the corepack our package requires
 RUN corepack install

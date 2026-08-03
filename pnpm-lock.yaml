@@ -19,9 +19,6 @@ overrides:
   eslint-plugin-import>eslint: 10.8.0
   eslint-plugin-react>eslint: 10.8.0
 
-patchedDependencies:
-  country-flag-emoji-polyfill@0.1.8: 62e8e21b08e806174417391c7d19216700fd09cf8e742cb96779033a65045891
-
 importers:
 
   .:
@@ -30,8 +27,8 @@ importers:
         specifier: 0.0.16
         version: 0.0.16(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@16.13.1)(react@19.2.8)(redux@5.0.1))
       country-flag-emoji-polyfill:
-        specifier: 0.1.8
-        version: 0.1.8(patch_hash=62e8e21b08e806174417391c7d19216700fd09cf8e742cb96779033a65045891)
+        specifier: 0.1.10
+        version: 0.1.10
       ip-address:
         specifier: 10.4.0
         version: 10.4.0
@@ -1714,8 +1711,8 @@ packages:
       typescript:
         optional: true
 
-  country-flag-emoji-polyfill@0.1.8:
-    resolution: {integrity: sha512-Mbah52sADS3gshUYhK5142gtUuJpHYOXlXtLFI3Ly4RqgkmPMvhX9kMZSTqDM8P7UqtSW99eHKFphhQSGXA3Cg==}
+  country-flag-emoji-polyfill@0.1.10:
+    resolution: {integrity: sha512-5O50p2mq/d8+4AfHz3monRQaBA4TIQ0XcKqJUhCYR6SMsLqlO4m8f87og6R1D68Z1sNXGkjLkcEccuzC6T9i5g==}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -5412,7 +5409,7 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.3
 
-  country-flag-emoji-polyfill@0.1.8(patch_hash=62e8e21b08e806174417391c7d19216700fd09cf8e742cb96779033a65045891): {}
+  country-flag-emoji-polyfill@0.1.10: {}
 
   cross-spawn@7.0.6:
     dependencies:
