@@ -140,11 +140,16 @@ async fn handle_socket(
     send_init_payload(&mut socket, active, totals).await?;
 
     // replay history, all connections with id > since
+    let mut last_sequence: i64 = since_id;
+
     let mut records = db::get_connections_since(&state.db_pool, since_id, Limit::Limit(1000));
 
     loop {
         match records.try_next().await {
             Ok(Some(record)) => {
+                // keep the lag catch-up cursor at the last record sent
+                last_sequence = record.id;
+
                 send_connection_record(&mut socket, record).await?;
             },
             Ok(None) => {
@@ -162,8 +167,6 @@ async fn handle_socket(
     send_ready_payload(&mut socket).await?;
 
     // forward live broadcast events, handling lag with a DB catch-up
-    let mut last_sequence: i64 = since_id;
-
     loop {
         tokio::select! {
             biased;
