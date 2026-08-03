@@ -20,6 +20,7 @@ function init(overrides?: Partial<Omit<InitEvent, "type">>): InitEvent {
         total_connections: 0,
         total_bytes_sent: 0,
         total_time_spent: 0,
+        last_counted_id: 0,
         ...overrides,
     };
 }
@@ -106,10 +107,10 @@ describe("wsReducer", () => {
     });
 
     describe("ready", () => {
-        it("switches to live on ready and back to replay on a new init", () => {
-            expect(applyEvents(INITIAL_WS_STATE, [init()]).isLive).toBe(false);
-            expect(applyEvents(INITIAL_WS_STATE, [init(), READY]).isLive).toBe(true);
-            expect(applyEvents(INITIAL_WS_STATE, [init(), READY, init()]).isLive).toBe(false);
+        it("leaves the state untouched", () => {
+            const before = applyEvents(INITIAL_WS_STATE, [init()]);
+
+            expect(wsReducer(before, READY)).toBe(before);
         });
     });
 
@@ -220,9 +221,9 @@ describe("wsReducer", () => {
             ).toEqual(["2001:db8::2"]);
         });
 
-        it("counts towards the totals when live", () => {
+        it("counts events above init's watermark towards the totals", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
-                init({ total_connections: 10, total_bytes_sent: 500, total_time_spent: 100 }),
+                init({ total_connections: 10, total_bytes_sent: 500, total_time_spent: 100, last_counted_id: 0 }),
                 READY,
                 disconnected(1, { bytes_sent: 25, time_spent: 5 }),
             ]);
@@ -232,9 +233,9 @@ describe("wsReducer", () => {
             expect(state.totalTimeSeconds).toBe(105);
         });
 
-        it("fills the feed during history replay without touching init's totals", () => {
+        it("fills the feed with events at or below the watermark without touching init's totals", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
-                init({ total_connections: 10, total_bytes_sent: 500, total_time_spent: 100 }),
+                init({ total_connections: 10, total_bytes_sent: 500, total_time_spent: 100, last_counted_id: 2 }),
                 disconnected(1, { bytes_sent: 25, time_spent: 5 }),
                 disconnected(2, { bytes_sent: 25, time_spent: 5 }),
                 READY,
@@ -280,7 +281,7 @@ describe("wsReducer", () => {
     describe("reconnect", () => {
         it("survives an overlapping replay without double-counting", () => {
             const beforeDrop = applyEvents(INITIAL_WS_STATE, [
-                init({ total_connections: 2, total_bytes_sent: 200, total_time_spent: 20 }),
+                init({ total_connections: 2, total_bytes_sent: 200, total_time_spent: 20, last_counted_id: 2 }),
                 READY,
                 disconnected(3, { bytes_sent: 100, time_spent: 10 }),
             ]);
@@ -288,7 +289,7 @@ describe("wsReducer", () => {
             expect(beforeDrop.totalConnections).toBe(3);
 
             const afterReconnect = applyEvents(beforeDrop, [
-                init({ total_connections: 3, total_bytes_sent: 300, total_time_spent: 30 }),
+                init({ total_connections: 3, total_bytes_sent: 300, total_time_spent: 30, last_counted_id: 3 }),
                 disconnected(3, { bytes_sent: 100, time_spent: 10 }),
                 disconnected(4),
                 READY,
@@ -300,7 +301,20 @@ describe("wsReducer", () => {
                     return event.sequence;
                 }),
             ).toEqual([3, 4, 5]);
-            expect(afterReconnect.totalConnections).toBe(4);
+            expect(afterReconnect.totalConnections).toBe(5);
+        });
+
+        it("counts a replayed event the totals don't cover yet", () => {
+            const state = applyEvents(INITIAL_WS_STATE, [
+                init({ total_connections: 2, total_bytes_sent: 200, total_time_spent: 20, last_counted_id: 2 }),
+                disconnected(2, { bytes_sent: 100, time_spent: 10 }),
+                disconnected(3, { bytes_sent: 100, time_spent: 10 }),
+                READY,
+            ]);
+
+            expect(state.totalConnections).toBe(3);
+            expect(state.totalBytes).toBe(300);
+            expect(state.totalTimeSeconds).toBe(30);
         });
     });
 });

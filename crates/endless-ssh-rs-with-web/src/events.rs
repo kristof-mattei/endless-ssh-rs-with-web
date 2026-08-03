@@ -38,6 +38,8 @@ pub enum WsEvent {
         total_bytes_sent: i64,
         #[serde(serialize_with = "as_seconds")]
         total_time_spent: Duration,
+        /// Totals cover exactly the connections with id at or below this.
+        last_counted_id: i64,
     },
     Ready,
     Connected {

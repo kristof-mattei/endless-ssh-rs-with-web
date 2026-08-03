@@ -173,6 +173,7 @@ pub async fn get_totals<'e, E>(executor: E) -> Result<AllTimeTotals, sqlx::Error
 where
     E: PgExecutor<'e>,
 {
+    // one statement means one snapshot, making the max id exactly the newest row these totals cover
     let row = sqlx::query_as!(
         AllTimeTotals,
         r#"
@@ -180,6 +181,12 @@ where
             total_connections AS "total_connections!: i64"
             , total_bytes_sent AS "total_bytes_sent!: i64"
             , total_time_spent AS "total_time_spent!: DbDuration"
+            , (
+                SELECT
+                    COALESCE(MAX(id), 0)
+                FROM
+                    connections
+            ) AS "last_counted_id!: i64"
         FROM totals
         WHERE id = 1
         "#

@@ -7,7 +7,7 @@ const MAX_EVENTS = 100;
 export interface WsState {
     activeConnections: ActiveConnection[];
     events: DisconnectedEvent[];
-    isLive: boolean;
+    lastCountedId: number;
     maxSeenSequence: number;
     totalBytes: number;
     totalConnections: number;
@@ -17,7 +17,7 @@ export interface WsState {
 export const INITIAL_WS_STATE: WsState = {
     activeConnections: [],
     events: [],
-    isLive: false,
+    lastCountedId: 0,
     maxSeenSequence: 0,
     totalBytes: 0,
     totalConnections: 0,
@@ -39,14 +39,15 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
             return {
                 ...state,
                 activeConnections: event.active_connections,
-                isLive: false,
+                lastCountedId: event.last_counted_id,
                 totalBytes: event.total_bytes_sent,
                 totalConnections: event.total_connections,
                 totalTimeSeconds: event.total_time_spent,
             };
         }
         case "ready": {
-            return { ...state, isLive: true };
+            // the server's replay-done marker, nothing to update
+            return state;
         }
         case "connected": {
             const isKnown = state.activeConnections.some((c) => {
@@ -90,8 +91,8 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
                 maxSeenSequence: event.sequence,
             };
 
-            // before "ready" we're replaying history that init's totals already include
-            if (!state.isLive) {
+            // at or below the last counted id the record is already inside init's totals
+            if (event.sequence <= state.lastCountedId) {
                 return next;
             }
 

@@ -38,6 +38,7 @@ async fn send_init_payload(
         total_connections: totals.total_connections,
         total_bytes_sent: totals.total_bytes_sent,
         total_time_spent: totals.total_time_spent.into(),
+        last_counted_id: totals.last_counted_id,
     }) {
         Ok(s) => s,
         Err(error) => {
@@ -120,8 +121,10 @@ async fn handle_socket(
         .map(|v| v.value().clone())
         .collect::<Vec<ActiveConnectionInfo>>();
 
+    let since_id = params.since.unwrap_or(0);
+
     let totals = match db::get_totals(&state.db_pool).await {
-        Ok(t) => t,
+        Ok(totals) => totals,
         Err(error) => {
             event!(Level::ERROR, ?error, "Failed to query all-time totals");
 
@@ -129,15 +132,14 @@ async fn handle_socket(
                 total_connections: 0,
                 total_bytes_sent: 0,
                 total_time_spent: DbDuration(time::Duration::ZERO),
+                last_counted_id: 0,
             }
         },
     };
 
     send_init_payload(&mut socket, active, totals).await?;
 
-    // replay history all connections with id > since
-    let since_id = params.since.unwrap_or(0);
-
+    // replay history, all connections with id > since
     let mut records = db::get_connections_since(&state.db_pool, since_id, Limit::Limit(1000));
 
     loop {
