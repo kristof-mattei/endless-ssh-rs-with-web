@@ -275,7 +275,7 @@ export const CustomTooltipContent: (
                             style={{ display: "block", paddingBottom: 4, paddingTop: 4, ...itemStyle }}
                         >
                             <span className="recharts-tooltip-item-name">{metric.label}</span>
-                            <span className="recharts-tooltip-item-separator">{" : "}</span>
+                            <span className="recharts-tooltip-item-separator">{": "}</span>
                             <span className="recharts-tooltip-item-value">
                                 {formatYLabel(metric.value, bucketPoint[metric.value])}
                             </span>
