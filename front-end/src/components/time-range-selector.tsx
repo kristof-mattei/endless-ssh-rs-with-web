@@ -82,10 +82,17 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
         void doFetch(selected);
     }, [doFetch, selected]);
 
-    const handleChange = useCallback((range: Range) => {
-        setSelected(range);
-        setIsLoading(true);
-    }, []);
+    const handleChange = useCallback(
+        (range: Range) => {
+            if (range === selected) {
+                return;
+            }
+
+            setSelected(range);
+            setIsLoading(true);
+        },
+        [selected],
+    );
 
     return (
         <div className="flex items-center gap-2">
