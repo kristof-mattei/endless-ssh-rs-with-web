@@ -38,8 +38,7 @@
         "react-compiler-runtime": "1.0.0",
         "react-dom": "19.2.8",
         "react-map-gl": "8.1.2",
-        "recharts": "3.10.1",
-        "temporal-polyfill": "1.0.3"
+        "recharts": "3.10.1"
     },
     "devDependencies": {
         "@codecov/vite-plugin": "2.0.1",

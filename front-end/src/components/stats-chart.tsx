@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import type { TooltipContentProps } from "recharts";
 import { Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, createHorizontalChart } from "recharts";
 
-import { Temporal } from "temporal-polyfill";
-
 import { formatBytes, formatDuration } from "../lib/formatting";
 
 import type { StatsRow } from "./time-range-selector";

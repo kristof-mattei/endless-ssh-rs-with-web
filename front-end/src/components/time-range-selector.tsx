@@ -1,6 +1,5 @@
 import type * as React from "react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { Temporal } from "temporal-polyfill";
 
 export interface StatsRow {
     bucket: string;

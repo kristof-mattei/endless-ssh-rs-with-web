@@ -1,6 +1,5 @@
 import type * as React from "react";
 import { useReducer, useState } from "react";
-import { Temporal } from "temporal-polyfill";
 
 import { useWebSocket } from "../hooks/use-web-sockets";
 import type { ConnectionStatus } from "../hooks/use-web-sockets";
