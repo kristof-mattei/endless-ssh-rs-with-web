@@ -50,6 +50,7 @@
         "dist/",
         "node_modules/",
         ".pnpm-store/",
+        ".local",
         "coverage/",
         "reports/",
         "target/"
