@@ -32,7 +32,7 @@ export interface DisconnectedEvent {
 
 export interface InitEvent {
     type: "init";
-    active_connections: ActiveConnection[];
+    active_connections: ActiveConnectionInfo[];
     total_connections: number;
     total_bytes_sent: number;
     total_time_spent: number;
@@ -44,7 +44,7 @@ export interface ReadyEvent {
     type: "ready";
 }
 
-export interface ActiveConnection {
+export interface ActiveConnectionInfo {
     ip: string;
     port: number;
     connected_at: string;

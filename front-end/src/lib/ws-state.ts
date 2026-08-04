@@ -1,11 +1,11 @@
 import { Temporal } from "temporal-polyfill";
 
-import type { ActiveConnection, DisconnectedEvent, WsEvent } from "../hooks/use-web-sockets";
+import type { ActiveConnectionInfo, DisconnectedEvent, WsEvent } from "../hooks/use-web-sockets";
 
 const MAX_EVENTS = 100;
 
 export interface WsState {
-    activeConnections: ActiveConnection[];
+    activeConnections: ActiveConnectionInfo[];
     events: DisconnectedEvent[];
     lastCountedId: number;
     maxSeenSequence: number;
@@ -24,7 +24,7 @@ export const INITIAL_WS_STATE: WsState = {
     totalTimeSeconds: 0,
 };
 
-function isSameConnection(active: ActiveConnection, event: DisconnectedEvent): boolean {
+function isSameConnection(active: ActiveConnectionInfo, event: DisconnectedEvent): boolean {
     if (active.ip !== event.ip || active.port !== event.port) {
         return false;
     }
