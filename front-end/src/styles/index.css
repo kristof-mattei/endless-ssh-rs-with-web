@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* the dashboard is dark for everyone, tell the browser so native controls and light-dark() follow */
+:root {
+    color-scheme: dark;
+}
+
 @utility flags-font {
     font-family: "Twemoji Country Flags";
 }

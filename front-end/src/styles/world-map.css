@@ -1,0 +1,26 @@
+@reference "./index.css";
+
+/*
+    the extra .maplibregl-map makes these more specific than maplibre-gl.css's own rules,
+    otherwise they would only win by coming later in the bundle
+*/
+.maplibregl-map .maplibregl-ctrl-attrib {
+    &,
+    &.maplibregl-compact {
+        @apply bg-white/50 text-black/75 dark:bg-gray-800/80 dark:text-gray-400;
+    }
+
+    & a {
+        @apply text-black/75 dark:text-gray-400;
+
+        &:hover {
+            @apply text-black dark:text-gray-200;
+        }
+    }
+
+    /* the toggle glyph is a dark inline SVG, inverting is the only way to recolor it */
+    &.maplibregl-compact .maplibregl-ctrl-attrib-button,
+    &.maplibregl-compact:after {
+        @apply bg-transparent opacity-70 invert;
+    }
+}
