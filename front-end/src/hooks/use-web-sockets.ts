@@ -1,61 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 
+import type { WsEvent } from "../generated/WsEvent";
+
 export type ConnectionStatus = "connecting" | "live" | "reconnecting";
 
-export interface ConnectedEvent {
-    type: "connected";
-    ip: string;
-    port: number;
-    connected_at: string;
-    country_code: null | string;
-    country_name: null | string;
-    city: null | string;
-    latitude: null | number;
-    longitude: null | number;
-}
-
-export interface DisconnectedEvent {
-    type: "disconnected";
-    sequence: number;
-    ip: string;
-    port: number;
-    connected_at: string;
-    disconnected_at: string;
-    time_spent: number;
-    bytes_sent: number;
-    country_code: null | string;
-    country_name: null | string;
-    city: null | string;
-    latitude: null | number;
-    longitude: null | number;
-}
-
-export interface InitEvent {
-    type: "init";
-    active_connections: ActiveConnectionInfo[];
-    total_connections: number;
-    total_bytes_sent: number;
-    total_time_spent: number;
-    /** Totals cover exactly the connections with id at or below this. */
-    last_counted_id: number;
-}
-
-export interface ReadyEvent {
-    type: "ready";
-}
-
-export interface ActiveConnectionInfo {
-    ip: string;
-    port: number;
-    connected_at: string;
-    latitude: null | number;
-    longitude: null | number;
-    country_code: null | string;
-    country_name: null | string;
-    city: null | string;
-}
-
-export type WsEvent = ConnectedEvent | DisconnectedEvent | InitEvent | ReadyEvent;
+export type ConnectedEvent = Extract<WsEvent, { type: "connected" }>;
+export type DisconnectedEvent = Extract<WsEvent, { type: "disconnected" }>;
+export type InitEvent = Extract<WsEvent, { type: "init" }>;
+export type ReadyEvent = Extract<WsEvent, { type: "ready" }>;
 
 interface Options {
     onEvent: (event: WsEvent) => void;

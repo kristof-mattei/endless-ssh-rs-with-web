@@ -84,6 +84,7 @@ uuid = { version = "=1.24.0", features = ["v7"] }
 
 [dev-dependencies]
 pretty_assertions = "=1.4.1"
+ts-rs = { version = "=12.0.1", features = ["format"] }
 
 [lints]
 workspace = true

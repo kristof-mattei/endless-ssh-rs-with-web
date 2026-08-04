@@ -199,12 +199,15 @@ where
 
 /// Aggregated stats returned by the `/api/stats` endpoint.
 #[derive(Debug, Serialize)]
+#[cfg_attr(test, derive(ts_rs::TS), ts(export))]
 pub struct StatsRow {
     #[serde(serialize_with = "time::serde::rfc3339::serialize")]
+    #[cfg_attr(test, ts(type = "string"))]
     pub bucket: OffsetDateTime,
     pub country_code: Option<String>,
     pub connects: i64,
     #[serde(serialize_with = "as_seconds")]
+    #[cfg_attr(test, ts(type = "number"))]
     pub time_spent: Duration,
     pub bytes_sent: i64,
 }

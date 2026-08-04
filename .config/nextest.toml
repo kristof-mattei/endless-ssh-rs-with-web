@@ -1,3 +1,11 @@
+# ts-rs export tests recursively write dependency files, so parallel processes can write the same file
+[test-groups]
+ts-bindings-export = { max-threads = 1 }
+
+[[profile.default.overrides]]
+filter = "test(export_bindings_)"
+test-group = "ts-bindings-export"
+
 [profile.ci]
 fail-fast = false
 

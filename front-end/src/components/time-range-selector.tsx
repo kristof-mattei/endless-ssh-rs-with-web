@@ -2,13 +2,7 @@ import type * as React from "react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Temporal } from "temporal-polyfill";
 
-export interface StatsRow {
-    bucket: string;
-    country_code: null | string;
-    connects: number;
-    time_spent: number;
-    bytes_sent: number;
-}
+import type { StatsRow } from "../generated/StatsRow";
 
 export interface StatsData {
     rows: StatsRow[];
