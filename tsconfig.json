@@ -46,7 +46,14 @@
         "useUnknownInCatchVariables": true,
         "verbatimModuleSyntax": true
     },
-    "exclude": ["dist/"],
+    "exclude": [
+        "dist/",
+        "node_modules/",
+        ".pnpm-store/",
+        "coverage/",
+        "reports/",
+        "target/"
+    ],
     "include": [
         "front-end/**/*.tsx",
         "**/*.d.ts",
