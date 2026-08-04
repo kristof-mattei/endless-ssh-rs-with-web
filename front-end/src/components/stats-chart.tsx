@@ -349,7 +349,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                             onClick={() => {
                                 setMetric(metric.value);
                             }}
-                            className={`rounded px-3 py-1 text-sm transition-colors ${
+                            className={`rounded-sm px-3 py-1 text-sm transition-colors ${
                                 selectedMetric === metric.value
                                     ? "bg-blue-600 text-white"
                                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"

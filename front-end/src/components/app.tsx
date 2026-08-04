@@ -48,7 +48,7 @@ const ConnectionBadge: React.FC<{ status: ConnectionStatus }> = ({ status }) => 
 
     return (
         <span className={`flex items-center gap-1.5 text-sm ${text}`}>
-            <span aria-hidden="true" className={`h-2 w-2 rounded-full ${dot}`} />
+            <span aria-hidden="true" className={`size-2 rounded-full ${dot}`} />
             {status}
         </span>
     );
@@ -69,7 +69,7 @@ export const App: React.FC = () => {
                 <h1 className="text-2xl font-bold">endless-ssh-rs, an ssh honeypot</h1>
             </header>
 
-            <section className="space-y-2 mb-6">
+            <section className="mb-6 space-y-2">
                 <div className="flex items-center gap-2">
                     <h2 className="text-lg font-semibold text-gray-300">Live attack map</h2>
                     <ConnectionBadge status={status} />
@@ -85,7 +85,7 @@ export const App: React.FC = () => {
                 <WorldMap activeConnections={activeConnections} />
             </section>
 
-            <section className="space-y-2 mb-6">
+            <section className="mb-6 space-y-2">
                 <h2 className="text-lg font-semibold text-gray-300">Stats</h2>
 
                 <TimeRangeSelector onData={setStatsData} />

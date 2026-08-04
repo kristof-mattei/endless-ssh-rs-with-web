@@ -42,8 +42,8 @@ const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
     const disconnectedAt = disconnectedAtToHumanReadable(event.disconnected_at);
 
     return (
-        <div className="col-span-full grid grid-cols-subgrid items-center rounded bg-gray-800 px-3 py-2 text-sm">
-            <span className="text-lg flags-font" title={event.country_code ?? undefined}>
+        <div className="col-span-full grid grid-cols-subgrid items-center rounded-sm bg-gray-800 px-3 py-2 text-sm">
+            <span className="flags-font text-lg" title={event.country_code ?? undefined}>
                 {countryFlag(event.country_code)}
             </span>
             <span className="truncate text-gray-400">{event.city ?? event.country_name ?? "Unknown"}</span>
