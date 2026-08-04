@@ -172,7 +172,6 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                         onClick={() => {
                             handleChange(r.value);
                         }}
-                        disabled={isLoading}
                         className={`rounded-sm px-3 py-1 text-sm transition-colors ${
                             selected === r.value
                                 ? "bg-blue-600 text-white"
@@ -188,7 +187,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                 onClick={() => {
                     void refresh();
                 }}
-                disabled={isLoading || isRefreshing}
+                disabled={isRefreshing}
                 title="Refresh"
                 aria-label="Refresh"
                 className="ml-2 rounded-sm bg-gray-700 px-3 py-1 text-sm text-gray-300 transition-colors hover:bg-gray-600"
