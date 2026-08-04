@@ -16,5 +16,5 @@ declare module "eslint-plugin-promise" {
 
     const plugin: Plugin;
 
-    export default plugin;
+    export = plugin;
 }
