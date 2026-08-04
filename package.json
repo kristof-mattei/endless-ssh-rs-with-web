@@ -15,7 +15,7 @@
         "lint:fix": "pnpm run lint --fix",
         "prepare": "husky",
         "preview": "vite preview",
-        "format": "prettier --write . '!.local' '!.sqlx'",
+        "format": "prettier --write . \"!.local\" \"!.sqlx\"",
         "spellcheck": "cspell --no-progress \"**\"",
         "deps:ci": "depcruise --config dependency-cruiser.config.mjs --output-type err front-end/src",
         "deps:graph": "depcruise --config dependency-cruiser.config.mjs --output-type dot front-end/src | dot -T svg > reports/dependency-graph.svg",
