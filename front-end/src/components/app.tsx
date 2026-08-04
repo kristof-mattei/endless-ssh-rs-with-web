@@ -37,6 +37,8 @@ function getTimezone(): string {
     return `${timeZoneName.value}, GMT ${offset}`;
 }
 
+const TIMEZONE = getTimezone();
+
 const CONNECTION_STATUS_STYLES: Record<ConnectionStatus, { dot: string; text: string }> = {
     connecting: { dot: "bg-gray-500", text: "text-gray-400" },
     live: { dot: "bg-green-500", text: "text-green-400" },
@@ -95,7 +97,7 @@ export const App: React.FC = () => {
 
             <section>
                 <h2 className="mb-2 text-lg font-semibold text-gray-300">
-                    Recent disconnections (times in {getTimezone()})
+                    Recent disconnections (times in {TIMEZONE})
                 </h2>
                 <EventFeed events={events} />
             </section>

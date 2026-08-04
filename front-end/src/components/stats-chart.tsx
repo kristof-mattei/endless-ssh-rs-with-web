@@ -21,6 +21,16 @@ type BucketPoint = {
     bucket: Temporal.Instant;
 } & BucketPointValues;
 
+// recharts hands axis values to d3, which coerces object keys via `valueOf()`.
+// `Temporal.Instant.prototype.valueOf` throws by design, so the axis carries
+// epoch milliseconds and formatters convert back to `Temporal.Instant`.
+const Typed = createHorizontalChart<BucketPoint, number>()({
+    XAxis,
+    YAxis,
+    Tooltip,
+    Bar,
+});
+
 const METRICS: ReadonlyArray<{ value: Metric; label: string }> = [
     { value: "connects", label: "Connections" },
     { value: "bytes_sent", label: "Bytes wasted" },
@@ -327,16 +337,6 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
     const formatTickLabel = getTickFormatter(spanHours);
     const bucketLabelOptions = getBucketLabelOptions(spanHours);
     const tickValues = getTickValues(from, to);
-
-    // recharts hands axis values to d3, which coerces object keys via `valueOf()`.
-    // `Temporal.Instant.prototype.valueOf` throws by design, so the axis carries
-    // epoch milliseconds and formatters convert back to `Temporal.Instant`.
-    const Typed = createHorizontalChart<BucketPoint, number>()({
-        XAxis,
-        YAxis,
-        Tooltip,
-        Bar,
-    });
 
     return (
         <div className="rounded-lg bg-gray-800 p-4">
