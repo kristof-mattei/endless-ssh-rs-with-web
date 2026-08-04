@@ -57,7 +57,7 @@ const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
 
 export const EventFeed: React.FC<Properties> = ({ events }) => {
     return (
-        <div className="grid max-h-[400px] grid-cols-[auto_minmax(0,12rem)_minmax(0,max-content)_minmax(0,1fr)_max-content_max-content] gap-x-3 gap-y-1 overflow-y-auto">
+        <div className="grid max-h-100 grid-cols-[auto_minmax(0,12rem)_minmax(0,max-content)_minmax(0,1fr)_max-content_max-content] gap-x-3 gap-y-1 overflow-y-auto">
             {events.length === 0 && (
                 <p className="col-span-full py-6 text-center text-gray-500">Waiting for connections…</p>
             )}
