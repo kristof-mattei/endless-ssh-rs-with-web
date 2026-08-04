@@ -43,7 +43,10 @@ const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
 
     return (
         <div className="col-span-full grid grid-cols-subgrid items-center rounded-sm bg-gray-800 px-3 py-2 text-sm">
-            <span className="flags-font text-lg" title={event.country_code ?? undefined}>
+            <span
+                className="cursor-default flags-font text-lg"
+                title={event.country_name ?? event.country_code ?? undefined}
+            >
                 {countryFlag(event.country_code)}
             </span>
             <span className="truncate text-gray-400">{event.city ?? event.country_name ?? "Unknown"}</span>
