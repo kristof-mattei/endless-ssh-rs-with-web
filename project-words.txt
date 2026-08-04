@@ -51,6 +51,7 @@ kristof
 lcovonly
 lldb
 maplibre
+maplibregl
 mattei
 maxlen
 MAXMIND

@@ -1,4 +1,5 @@
 import "maplibre-gl/dist/maplibre-gl.css";
+import "../styles/world-map.css";
 
 import type * as React from "react";
 import { Map, Marker } from "react-map-gl/maplibre";
@@ -22,7 +23,7 @@ export const WorldMap: React.FC<Properties> = ({ activeConnections }) => {
                 initialViewState={{ longitude: 0, latitude: 20, zoom: 1 }}
                 mapStyle={MAP_STYLE}
                 style={{ width: "100%", height: "100%" }}
-                attributionControl={false}
+                attributionControl={{ compact: true }}
             >
                 {dots.map((dot) => {
                     return (
