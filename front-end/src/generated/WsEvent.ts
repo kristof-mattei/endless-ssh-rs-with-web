@@ -4,8 +4,42 @@ import type { ActiveConnectionInfo } from "./ActiveConnectionInfo";
 /**
  * WebSocket broadcast.
  */
-export type WsEvent = { "type": "init", active_connections: Array<ActiveConnectionInfo>, total_connections: number, total_bytes_sent: number, total_time_spent: number, 
-/**
- * Totals cover exactly the connections with id at or below this.
- */
-last_counted_id: number, } | { "type": "ready" } | { "type": "connected", ip: string, port: number, connected_at: string, country_code: string | null, country_name: string | null, city: string | null, latitude: number | null, longitude: number | null, } | { "type": "disconnected", sequence: number, ip: string, port: number, connected_at: string, disconnected_at: string, time_spent: number, bytes_sent: number, country_code: string | null, country_name: string | null, city: string | null, latitude: number | null, longitude: number | null, };
+export type WsEvent =
+  | {
+    "type": "init";
+    active_connections: Array<ActiveConnectionInfo>;
+    total_connections: number;
+    total_bytes_sent: number;
+    total_time_spent: number;
+    /**
+     * Totals cover exactly the connections with id at or below this.
+     */
+    last_counted_id: number;
+  }
+  | { "type": "ready" }
+  | {
+    "type": "connected";
+    ip: string;
+    port: number;
+    connected_at: string;
+    country_code: string | null;
+    country_name: string | null;
+    city: string | null;
+    latitude: number | null;
+    longitude: number | null;
+  }
+  | {
+    "type": "disconnected";
+    sequence: number;
+    ip: string;
+    port: number;
+    connected_at: string;
+    disconnected_at: string;
+    time_spent: number;
+    bytes_sent: number;
+    country_code: string | null;
+    country_name: string | null;
+    city: string | null;
+    latitude: number | null;
+    longitude: number | null;
+  };

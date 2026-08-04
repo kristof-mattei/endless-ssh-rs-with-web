@@ -10,10 +10,6 @@ trim_trailing_whitespace = true
 
 charset = utf-8
 
-# ts-rs output contains trailing whitespace, the file must stay byte-identical to what cargo test regenerates
-[front-end/src/generated/**]
-trim_trailing_whitespace = false
-
 [*.sh]
 indent_size = 4
 

@@ -5,4 +5,13 @@
  * # Considerations
  * We might merge this with the actual Client.
  */
-export type ActiveConnectionInfo = { ip: string, port: number, connected_at: string, latitude: number | null, longitude: number | null, country_code: string | null, country_name: string | null, city: string | null, };
+export type ActiveConnectionInfo = {
+  ip: string;
+  port: number;
+  connected_at: string;
+  latitude: number | null;
+  longitude: number | null;
+  country_code: string | null;
+  country_name: string | null;
+  city: string | null;
+};

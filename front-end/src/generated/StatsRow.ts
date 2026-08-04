@@ -3,4 +3,10 @@
 /**
  * Aggregated stats returned by the `/api/stats` endpoint.
  */
-export type StatsRow = { bucket: string, country_code: string | null, connects: number, time_spent: number, bytes_sent: number, };
+export type StatsRow = {
+  bucket: string;
+  country_code: string | null;
+  connects: number;
+  time_spent: number;
+  bytes_sent: number;
+};
