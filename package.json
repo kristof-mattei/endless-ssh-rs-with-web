@@ -27,7 +27,7 @@
             "depcruise --config dependency-cruiser.config.mjs --include-only ^front-end/src/ --validate --"
         ],
         "*": [
-            "prettier --ignore-unknown --"
+            "prettier --check --ignore-unknown --"
         ]
     },
     "dependencies": {
