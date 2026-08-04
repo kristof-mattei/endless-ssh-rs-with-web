@@ -10,11 +10,5 @@ declare module "eslint-plugin-react-hook-form" {
         "react-compiler": Ruleset;
     } & Record<string, Ruleset>;
 
-    interface Plugin {
-        configs: Configs;
-    }
-
-    const plugin: Plugin;
-
-    export = plugin;
+    export const configs: Configs;
 }
