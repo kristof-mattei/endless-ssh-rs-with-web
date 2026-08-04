@@ -30,7 +30,7 @@ function disconnectedAtToHumanReadable(disconnectedAt: string): string {
 
     const localZonedDateTime = instant.toZonedDateTimeISO(Temporal.Now.timeZoneId());
 
-    const humanReadable = localZonedDateTime.toLocaleString("en-US", {
+    const humanReadable = localZonedDateTime.toLocaleString([], {
         dateStyle: "full",
         timeStyle: "short",
     });
