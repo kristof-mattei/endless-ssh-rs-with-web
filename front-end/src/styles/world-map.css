@@ -1,0 +1,17 @@
+/* Attribution colors MapLibre sets on descendants, out of reach of the typed AttributionControl style prop. */
+
+.maplibregl-ctrl-attrib a {
+    color: light-dark(rgb(0 0 0 / 0.75), #9ca3af);
+}
+
+.maplibregl-ctrl-attrib a:hover {
+    color: light-dark(#000, #e5e7eb);
+}
+
+/* the toggle glyph is a dark inline SVG, inverting is the only way to recolor it */
+.maplibregl-ctrl-attrib-button,
+.maplibregl-ctrl-attrib.maplibregl-compact:after {
+    background-color: transparent;
+    filter: invert(1);
+    opacity: 0.7;
+}

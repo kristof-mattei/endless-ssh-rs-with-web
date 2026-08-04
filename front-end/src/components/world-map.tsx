@@ -1,7 +1,8 @@
 import "maplibre-gl/dist/maplibre-gl.css";
+import "../styles/world-map.css";
 
 import type * as React from "react";
-import { Map, Marker } from "react-map-gl/maplibre";
+import { AttributionControl, Map, Marker } from "react-map-gl/maplibre";
 
 import type { ActiveConnection } from "../hooks/use-web-sockets";
 
@@ -24,6 +25,13 @@ export const WorldMap: React.FC<Properties> = ({ activeConnections }) => {
                 style={{ width: "100%", height: "100%" }}
                 attributionControl={false}
             >
+                <AttributionControl
+                    compact={true}
+                    style={{
+                        backgroundColor: "light-dark(rgb(255 255 255 / 0.5), rgb(31 41 55 / 0.8))",
+                        color: "light-dark(rgb(0 0 0 / 0.75), #9ca3af)",
+                    }}
+                />
                 {dots.map((dot) => {
                     return (
                         <Marker
