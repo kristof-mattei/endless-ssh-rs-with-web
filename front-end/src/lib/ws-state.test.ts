@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type {
-    ActiveConnection,
+    ActiveConnectionInfo,
     ConnectedEvent,
     DisconnectedEvent,
     InitEvent,
@@ -63,7 +63,7 @@ function disconnected(
     };
 }
 
-function activeConnection(ip: string, overrides?: Partial<Omit<ActiveConnection, "ip">>): ActiveConnection {
+function activeConnection(ip: string, overrides?: Partial<Omit<ActiveConnectionInfo, "ip">>): ActiveConnectionInfo {
     return {
         ip,
         port: 50_000,
