@@ -107,7 +107,7 @@ const sharedRules: RulesConfig = {
 const config: ReturnType<typeof defineConfig> = defineConfig(
     globalIgnores([".local/*"]),
     {
-        ignores: ["dist/**", "reports/**", "coverage/**"],
+        ignores: ["dist/**", "reports/**", "coverage/**", "front-end/src/generated/**"],
     },
     {
         files: ["**/*.js", "**/*.cjs", "**/*.mjs", "**/*.ts", "**/*.tsx"],

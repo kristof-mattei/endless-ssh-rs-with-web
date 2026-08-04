@@ -5,9 +5,9 @@ import { Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, createH
 
 import { Temporal } from "temporal-polyfill";
 
-import { formatBytes, formatDuration } from "../lib/formatting";
+import type { StatsRow } from "../generated/StatsRow";
 
-import type { StatsRow } from "./time-range-selector";
+import { formatBytes, formatDuration } from "../lib/formatting";
 
 interface BucketPointValues {
     bytes_sent: number;

@@ -1,13 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import type {
-    ActiveConnectionInfo,
-    ConnectedEvent,
-    DisconnectedEvent,
-    InitEvent,
-    ReadyEvent,
-    WsEvent,
-} from "../hooks/use-web-sockets";
+import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
+import type { WsEvent } from "../generated/WsEvent";
+import type { ConnectedEvent, DisconnectedEvent, InitEvent, ReadyEvent } from "../hooks/use-web-sockets";
 
 import type { WsState } from "./ws-state";
 

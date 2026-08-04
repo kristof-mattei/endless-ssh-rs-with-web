@@ -4,7 +4,7 @@ import "../styles/world-map.css";
 import type * as React from "react";
 import { Map, Marker } from "react-map-gl/maplibre";
 
-import type { ActiveConnectionInfo } from "../hooks/use-web-sockets";
+import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
 
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 

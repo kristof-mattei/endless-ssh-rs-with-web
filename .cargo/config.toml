@@ -1,5 +1,10 @@
 [build]
 rustflags = ["--cfg", "tokio_unstable"]
 
+[env]
+TS_RS_EXPORT_DIR = { value = "front-end/src/generated", relative = true }
+# serde_json emits i64/u64/usize as plain JSON numbers, so the bindings must say number, not bigint
+TS_RS_LARGE_INT = "number"
+
 [target.'cfg(target_os = "linux")']
 rustflags = ["-C", "link-arg=-fuse-ld=mold", "--cfg", "tokio_unstable"]

@@ -1,6 +1,8 @@
 import { Temporal } from "temporal-polyfill";
 
-import type { ActiveConnectionInfo, DisconnectedEvent, WsEvent } from "../hooks/use-web-sockets";
+import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
+import type { WsEvent } from "../generated/WsEvent";
+import type { DisconnectedEvent } from "../hooks/use-web-sockets";
 
 const MAX_EVENTS = 100;
 

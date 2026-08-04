@@ -30,6 +30,7 @@ pub enum ClientEvent {
 
 /// WebSocket broadcast.
 #[derive(Clone, Serialize)]
+#[cfg_attr(test, derive(ts_rs::TS), ts(export))]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum WsEvent {
     Init {
@@ -37,6 +38,7 @@ pub enum WsEvent {
         total_connections: i64,
         total_bytes_sent: i64,
         #[serde(serialize_with = "as_seconds")]
+        #[cfg_attr(test, ts(type = "number"))]
         total_time_spent: Duration,
         /// Totals cover exactly the connections with id at or below this.
         last_counted_id: i64,
@@ -46,6 +48,7 @@ pub enum WsEvent {
         ip: IpAddr,
         port: u16,
         #[serde(with = "time::serde::rfc3339")]
+        #[cfg_attr(test, ts(type = "string"))]
         connected_at: OffsetDateTime,
         country_code: Option<String>,
         country_name: Option<String>,
@@ -58,10 +61,13 @@ pub enum WsEvent {
         ip: IpAddr,
         port: u16,
         #[serde(with = "time::serde::rfc3339")]
+        #[cfg_attr(test, ts(type = "string"))]
         connected_at: OffsetDateTime,
         #[serde(with = "time::serde::rfc3339")]
+        #[cfg_attr(test, ts(type = "string"))]
         disconnected_at: OffsetDateTime,
         #[serde(serialize_with = "as_seconds")]
+        #[cfg_attr(test, ts(type = "number"))]
         time_spent: Duration,
         bytes_sent: usize,
         country_code: Option<String>,
@@ -76,10 +82,12 @@ pub enum WsEvent {
 /// # Considerations
 /// We might merge this with the actual Client.
 #[derive(Clone, Serialize)]
+#[cfg_attr(test, derive(ts_rs::TS), ts(export))]
 pub struct ActiveConnectionInfo {
     pub ip: IpAddr,
     pub port: u16,
     #[serde(with = "time::serde::rfc3339")]
+    #[cfg_attr(test, ts(type = "string"))]
     pub connected_at: OffsetDateTime,
     pub latitude: Option<f64>,
     pub longitude: Option<f64>,
