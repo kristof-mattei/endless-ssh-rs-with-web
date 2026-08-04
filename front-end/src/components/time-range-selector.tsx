@@ -173,7 +173,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                             handleChange(r.value);
                         }}
                         disabled={isLoading}
-                        className={`rounded px-3 py-1 text-sm transition-colors ${
+                        className={`rounded-sm px-3 py-1 text-sm transition-colors ${
                             selected === r.value
                                 ? "bg-blue-600 text-white"
                                 : "bg-gray-700 text-gray-300 hover:bg-gray-600"
@@ -191,7 +191,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                 disabled={isLoading || isRefreshing}
                 title="Refresh"
                 aria-label="Refresh"
-                className="ml-2 rounded bg-gray-700 px-3 py-1 text-sm text-gray-300 transition-colors hover:bg-gray-600"
+                className="ml-2 rounded-sm bg-gray-700 px-3 py-1 text-sm text-gray-300 transition-colors hover:bg-gray-600"
             >
                 <span aria-hidden="true" className={`inline-block ${isRefreshing ? "animate-spin" : ""}`}>
                     ↻
@@ -206,7 +206,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                 onChange={(event) => {
                     setRefreshSeconds(event.target.value === "off" ? null : Number(event.target.value));
                 }}
-                className="rounded bg-gray-700 px-2 py-1 text-sm text-gray-300"
+                className="rounded-sm bg-gray-700 px-2 py-1 text-sm text-gray-300"
             >
                 <option value="off">Off</option>
                 {REFRESH_INTERVALS.map((interval) => {

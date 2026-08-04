@@ -1,5 +1,5 @@
 @import "tailwindcss";
 
-.flags-font {
+@utility flags-font {
     font-family: "Twemoji Country Flags";
 }
