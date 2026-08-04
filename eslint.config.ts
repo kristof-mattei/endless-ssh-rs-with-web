@@ -176,6 +176,11 @@ const config: ReturnType<typeof defineConfig> = defineConfig(
 
             "react-refresh/only-export-components": "error",
 
+            "react/jsx-curly-brace-presence": [
+                "error",
+                { children: "never", propElementValues: "always", props: "never" },
+            ],
+
             ...sharedRules,
         },
     },
