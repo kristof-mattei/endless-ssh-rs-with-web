@@ -149,7 +149,10 @@ export default {
                 // type only dependencies are not a problem as they don't end up in the
                 // production code or are ignored by the runtime.
                 dependencyTypesNot: ["type-only"],
-                pathNot: ["node_modules/@types/"],
+                pathNot: [
+                    // only imported behind import.meta.env.DEV, the production build eliminates it
+                    "node_modules/@recharts/devtools/",
+                ],
             },
         },
         {
