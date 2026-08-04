@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Temporal } from "temporal-polyfill";
 
 export interface StatsRow {
@@ -26,6 +26,13 @@ const RANGES: Array<{ label: string; value: Range }> = [
     { label: "All time", value: "all" },
 ];
 
+const REFRESH_INTERVALS: Array<{ label: string; seconds: number }> = [
+    { label: "10s", seconds: 10 },
+    { label: "30s", seconds: 30 },
+    { label: "1m", seconds: 60 },
+    { label: "5m", seconds: 300 },
+];
+
 function rangeToParameters(range: Range): { from: string; to: string } {
     const now = Temporal.Now.instant();
     const to = now.toString();
@@ -44,10 +51,12 @@ function rangeToParameters(range: Range): { from: string; to: string } {
     return { from: from.toString(), to };
 }
 
-async function fetchStats(range: Range, onData: (data: StatsData) => void): Promise<void> {
+async function fetchStats(range: Range, onData: (data: StatsData) => void, signal: AbortSignal): Promise<void> {
     const { from, to } = rangeToParameters(range);
 
-    const response = await fetch(`/api/stats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`);
+    const response = await fetch(`/api/stats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, {
+        signal,
+    });
 
     if (!response.ok) {
         return;
@@ -66,13 +75,31 @@ interface Properties {
 export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     const [selected, setSelected] = useState<Range>("24h");
     const [isLoading, setIsLoading] = useState(true);
+    const [refreshSeconds, setRefreshSeconds] = useState<null | number>(null);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const abortReference = useRef<AbortController | null>(null);
+    const intervalReference = useRef<null | ReturnType<typeof setInterval>>(null);
+    const autoRefreshId = useId();
 
     const doFetch = useCallback(
         async (range: Range) => {
+            abortReference.current?.abort();
+
+            const controller = new AbortController();
+            abortReference.current = controller;
+
             try {
-                await fetchStats(range, onData);
+                await fetchStats(range, onData, controller.signal);
+            } catch (error) {
+                if (!(error instanceof DOMException && error.name === "AbortError")) {
+                    throw error;
+                }
             } finally {
-                setIsLoading(false);
+                // only the newest fetch owns the loading state
+                if (abortReference.current === controller) {
+                    setIsLoading(false);
+                }
             }
         },
         [onData],
@@ -81,6 +108,33 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     useEffect(() => {
         void doFetch(selected);
     }, [doFetch, selected]);
+
+    const stopIntervalTimer = useCallback(() => {
+        if (intervalReference.current === null) {
+            return;
+        }
+
+        clearInterval(intervalReference.current);
+        intervalReference.current = null;
+    }, []);
+
+    const startIntervalTimer = useCallback(() => {
+        stopIntervalTimer();
+
+        if (refreshSeconds === null) {
+            return;
+        }
+
+        intervalReference.current = setInterval(() => {
+            void doFetch(selected);
+        }, refreshSeconds * 1000);
+    }, [doFetch, refreshSeconds, selected, stopIntervalTimer]);
+
+    useEffect(() => {
+        startIntervalTimer();
+
+        return stopIntervalTimer;
+    }, [startIntervalTimer, stopIntervalTimer]);
 
     const handleChange = useCallback(
         (range: Range) => {
@@ -93,6 +147,19 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
         },
         [selected],
     );
+
+    const refresh = useCallback(async () => {
+        setIsRefreshing(true);
+
+        // re-anchor the auto-refresh countdown to this fetch
+        startIntervalTimer();
+
+        try {
+            await doFetch(selected);
+        } finally {
+            setIsRefreshing(false);
+        }
+    }, [doFetch, selected, startIntervalTimer]);
 
     return (
         <div className="flex items-center gap-2">
@@ -116,6 +183,40 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                     </button>
                 );
             })}
+            <button
+                type="button"
+                onClick={() => {
+                    void refresh();
+                }}
+                disabled={isLoading || isRefreshing}
+                title="Refresh"
+                aria-label="Refresh"
+                className="ml-2 rounded bg-gray-700 px-3 py-1 text-sm text-gray-300 transition-colors hover:bg-gray-600"
+            >
+                <span aria-hidden="true" className={`inline-block ${isRefreshing ? "animate-spin" : ""}`}>
+                    ↻
+                </span>
+            </button>
+            <label className="text-sm text-gray-400" htmlFor={autoRefreshId}>
+                Auto-refresh:
+            </label>
+            <select
+                id={autoRefreshId}
+                value={refreshSeconds ?? "off"}
+                onChange={(event) => {
+                    setRefreshSeconds(event.target.value === "off" ? null : Number(event.target.value));
+                }}
+                className="rounded bg-gray-700 px-2 py-1 text-sm text-gray-300"
+            >
+                <option value="off">Off</option>
+                {REFRESH_INTERVALS.map((interval) => {
+                    return (
+                        <option key={interval.seconds} value={interval.seconds}>
+                            {interval.label}
+                        </option>
+                    );
+                })}
+            </select>
             {isLoading && <span className="ml-2 text-xs text-gray-500">Loading...</span>}
         </div>
     );
