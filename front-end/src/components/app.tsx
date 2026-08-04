@@ -19,7 +19,7 @@ function getTimezone(): string {
     // signHH:MM as a string offset (e.g., -07:00)
     const offset = now.offset;
 
-    const format = new Intl.DateTimeFormat("en-US", {
+    const format = new Intl.DateTimeFormat([], {
         timeZone: now.timeZoneId,
         timeZoneName: "long",
     });
