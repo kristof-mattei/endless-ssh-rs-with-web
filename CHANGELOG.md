@@ -1,4 +1,33 @@
 <!-- header goes here -->
+## [0.14.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.13.0..v0.14.0) - 2026-08-04
+
+### 🚀 Features
+
+- Refresh button and auto-refresh by [@kristof-mattei](https://github.com/kristof-mattei) ([`cd15374`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/cd15374118d54e527a26cdcca5f98ed402db79f8))
+- Show full country name on flag hover by [@kristof-mattei](https://github.com/kristof-mattei) ([`4c53110`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4c53110862a74b5d4bd794c2097724b9b56a3612))
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update temporal-polyfill (npm) to v1.0.3 by [@renovate[bot]](https://github.com/renovate[bot]) ([`2eec8d9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2eec8d955ba9abefb559ef6d504e3569309ef91d))
+- *(deps)* Update temporal-polyfill (npm) to v1.0.3 (#3162) by [@renovate[bot]](https://github.com/renovate[bot]) in #3162 ([`6a42d36`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6a42d3604f9a9aaf8dc206197d3f4a95e51e0ba1))
+- Both sizes are now auto-sized by [@kristof-mattei](https://github.com/kristof-mattei) ([`2998c45`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2998c459aa52d0a283eb188499ebeb349cc618f1))
+- Better formatting at the right fidelity for the scale by [@kristof-mattei](https://github.com/kristof-mattei) ([`204510b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/204510b55a71e0b87da3077db26e071827da5c18))
+- Clicking on a selected time range no longer locks the application in loading mode by [@kristof-mattei](https://github.com/kristof-mattei) ([`9c39a83`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9c39a8318ac3d20d6beb784e72bf797a6b122317))
+- Remove space before separator by [@kristof-mattei](https://github.com/kristof-mattei) ([`0ab7982`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0ab7982c62637cd0c8bb5ba94aa21031cd208044))
+- Refreshing resets the timer by [@kristof-mattei](https://github.com/kristof-mattei) ([`f10cd94`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f10cd949cb6cb3384068ff6b23665dea1cb890d8))
+- Enforce react/jsx-curly-brace-presence by [@kristof-mattei](https://github.com/kristof-mattei) ([`bbb98ed`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bbb98edd027f03dbfd91e52492099d6db6db527d))
+- Replace event feed fixed widths with subgrid columns by [@kristof-mattei](https://github.com/kristof-mattei) ([`6016291`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/60162917542abe18a5fe2096447640ce18c2f03f))
+- Use canonical tailwind class name by [@kristof-mattei](https://github.com/kristof-mattei) ([`1dee120`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1dee120b39976834e8190b94292f0d6ac09fa3d8))
+- Enforce better-tailwindcss recommended rules by [@kristof-mattei](https://github.com/kristof-mattei) ([`f6b918a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f6b918aa38b0ee5fee17787af1aeb1a62b1be7e4))
+- Format dates in the browser locale by [@kristof-mattei](https://github.com/kristof-mattei) ([`81d8184`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/81d8184a8cc7aaa3260981b97cb28dc066c4c721))
+- Hoist per-render constants to module scope by [@kristof-mattei](https://github.com/kristof-mattei) ([`5ad1562`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5ad1562194478febf9aa63eed1509f0d6c4633ea))
+- Stop disabling range buttons during stats fetch by [@kristof-mattei](https://github.com/kristof-mattei) ([`669366d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/669366db52bab8ca747b5e0dbb7f24c1bcdc1b6b))
+- Restore basemap attribution by [@kristof-mattei](https://github.com/kristof-mattei) ([`df9ada1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/df9ada11c4dce399b17677eabbe62df75b63f81c))
+
+### ⚙️ Miscellaneous Tasks
+
+- Sort deps and devDeps alphabetically by [@kristof-mattei](https://github.com/kristof-mattei) ([`fe7d574`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fe7d57443d9c9c5a3c7b07e2a8bee544f0c4c096))
+- Move @recharts/devtools to devDependencies by [@kristof-mattei](https://github.com/kristof-mattei) ([`203da7e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/203da7ed8c443af09da84563d2f5140d80addeaa))
 ## [0.13.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.12.1..v0.13.0) - 2026-08-03
 
 ### 🚀 Features
