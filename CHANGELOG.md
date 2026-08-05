@@ -1,4 +1,19 @@
 <!-- header goes here -->
+## [0.15.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.14.0..v0.15.0) - 2026-08-05
+
+### 🚀 Features
+
+- Use ts-rs to derive ts types from Rust structs, removing duplication by [@kristof-mattei](https://github.com/kristof-mattei) ([`232625a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/232625a200c709253c68e784daada1a2a8caf2f6))
+
+### 🐛 Bug Fixes
+
+- Format ts-rs output by [@kristof-mattei](https://github.com/kristof-mattei) ([`03f6b10`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/03f6b10bfc953697cf23b9c7a662a748c943df88))
+- Serialize emitting of ts files by [@kristof-mattei](https://github.com/kristof-mattei) ([`8e0a2b1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8e0a2b119f58e8282dd75feebb34d98ab723720a))
+- Unicorn 73 rules by [@kristof-mattei](https://github.com/kristof-mattei) ([`6f8e46c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6f8e46c0c7dd8f4bd9d8ba0d93a9e8a96c8f44a3))
+
+### ⚙️ Miscellaneous Tasks
+
+- Rename `ActiveConnection` to `ActivceConnectionInfo` to match backend by [@kristof-mattei](https://github.com/kristof-mattei) ([`cdd43d4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/cdd43d4cbd5080e7d72ea98993737d7665bc0061))
 ## [0.14.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.13.0..v0.14.0) - 2026-08-04
 
 ### 🚀 Features
