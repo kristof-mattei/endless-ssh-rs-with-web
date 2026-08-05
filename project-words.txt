@@ -67,6 +67,7 @@ mmdb
 monomorphization
 multiplatform
 mypy
+netsh
 nextest
 nsec
 nvmrc
@@ -74,6 +75,7 @@ ossdata
 pathbuf
 pgadmin
 pgsql
+portproxy
 postprocessors
 prereleased
 profraw
@@ -120,8 +122,10 @@ undercounted
 uninlined
 unrs
 unseparated
+unstub
 usernamehw
 vadimcn
+venv
 visibilitychange
 vite
 Vitest
