@@ -10,13 +10,13 @@ import type { ViteUserConfigFn } from "vitest/config";
 import { coverageConfigDefaults, defineConfig } from "vitest/config";
 
 function resolvePort(environmentValue: string | undefined, fallback: number): number {
-    if (environmentValue === undefined || environmentValue === "") {
+    if (environmentValue === undefined || environmentValue.trim() === "") {
         return fallback;
     }
 
     const parsed = Number(environmentValue);
 
-    return Number.isNaN(parsed) ? fallback : parsed;
+    return Number.isSafeInteger(parsed) && parsed > 0 && parsed <= 65_535 ? parsed : fallback;
 }
 
 const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
