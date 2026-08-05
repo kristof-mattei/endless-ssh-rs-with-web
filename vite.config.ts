@@ -95,6 +95,12 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
                 junit: "../../reports/vitest/test-report.xml",
             },
             restoreMocks: true,
+            server: {
+                deps: {
+                    // Node's ESM loader rejects @unovis's directory imports, resolve them through Vite instead
+                    inline: ["@unovis/react", "@unovis/ts"],
+                },
+            },
             setupFiles: ["./test.setup.ts"],
             unstubGlobals: true,
         },
