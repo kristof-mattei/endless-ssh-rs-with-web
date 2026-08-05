@@ -2,7 +2,7 @@ use std::net::IpAddr;
 
 use ipnet::{IpNet, Ipv4Net, Ipv6Net};
 use sqlx::postgres::types::PgInterval;
-use time::Duration;
+use time::SignedDuration;
 
 /// Convert `IpAddr` to `IpNetwork` for `PostgreSQL` INET binding.
 /// Inserting an `IpAddr` works equally as well, but then we're not explicit.
@@ -13,7 +13,7 @@ pub fn to_inet(ip: IpAddr) -> IpNet {
     }
 }
 
-pub fn to_interval(duration: Duration) -> PgInterval {
+pub fn to_interval(duration: SignedDuration) -> PgInterval {
     // let's talk about this conversion for a moment:
     // our duration is always positive (we should encode this into the typesystem though!)
     // now, let's talk about what it means for `whole_microseconds()` to exceed `i64::MAX`:
@@ -34,8 +34,9 @@ pub fn to_interval(duration: Duration) -> PgInterval {
     }
 }
 
-pub fn to_duration(interval: PgInterval) -> time::Duration {
+pub fn to_duration(interval: PgInterval) -> time::SignedDuration {
     let total_days = (i64::from(interval.months) * 30) + i64::from(interval.days);
 
-    time::Duration::days(total_days) + time::Duration::microseconds(interval.microseconds)
+    time::SignedDuration::days(total_days)
+        + time::SignedDuration::microseconds(interval.microseconds)
 }

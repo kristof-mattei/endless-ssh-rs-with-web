@@ -2,7 +2,7 @@ use std::net::SocketAddr;
 use std::os::fd::{AsRawFd, FromRawFd as _, OwnedFd};
 use std::sync::Arc;
 
-use time::{Duration, OffsetDateTime};
+use time::{OffsetDateTime, SignedDuration};
 use tokio::io::unix::{AsyncFd, AsyncFdReadyGuard};
 use tokio::net::TcpStream;
 use tokio::sync::OwnedSemaphorePermit;
@@ -81,11 +81,11 @@ async fn listen_forever(
     connected_at: OffsetDateTime,
     config: &Config,
     context: &ClientContext,
-) -> (Duration, usize) {
+) -> (SignedDuration, usize) {
     // use monotonic time to measure elapsed time of how long client is connected
     let connected_instant = Instant::now();
     let mut send_next = connected_instant + config.delay;
-    let mut time_spent = Duration::ZERO;
+    let mut time_spent = SignedDuration::ZERO;
     let mut bytes_sent = 0_usize;
 
     // register the stream for disconnect events only, failures are non-fatal and
