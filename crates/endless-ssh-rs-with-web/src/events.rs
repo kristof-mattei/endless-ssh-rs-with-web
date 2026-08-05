@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use serde::Serialize;
-use time::{Duration, OffsetDateTime};
+use time::{OffsetDateTime, SignedDuration};
 use tokio::sync::broadcast;
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
@@ -23,7 +23,7 @@ pub enum ClientEvent {
         addr: SocketAddr,
         connected_at: OffsetDateTime,
         disconnected_at: OffsetDateTime,
-        time_spent: Duration,
+        time_spent: SignedDuration,
         bytes_sent: usize,
     },
 }
@@ -39,7 +39,7 @@ pub enum WsEvent {
         total_bytes_sent: i64,
         #[serde(serialize_with = "as_seconds")]
         #[cfg_attr(test, ts(type = "number"))]
-        total_time_spent: Duration,
+        total_time_spent: SignedDuration,
         /// Totals cover exactly the connections with id at or below this.
         last_counted_id: i64,
     },
@@ -68,7 +68,7 @@ pub enum WsEvent {
         disconnected_at: OffsetDateTime,
         #[serde(serialize_with = "as_seconds")]
         #[cfg_attr(test, ts(type = "number"))]
-        time_spent: Duration,
+        time_spent: SignedDuration,
         bytes_sent: usize,
         country_code: Option<String>,
         country_name: Option<String>,

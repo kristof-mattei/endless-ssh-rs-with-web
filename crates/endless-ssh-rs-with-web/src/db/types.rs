@@ -6,7 +6,7 @@ use sqlx::error::BoxDynError;
 use sqlx::postgres::types::PgInterval;
 use sqlx::postgres::{PgArgumentBuffer, PgTypeInfo, PgValueRef};
 use sqlx::{Decode, Encode, Postgres, Type};
-use time::{Duration, OffsetDateTime};
+use time::{OffsetDateTime, SignedDuration};
 
 use crate::db::conversions::{to_duration, to_inet, to_interval};
 
@@ -93,7 +93,7 @@ impl From<DbPort> for u16 {
 }
 
 #[derive(Debug, Clone)]
-pub struct DbDuration(pub Duration);
+pub struct DbDuration(pub SignedDuration);
 
 impl Type<Postgres> for DbDuration {
     fn type_info() -> PgTypeInfo {
@@ -116,7 +116,7 @@ impl Encode<'_, Postgres> for DbDuration {
     }
 }
 
-impl From<DbDuration> for Duration {
+impl From<DbDuration> for SignedDuration {
     fn from(value: DbDuration) -> Self {
         value.0
     }

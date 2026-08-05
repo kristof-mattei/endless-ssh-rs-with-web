@@ -131,7 +131,7 @@ async fn handle_socket(
             AllTimeTotals {
                 total_connections: 0,
                 total_bytes_sent: 0,
-                total_time_spent: DbDuration(time::Duration::ZERO),
+                total_time_spent: DbDuration(time::SignedDuration::ZERO),
                 last_counted_id: 0,
             }
         },

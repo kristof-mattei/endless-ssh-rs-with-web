@@ -44,7 +44,7 @@ async fn stats_handler(
         let from = from
             .as_deref()
             .and_then(|s| OffsetDateTime::parse(s, &Rfc3339).ok())
-            .unwrap_or_else(|| to - time::Duration::hours(24));
+            .unwrap_or_else(|| to - time::SignedDuration::hours(24));
 
         if from > to {
             return (StatusCode::BAD_REQUEST, "`from` needs to be before `to`").into_response();

@@ -8,7 +8,7 @@ use serde::Serialize;
 use sqlx::migrate::MigrateError;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{AssertSqlSafe, PgExecutor, PgPool, Row as _};
-use time::{Duration, OffsetDateTime};
+use time::{OffsetDateTime, SignedDuration};
 use tracing::{Level, event};
 
 use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, DbPort, Limit};
@@ -33,7 +33,7 @@ pub async fn insert_connection(
     port: u16,
     connected_at: OffsetDateTime,
     disconnected_at: OffsetDateTime,
-    time_spent: time::Duration,
+    time_spent: time::SignedDuration,
     bytes_sent: usize,
     geo: Option<&GeoInfo>,
 ) -> Result<i64, sqlx::Error> {
@@ -208,7 +208,7 @@ pub struct StatsRow {
     pub connects: i64,
     #[serde(serialize_with = "as_seconds")]
     #[cfg_attr(test, ts(type = "number"))]
-    pub time_spent: Duration,
+    pub time_spent: SignedDuration,
     pub bytes_sent: i64,
 }
 
