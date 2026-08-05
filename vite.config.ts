@@ -96,6 +96,7 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
             },
             restoreMocks: true,
             setupFiles: ["./test.setup.ts"],
+            unstubGlobals: true,
         },
     };
 
