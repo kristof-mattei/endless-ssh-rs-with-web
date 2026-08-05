@@ -120,6 +120,7 @@ Twemoji
 typesystem
 undercounted
 uninlined
+unovis
 unrs
 unseparated
 unstub
