@@ -65,16 +65,14 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
         root: "front-end/src",
         server: {
             port,
-            host: true,
+            // uncomment to test from other devices
+            // on WSL you will also need netsh portproxy
+            // host: true,
             strictPort: true,
-            hmr: {
-                host: "localhost",
-                port,
-            },
-            cors: true,
             proxy: {
                 "/api": {
-                    target: "http://localhost:3000",
+                    // on local development, target only binds to IPv4
+                    target: "http://127.0.0.1:3000",
                     changeOrigin: true,
                     secure: false,
                     ws: true,
