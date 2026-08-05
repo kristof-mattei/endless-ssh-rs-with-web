@@ -2,7 +2,7 @@
 
 import { render, screen } from "@testing-library/react";
 import type * as React from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { App } from "./app";
 
@@ -34,10 +34,6 @@ class InertWebSocket {
 }
 
 describe("App", () => {
-    afterEach(() => {
-        vi.unstubAllGlobals();
-    });
-
     it("renders", () => {
         vi.stubGlobal("WebSocket", InertWebSocket);
         // a forever-pending stats fetch, the test only covers first paint
