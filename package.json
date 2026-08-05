@@ -19,6 +19,8 @@
         "deps:report": "depcruise --config dependency-cruiser.config.ts --output-type err-html --output-to reports/dependency-report.html front-end/src"
     },
     "dependencies": {
+        "@unovis/react": "1.6.7",
+        "@unovis/ts": "1.6.7",
         "country-flag-emoji-polyfill": "0.1.10",
         "ip-address": "10.7.0",
         "maplibre-gl": "6.7.0",

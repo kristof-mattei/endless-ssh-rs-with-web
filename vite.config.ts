@@ -64,7 +64,7 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
         ],
         optimizeDeps: {
             noDiscovery: true,
-            include: ["ip-address", "maplibre-gl", "react-dom/client", "recharts"],
+            include: ["@unovis/react", "@unovis/ts", "ip-address", "maplibre-gl", "react-dom/client", "recharts"],
         },
         root: "front-end/src",
         server: {
@@ -97,6 +97,12 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
                 junit: "../../reports/vitest/test-report.xml",
             },
             restoreMocks: true,
+            server: {
+                deps: {
+                    // Node's ESM loader rejects @unovis's directory imports, resolve them through Vite instead
+                    inline: ["@unovis/react", "@unovis/ts"],
+                },
+            },
             setupFiles: ["./test.setup.ts"],
             unstubGlobals: true,
         },

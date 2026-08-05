@@ -120,6 +120,7 @@ typesystem
 uninit
 uninlined
 uninspectable
+unovis
 unseparated
 unstub
 uppercases
