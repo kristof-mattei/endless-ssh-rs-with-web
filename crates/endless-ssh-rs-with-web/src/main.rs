@@ -213,9 +213,9 @@ async fn start_tasks() -> Shutdown {
     let active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>> =
         Arc::new(DashMap::new());
 
-    // this channel is used to communicate between
-    // tasks and this function, in the case that a task fails, they'll send a message on the shutdown channel
-    // after which we'll gracefully terminate other services
+    // shutdown broadcast: every task watches this token (or a child of it) to know
+    // when to stop, and holds a drop guard on it, so a task stopping on its own
+    // takes the others down with it
     let cancellation_token = CancellationToken::new();
     let client_cancellation_token = cancellation_token.child_token();
 
@@ -285,10 +285,11 @@ async fn start_tasks() -> Shutdown {
     tasks.close();
 
     // now we wait forever for either
+    // * the cancellation token. we only cancel it ourselves after this select, so
+    //   here it means a task stopped on its own, which tasks only do on failure
     // * SIGTERM
     // * CTRL+c (SIGINT)
-    // * a message on the shutdown channel, sent either by the server task or
-    // another task when they complete (which means they failed)
+    // biased so that when multiple are ready at once, task failure wins over signals
     let shutdown_reason = tokio::select! {
         biased;
         () = cancellation_token.cancelled() => {
@@ -296,7 +297,7 @@ async fn start_tasks() -> Shutdown {
 
             Shutdown::OperationalFailure {
                 code: ExitCode::FAILURE,
-                message: "Some task unexpectedly failed which triggered a shutdown."
+                message: "A task failed, triggering a shutdown"
             }
         },
         result = signal_handlers::wait_for_sigterm() => {
