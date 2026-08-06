@@ -213,9 +213,9 @@ async fn start_tasks() -> Shutdown {
     let active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>> =
         Arc::new(DashMap::new());
 
-    // this channel is used to communicate between
-    // tasks and this function, in the case that a task fails, they'll send a message on the shutdown channel
-    // after which we'll gracefully terminate other services
+    // shutdown broadcast: every task watches this token (or a child of it) to know
+    // when to stop, and holds a drop guard on it, so a task stopping on its own
+    // takes the others down with it
     let cancellation_token = CancellationToken::new();
     let client_cancellation_token = cancellation_token.child_token();
 
@@ -285,31 +285,28 @@ async fn start_tasks() -> Shutdown {
     tasks.close();
 
     // now we wait forever for either
+    // * the cancellation token. we only cancel it ourselves after this select, so
+    //   here it means a task stopped on its own, which tasks only do on failure
     // * SIGTERM
     // * CTRL+c (SIGINT)
-    // * a message on the shutdown channel, sent either by the server task or
-    // another task when they complete (which means they failed)
-    tokio::select! {
-        result = signal_handlers::wait_for_sigterm() => {
-            if let Err(error) = result {
-                event!(Level::ERROR, ?error, "Failed to register SIGERM handler, aborting");
-            } else {
-                // we completed because ...
-                event!(Level::WARN, "Sigterm detected, stopping all tasks");
+    // biased so that when multiple are ready at once, task failure wins over signals
+    let shutdown_reason = tokio::select! {
+        biased;
+        () = cancellation_token.cancelled() => {
+            event!(Level::WARN, "Underlying task stopped, stopping all other tasks");
+
+            Shutdown::OperationalFailure {
+                code: ExitCode::FAILURE,
+                message: "A task failed, triggering a shutdown"
             }
+        },
+        result = signal_handlers::wait_for_sigterm() => {
+            result
         },
         result = signal_handlers::wait_for_sigint() => {
-            if let Err(error) = result {
-                event!(Level::ERROR, ?error, "Failed to register CTRL+c handler, aborting");
-            } else {
-                // we completed because ...
-                event!(Level::WARN, "CTRL+c detected, stopping all tasks");
-            }
+            result
         },
-        () = cancellation_token.cancelled() => {
-            event!(Level::WARN, "Underlying task stopped, stopping all others tasks");
-        },
-    }
+    };
 
     client_cancellation_token.cancel();
     client_tasks.close();
@@ -336,9 +333,9 @@ async fn start_tasks() -> Shutdown {
         event!(Level::ERROR, "Tasks didn't stop within allotted time!");
     }
 
-    event!(Level::INFO, "Done");
+    event!(Level::INFO, "Shutdown completed");
 
-    Shutdown::Success
+    shutdown_reason
 }
 
 async fn set_up_server(application_state: ApplicationState, cancellation_token: CancellationToken) {
