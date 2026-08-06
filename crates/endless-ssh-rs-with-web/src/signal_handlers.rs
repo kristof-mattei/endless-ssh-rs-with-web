@@ -39,9 +39,11 @@ async fn receive_sigterm() -> Result<(), std::io::Error> {
 /// Waits forever for a `SIGTERM`.
 pub async fn wait_for_sigterm() -> Shutdown {
     if let Err(error) = receive_sigterm().await {
-        const MESSAGE: &str = "Failed to register SIGTERM handler";
-
-        Shutdown::UnexpectedError(eyre::Report::from(error).wrap_err(MESSAGE))
+        Shutdown::UnexpectedError(wrap_and_report!(
+            Level::ERROR,
+            error,
+            "Failed to register SIGTERM handler"
+        ))
     } else {
         event!(Level::WARN, "SIGTERM detected, stopping all tasks");
 
@@ -62,9 +64,11 @@ async fn receive_sigint() -> Result<(), std::io::Error> {
 /// Waits forever for a `SIGINT`.
 pub async fn wait_for_sigint() -> Shutdown {
     if let Err(error) = receive_sigint().await {
-        const MESSAGE: &str = "Failed to register CTRL+c handler";
-
-        Shutdown::UnexpectedError(eyre::Report::from(error).wrap_err(MESSAGE))
+        Shutdown::UnexpectedError(wrap_and_report!(
+            Level::ERROR,
+            error,
+            "Failed to register CTRL+c handler"
+        ))
     } else {
         event!(Level::WARN, "CTRL+c detected, stopping all tasks");
 
