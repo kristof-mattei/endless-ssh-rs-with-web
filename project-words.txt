@@ -66,6 +66,7 @@ netsh
 nextest
 nsec
 nvmrc
+oldact
 ossdata
 pathbuf
 pgadmin
@@ -88,6 +89,7 @@ sccache
 sendline
 setsockopt
 sigaction
+sigemptyset
 SIGERM
 signum
 sigset
@@ -98,6 +100,7 @@ startswith
 striptags
 subsec
 syscall
+syscalls
 taiki
 targetplatformdash
 tarpit
@@ -110,6 +113,7 @@ topo
 trixie
 Twemoji
 typesystem
+Uninit
 uninlined
 unrs
 unseparated
