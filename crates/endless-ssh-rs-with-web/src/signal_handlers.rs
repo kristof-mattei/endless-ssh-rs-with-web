@@ -122,8 +122,8 @@ pub unsafe fn set_up_handler(
         sa_restorer: None,
     };
 
-    // SAFETY: `sa` is initialized and valid for reads, a null `oldact` is
-    // permitted and means the previous action is not retrieved.
+    // SAFETY: `sa` is initialized and valid for reads. A null `oldact` is
+    // permitted by sigaction(2).
     if unsafe { sigaction(signum, &raw const sa, null_mut()) } == -1 {
         return Err(wrap_and_report!(
             Level::ERROR,

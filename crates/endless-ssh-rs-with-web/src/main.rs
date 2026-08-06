@@ -333,7 +333,7 @@ async fn start_tasks() -> Shutdown {
         event!(Level::ERROR, "Tasks didn't stop within allotted time!");
     }
 
-    event!(Level::INFO, "Done");
+    event!(Level::INFO, "Shutdown completed");
 
     shutdown_reason
 }
