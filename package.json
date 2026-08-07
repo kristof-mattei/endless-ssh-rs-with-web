@@ -31,6 +31,8 @@
         ]
     },
     "dependencies": {
+        "@unovis/react": "1.6.7",
+        "@unovis/ts": "1.6.7",
         "country-flag-emoji-polyfill": "0.1.10",
         "ip-address": "10.4.0",
         "maplibre-gl": "6.1.0",
