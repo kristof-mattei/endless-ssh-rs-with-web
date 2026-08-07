@@ -1,17 +1,16 @@
 use std::env;
 use std::ffi::OsString;
 use std::net::SocketAddr;
-use std::num::{NonZeroU8, NonZeroU16};
+use std::num::NonZeroU8;
 use std::time::Duration;
 
 use clap::error::ErrorKind;
 use clap::{ArgAction, Parser, value_parser};
 use color_eyre::eyre;
-use tracing::{Level, event};
 
 use crate::config::{
-    BindFamily, Config, DEFAULT_DELAY_MS, DEFAULT_HTTP_LISTEN_ADDRESS, DEFAULT_MAX_CLIENTS,
-    DEFAULT_MAX_LINE_LENGTH, DEFAULT_PORT,
+    Config, DEFAULT_DELAY_MS, DEFAULT_HTTP_LISTEN_ADDRESS, DEFAULT_MAX_CLIENTS,
+    DEFAULT_MAX_LINE_LENGTH, DEFAULT_SSH_LISTEN_ADDRESS,
 };
 
 fn delay_parser(value: &str) -> Result<Duration, clap::Error> {
@@ -25,24 +24,6 @@ fn delay_parser(value: &str) -> Result<Duration, clap::Error> {
 #[derive(Debug, Parser)]
 #[command(disable_help_flag = true)]
 pub struct Cli {
-    #[clap(
-        short = '4',
-        long = "only_4",
-        action = ArgAction::SetTrue,
-        help = "Bind to IPv4 only",
-        group = "ip_version"
-    )]
-    only_4: bool,
-
-    #[clap(
-        short = '6',
-        long = "only_6",
-        action = ArgAction::SetTrue,
-        help = "Bind to IPv6 only",
-        group = "ip_version"
-    )]
-    only_6: bool,
-
     #[clap(
         short = 'd',
         long = "delay",
@@ -71,13 +52,12 @@ pub struct Cli {
     max_clients: u8,
 
     #[clap(
-        short = 'p',
-        long = "port",
-        default_value_t = DEFAULT_PORT.get(),
-        help = "Listening port",
-        value_parser = value_parser!(u16).range(1..)
+        long,
+        env,
+        default_value_t = DEFAULT_SSH_LISTEN_ADDRESS,
+        help = "SSH listen address"
     )]
-    port: u16,
+    ssh_listen_address: SocketAddr,
 
     #[clap(
         long,
@@ -98,24 +78,12 @@ pub struct Cli {
 
 impl From<Cli> for Config {
     fn from(matches: Cli) -> Self {
-        let bind_family = match (matches.only_4, matches.only_6) {
-            (true, false) => BindFamily::Ipv4,
-            (false, true) => {
-                event!(Level::WARN, "Ipv6 only currently implies dual stack");
-
-                BindFamily::Ipv6
-            },
-            (false, false) => BindFamily::DualStack,
-            (true, true) => unreachable!("Guaranteed by clap"),
-        };
-
         Config {
-            bind_family,
             delay: matches.delay,
+            http_listen_address: matches.http_listen_address,
             max_clients: NonZeroU8::new(matches.max_clients).expect("Guaranteed by clap"),
             max_line_length: NonZeroU8::new(matches.max_line_length).expect("Guaranteed by clap"),
-            port: NonZeroU16::new(matches.port).expect("Guaranteed by clap"),
-            http_listen_address: matches.http_listen_address,
+            ssh_listen_address: matches.ssh_listen_address,
         }
     }
 }
@@ -135,13 +103,13 @@ where
 #[cfg(test)]
 mod tests {
     use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
-    use std::num::{NonZeroU8, NonZeroU16};
+    use std::num::NonZeroU8;
 
     use color_eyre::eyre;
     use pretty_assertions::{assert_eq, assert_matches};
 
     use super::parse_cli_from;
-    use crate::config::{BindFamily, Config};
+    use crate::config::Config;
 
     fn parse_factory(input: &'static str) -> Result<Config, eyre::Report> {
         // fake input
@@ -164,19 +132,6 @@ mod tests {
 
         #[expect(unused_must_use, reason = "Testing")]
         result.unwrap_err();
-    }
-
-    #[test]
-    fn parses_port() {
-        let result = parse_factory("endless-ssh-rs --port 2000");
-
-        let expected_config = Config {
-            port: NonZeroU16::new(2000).unwrap(),
-            ..Config::default()
-        };
-
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), expected_config);
     }
 
     #[test]
@@ -227,6 +182,18 @@ mod tests {
     }
 
     #[test]
+    fn parses_ssh_listen_address() {
+        let result = parse_factory("endless-ssh-rs --ssh-listen-address 127.0.0.1:2000");
+
+        let expected_config = Config {
+            ssh_listen_address: SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 2000),
+            ..Config::default()
+        };
+
+        assert_matches!(result, Ok(config) if config == expected_config);
+    }
+
+    #[test]
     fn parses_http_listen_address() {
         let result = parse_factory("endless-ssh-rs --http-listen-address [::1]:9090");
 
@@ -239,7 +206,7 @@ mod tests {
     }
 
     #[test]
-    fn defaults_listen_addresses_to_loopback() {
+    fn defaults_http_listen_address_to_loopback() {
         let result = parse_factory("endless-ssh-rs");
 
         let expected_http = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 3000);
@@ -248,55 +215,18 @@ mod tests {
     }
 
     #[test]
+    fn defaults_ssh_listen_address_to_wildcard() {
+        let result = parse_factory("endless-ssh-rs");
+
+        let expected_ssh = SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), 2223);
+
+        assert_matches!(result, Ok(config) if config.ssh_listen_address == expected_ssh);
+    }
+
+    #[test]
     fn rejects_listen_address_without_port() {
         let result = parse_factory("endless-ssh-rs --http-listen-address 127.0.0.1");
 
         assert_matches!(result, Err(_));
-    }
-
-    #[test]
-    fn parses_ipv4_only() {
-        let result = parse_factory("endless-ssh-rs -4");
-
-        let expected_config = Config {
-            bind_family: BindFamily::Ipv4,
-            ..Config::default()
-        };
-
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), expected_config);
-    }
-
-    #[test]
-    fn parses_ipv6_only() {
-        let result = parse_factory("endless-ssh-rs -6");
-
-        let expected_config = Config {
-            bind_family: BindFamily::Ipv6,
-            ..Config::default()
-        };
-
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), expected_config);
-    }
-
-    #[test]
-    fn no_ip_options_mean_dual_stack() {
-        let result = parse_factory("endless-ssh-rs");
-
-        let expected_config = Config {
-            bind_family: BindFamily::DualStack,
-            ..Config::default()
-        };
-
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), expected_config);
-    }
-    #[test]
-    fn specifying_ipv4_and_ipv6_throw_error() {
-        let result = parse_factory("endless-ssh-rs -4 -6");
-
-        #[expect(unused_must_use, reason = "Testing")]
-        result.unwrap_err();
     }
 }

@@ -1,4 +1,3 @@
-use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 use std::sync::Arc;
 
 use color_eyre::eyre;
@@ -11,7 +10,7 @@ use tracing::{Level, event};
 
 use crate::SIZE_IN_BYTES;
 use crate::client::{ClientContext, handle_client};
-use crate::config::{BindFamily, Config};
+use crate::config::Config;
 use crate::events::ClientEvent;
 use crate::ffi_wrapper::set_receive_buffer_size;
 
@@ -83,22 +82,7 @@ impl Listener {
         internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
         semaphore: Arc<Semaphore>,
     ) -> Result<Self, eyre::Report> {
-        let sa = match config.bind_family {
-            BindFamily::Ipv4 => {
-                SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, config.port.get()))
-            },
-            BindFamily::Ipv6 | BindFamily::DualStack => SocketAddr::V6(SocketAddrV6::new(
-                Ipv6Addr::UNSPECIFIED,
-                config.port.get(),
-                0,
-                0,
-            )),
-        };
-
-        // TODO BindFamily::Ipv6 is not respected. Dual stack / IPv6 only are
-        // set by /proc/sys/net/ipv6/bindv6only
-
-        let listener = TcpListener::bind(sa).await?;
+        let listener = TcpListener::bind(config.ssh_listen_address).await?;
 
         Ok(Self {
             config,
