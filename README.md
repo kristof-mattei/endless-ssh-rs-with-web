@@ -47,20 +47,21 @@ pnpm run build
 SQLX_OFFLINE=true cargo run --release --package endless-ssh-rs-with-web
 ```
 
-The web dashboard is served on port 3000. The SSH honeypot listens on port 2223 by default.
+The web dashboard is served on `127.0.0.1:3000` by default. The SSH honeypot listens on port 2223 by default.
 
 ## Configuration
 
 ### CLI flags
 
-| Flag                      | Default | Description                          |
-| ------------------------- | ------- | ------------------------------------ |
-| `-p`, `--port`            | `2223`  | Honeypot listening port              |
-| `-d`, `--delay`           | `10000` | Delay between messages (ms)          |
-| `-l`, `--max-line-length` | `32`    | Max banner line length (3–255 bytes) |
-| `-m`, `--max-clients`     | `64`    | Max concurrent connections           |
-| `-4`, `--only_4`          | —       | Bind to IPv4 only                    |
-| `-6`, `--only_6`          | —       | Bind to IPv6 only                    |
+| Flag                      | Default          | Description                             |
+| ------------------------- | ---------------- | --------------------------------------- |
+| `-p`, `--port`            | `2223`           | Honeypot listening port                 |
+| `-d`, `--delay`           | `10000`          | Delay between messages (ms)             |
+| `-l`, `--max-line-length` | `32`             | Max banner line length (3–255 bytes)    |
+| `-m`, `--max-clients`     | `64`             | Max concurrent connections              |
+| `-4`, `--only_4`          | —                | Bind to IPv4 only                       |
+| `-6`, `--only_6`          | —                | Bind to IPv6 only                       |
+| `--http-listen-address`   | `127.0.0.1:3000` | HTTP listen address (dashboard and API) |
 
 ### Environment variables
 
@@ -69,6 +70,7 @@ The web dashboard is served on port 3000. The SSH honeypot listens on port 2223 
 | `DATABASE_URL`        | PostgreSQL connection string                         |
 | `MAXMIND_LICENSE_KEY` | MaxMind license key for GeoIP lookups (optional)     |
 | `RUST_LOG`            | Log level, e.g. `INFO,endless-ssh-rs-with-web=TRACE` |
+| `HTTP_LISTEN_ADDRESS` | HTTP listen address (dashboard and API)              |
 
 ## Docker
 
