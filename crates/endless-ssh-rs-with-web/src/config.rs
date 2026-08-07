@@ -1,3 +1,4 @@
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::num::{NonZeroU8, NonZeroU16, NonZeroU32};
 use std::time::Duration;
 
@@ -7,11 +8,14 @@ pub const DEFAULT_PORT: NonZeroU16 = NonZeroU16::new(2223).unwrap();
 pub const DEFAULT_DELAY_MS: NonZeroU32 = NonZeroU32::new(10000).unwrap();
 pub const DEFAULT_MAX_LINE_LENGTH: NonZeroU8 = NonZeroU8::new(32).unwrap();
 pub const DEFAULT_MAX_CLIENTS: NonZeroU8 = NonZeroU8::new(64).unwrap();
+pub const DEFAULT_HTTP_LISTEN_ADDRESS: SocketAddr =
+    SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 3000);
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Config {
     pub bind_family: BindFamily,
     pub delay: Duration,
+    pub http_listen_address: SocketAddr,
     pub max_clients: NonZeroU8,
     pub max_line_length: NonZeroU8,
     pub port: NonZeroU16,
@@ -48,6 +52,7 @@ impl Config {
             max_line_length: DEFAULT_MAX_LINE_LENGTH,
             max_clients: DEFAULT_MAX_CLIENTS,
             bind_family: BindFamily::DualStack,
+            http_listen_address: DEFAULT_HTTP_LISTEN_ADDRESS,
         }
     }
 
@@ -57,5 +62,10 @@ impl Config {
         event!(Level::INFO, "MaxLineLength: {}", self.max_line_length);
         event!(Level::INFO, "MaxClients: {}", self.max_clients);
         event!(Level::INFO, "BindFamily: {}", self.bind_family);
+        event!(
+            Level::INFO,
+            "HttpListenAddress: {}",
+            self.http_listen_address
+        );
     }
 }

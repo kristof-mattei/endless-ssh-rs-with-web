@@ -1,5 +1,6 @@
 use std::env;
 use std::ffi::OsString;
+use std::net::SocketAddr;
 use std::num::{NonZeroU8, NonZeroU16};
 use std::time::Duration;
 
@@ -9,8 +10,8 @@ use color_eyre::eyre;
 use tracing::{Level, event};
 
 use crate::config::{
-    BindFamily, Config, DEFAULT_DELAY_MS, DEFAULT_MAX_CLIENTS, DEFAULT_MAX_LINE_LENGTH,
-    DEFAULT_PORT,
+    BindFamily, Config, DEFAULT_DELAY_MS, DEFAULT_HTTP_LISTEN_ADDRESS, DEFAULT_MAX_CLIENTS,
+    DEFAULT_MAX_LINE_LENGTH, DEFAULT_PORT,
 };
 
 fn delay_parser(value: &str) -> Result<Duration, clap::Error> {
@@ -79,6 +80,14 @@ pub struct Cli {
     port: u16,
 
     #[clap(
+        long,
+        env,
+        default_value_t = DEFAULT_HTTP_LISTEN_ADDRESS,
+        help = "HTTP listen address"
+    )]
+    http_listen_address: SocketAddr,
+
+    #[clap(
         short = 'h',
         long = "help",
         help = "Print this help message and exit",
@@ -106,6 +115,7 @@ impl From<Cli> for Config {
             max_clients: NonZeroU8::new(matches.max_clients).expect("Guaranteed by clap"),
             max_line_length: NonZeroU8::new(matches.max_line_length).expect("Guaranteed by clap"),
             port: NonZeroU16::new(matches.port).expect("Guaranteed by clap"),
+            http_listen_address: matches.http_listen_address,
         }
     }
 }
@@ -124,10 +134,11 @@ where
 
 #[cfg(test)]
 mod tests {
+    use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
     use std::num::{NonZeroU8, NonZeroU16};
 
     use color_eyre::eyre;
-    use pretty_assertions::assert_eq;
+    use pretty_assertions::{assert_eq, assert_matches};
 
     use super::parse_cli_from;
     use crate::config::{BindFamily, Config};
@@ -213,6 +224,34 @@ mod tests {
 
         #[expect(unused_must_use, reason = "Testing")]
         result.unwrap_err();
+    }
+
+    #[test]
+    fn parses_http_listen_address() {
+        let result = parse_factory("endless-ssh-rs --http-listen-address [::1]:9090");
+
+        let expected_config = Config {
+            http_listen_address: SocketAddr::new(IpAddr::V6(Ipv6Addr::LOCALHOST), 9090),
+            ..Config::default()
+        };
+
+        assert_matches!(result, Ok(config) if config == expected_config);
+    }
+
+    #[test]
+    fn defaults_listen_addresses_to_loopback() {
+        let result = parse_factory("endless-ssh-rs");
+
+        let expected_http = SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 3000);
+
+        assert_matches!(result, Ok(config) if config.http_listen_address == expected_http);
+    }
+
+    #[test]
+    fn rejects_listen_address_without_port() {
+        let result = parse_factory("endless-ssh-rs --http-listen-address 127.0.0.1");
+
+        assert_matches!(result, Err(_));
     }
 
     #[test]

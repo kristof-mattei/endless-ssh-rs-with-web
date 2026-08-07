@@ -165,6 +165,8 @@ COPY --from=rust-base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 USER appuser
 
 ENV RUST_BACKTRACE=full
+# Docker port publishing needs a wildcard bind as traffic arrives on the container's external interface
+ENV HTTP_LISTEN_ADDRESS=[::]:3000
 
 WORKDIR /app
 

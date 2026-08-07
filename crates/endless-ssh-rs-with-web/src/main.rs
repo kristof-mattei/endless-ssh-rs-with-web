@@ -236,7 +236,11 @@ async fn start_tasks() -> Shutdown {
 
     tasks.spawn_with_name(
         "server",
-        set_up_server(application_state, cancellation_token.clone()),
+        set_up_server(
+            config.http_listen_address,
+            application_state,
+            cancellation_token.clone(),
+        ),
     );
 
     {
@@ -338,8 +342,11 @@ async fn start_tasks() -> Shutdown {
     shutdown_reason
 }
 
-async fn set_up_server(application_state: ApplicationState, cancellation_token: CancellationToken) {
-    let bind_to = SocketAddr::from(([0, 0, 0, 0], 3000));
+async fn set_up_server(
+    bind_to: SocketAddr,
+    application_state: ApplicationState,
+    cancellation_token: CancellationToken,
+) {
     let router = build_router(application_state);
 
     let _guard = cancellation_token.clone().drop_guard();
