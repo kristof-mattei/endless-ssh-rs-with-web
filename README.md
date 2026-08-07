@@ -47,7 +47,7 @@ pnpm run build
 SQLX_OFFLINE=true cargo run --release --package endless-ssh-rs-with-web
 ```
 
-The web dashboard is served on `127.0.0.1:3000` by default. The SSH honeypot listens on port 2223 by default.
+The web dashboard is served on `127.0.0.1:3000` by default. The SSH honeypot listens on `[::]:2223` (all interfaces, both families) by default, a tarpit wants traffic.
 
 ## Configuration
 
@@ -55,12 +55,10 @@ The web dashboard is served on `127.0.0.1:3000` by default. The SSH honeypot lis
 
 | Flag                      | Default          | Description                             |
 | ------------------------- | ---------------- | --------------------------------------- |
-| `-p`, `--port`            | `2223`           | Honeypot listening port                 |
 | `-d`, `--delay`           | `10000`          | Delay between messages (ms)             |
 | `-l`, `--max-line-length` | `32`             | Max banner line length (3–255 bytes)    |
 | `-m`, `--max-clients`     | `64`             | Max concurrent connections              |
-| `-4`, `--only_4`          | —                | Bind to IPv4 only                       |
-| `-6`, `--only_6`          | —                | Bind to IPv6 only                       |
+| `--ssh-listen-address`    | `[::]:2223`      | SSH honeypot listen address             |
 | `--http-listen-address`   | `127.0.0.1:3000` | HTTP listen address (dashboard and API) |
 
 ### Environment variables
@@ -70,6 +68,7 @@ The web dashboard is served on `127.0.0.1:3000` by default. The SSH honeypot lis
 | `DATABASE_URL`        | PostgreSQL connection string                         |
 | `MAXMIND_LICENSE_KEY` | MaxMind license key for GeoIP lookups (optional)     |
 | `RUST_LOG`            | Log level, e.g. `INFO,endless-ssh-rs-with-web=TRACE` |
+| `SSH_LISTEN_ADDRESS`  | SSH honeypot listen address                          |
 | `HTTP_LISTEN_ADDRESS` | HTTP listen address (dashboard and API)              |
 
 ## Docker
