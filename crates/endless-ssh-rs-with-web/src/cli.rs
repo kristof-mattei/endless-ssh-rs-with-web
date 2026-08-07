@@ -4,6 +4,7 @@ use std::net::SocketAddr;
 use std::num::NonZeroU8;
 use std::time::Duration;
 
+use clap::builder::TypedValueParser as _;
 use clap::error::ErrorKind;
 use clap::{ArgAction, Parser, value_parser};
 use color_eyre::eyre;
@@ -36,20 +37,19 @@ pub struct Cli {
     #[clap(
         short = 'l',
         long = "max-line-length",
-        default_value_t = DEFAULT_MAX_LINE_LENGTH.get(),
+        default_value_t = DEFAULT_MAX_LINE_LENGTH,
         help = "Maximum banner line length (3-255)",
-        value_parser = value_parser!(u8).range(3..=255)
+        value_parser = value_parser!(u8).range(3..=255).try_map(NonZeroU8::try_from)
     )]
-    max_line_length: u8,
+    max_line_length: NonZeroU8,
 
     #[clap(
         short = 'm',
         long = "max-clients",
-        default_value_t = DEFAULT_MAX_CLIENTS.get(),
-        help = "Maximum number of clients",
-        value_parser = value_parser!(u8).range(1..)
+        default_value_t = DEFAULT_MAX_CLIENTS,
+        help = "Maximum number of clients"
     )]
-    max_clients: u8,
+    max_clients: NonZeroU8,
 
     #[clap(
         long,
@@ -81,8 +81,8 @@ impl From<Cli> for Config {
         Config {
             delay: matches.delay,
             http_listen_address: matches.http_listen_address,
-            max_clients: NonZeroU8::new(matches.max_clients).expect("Guaranteed by clap"),
-            max_line_length: NonZeroU8::new(matches.max_line_length).expect("Guaranteed by clap"),
+            max_clients: matches.max_clients,
+            max_line_length: matches.max_line_length,
             ssh_listen_address: matches.ssh_listen_address,
         }
     }
@@ -179,6 +179,13 @@ mod tests {
 
         #[expect(unused_must_use, reason = "Testing")]
         result.unwrap_err();
+    }
+
+    #[test]
+    fn rejects_zero_max_clients() {
+        let result = parse_factory("endless-ssh-rs --max-clients 0");
+
+        assert_matches!(result, Err(_));
     }
 
     #[test]
