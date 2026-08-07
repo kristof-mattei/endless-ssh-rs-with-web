@@ -96,3 +96,5 @@ pnpm run build     # Production build
 MIT, see [LICENSE](./LICENSE)
 
 `SPDX-License-Identifier: MIT`
+
+The favicon and the country-flag font glyphs are derived from [Twemoji](https://github.com/twitter/twemoji) (Copyright 2020 Twitter, Inc and other contributors), licensed [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). The favicon uses [`1f36f.svg`](https://github.com/twitter/twemoji/blob/v14.0.2/assets/svg/1f36f.svg), the flags come from [country-flag-emoji-polyfill](https://github.com/talkjs/country-flag-emoji-polyfill).
