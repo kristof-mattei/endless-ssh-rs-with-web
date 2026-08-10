@@ -31,8 +31,6 @@ libc = "=0.2.189"
 maxminddb = { version = "=0.30.0", features = ["mmap"] }
 memmap2 = "=0.9.11"
 mimalloc = "=0.1.52"
-mockall = "=0.15.0"
-mockall_double = "=0.3.1"
 rand = "=0.10.2"
 reqwest = { version = "=0.13.4", default-features = false, features = [
     "gzip",
@@ -83,6 +81,7 @@ url = { version = "=2.5.8", features = ["serde"] }
 uuid = { version = "=1.24.0", features = ["v7"] }
 
 [dev-dependencies]
+mockall = "=0.15.0"
 pretty_assertions = { version = "=1.4.1", features = ["unstable"] }
 ts-rs = { version = "=12.0.1", features = ["format"] }
 

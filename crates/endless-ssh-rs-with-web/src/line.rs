@@ -2,13 +2,11 @@ use ::rand::distr::uniform::{SampleRange, SampleUniform};
 use rand::RngExt as _;
 use rand::rngs::ThreadRng;
 
+#[cfg_attr(test, expect(clippy::disallowed_types, reason = "Macro"))]
 mod get_random {
-    #![expect(clippy::disallowed_types, reason = "Macro")]
-
     use ::rand::distr::uniform::{SampleRange, SampleUniform};
-    use mockall::automock;
 
-    #[automock]
+    #[cfg_attr(test, mockall::automock)]
     pub trait GetRandom {
         fn gen_range<T, R>(&mut self, range: R) -> T
         where
@@ -68,18 +66,16 @@ fn randline_from(mut rng: impl GetRandom, maxlen: usize) -> Vec<u8> {
 mod tests {
     use std::ops::RangeInclusive;
 
-    use mockall_double::double;
     use pretty_assertions::assert_eq;
 
-    #[double]
-    use crate::line::get_random::GetRandom;
+    use crate::line::get_random::MockGetRandom;
     use crate::line::randline_from;
 
     #[test]
     fn randline() {
         // given
         // mock rng
-        let mut mock_rng = GetRandom::new();
+        let mut mock_rng = MockGetRandom::new();
 
         // set random length to requested maximum length
         mock_rng
@@ -106,7 +102,7 @@ mod tests {
     fn randline_carriage_return_line_feed() {
         // given
         // mock rng
-        let mut ctx = GetRandom::new();
+        let mut ctx = MockGetRandom::new();
 
         // set random length to requested maximum length
         ctx.expect_gen_range::<usize, RangeInclusive<usize>>()
@@ -131,7 +127,7 @@ mod tests {
     fn randline_no_ssh_prefix() {
         // given
         // mock rng
-        let mut ctx = GetRandom::new();
+        let mut ctx = MockGetRandom::new();
 
         // set random length to requested maximum length
         ctx.expect_gen_range::<usize, RangeInclusive<usize>>()
