@@ -32,7 +32,7 @@
     },
     "dependencies": {
         "country-flag-emoji-polyfill": "0.1.10",
-        "ip-address": "10.4.0",
+        "ip-address": "10.5.0",
         "maplibre-gl": "6.2.0",
         "pretty-bytes": "7.1.1",
         "react": "19.2.8",
