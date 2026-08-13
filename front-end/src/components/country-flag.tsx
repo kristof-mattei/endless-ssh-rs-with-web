@@ -24,8 +24,9 @@ function countryFlag(code: null | string): null | string {
 
 export const CountryFlag: React.FC<Properties> = ({ countryCode, countryName }) => {
     return (
-        <span className="cursor-default flags-font text-lg" title={countryName ?? countryCode ?? undefined}>
-            {countryFlag(countryCode)}
+        <span className="cursor-default" title={countryName ?? countryCode ?? undefined}>
+            <span className="flags-font text-lg">{countryFlag(countryCode)}</span>
+            {countryName !== null && <span className="ml-1.5 text-gray-400">{countryName}</span>}
         </span>
     );
 };
