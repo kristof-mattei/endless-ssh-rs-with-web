@@ -2,6 +2,8 @@ import { render, screen } from "@testing-library/react";
 import type * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 
+import { useWebSocket } from "../hooks/use-web-sockets";
+
 import { App } from "./app";
 
 // maplibre requires WebGL, absent in jsdom
@@ -42,7 +44,7 @@ describe("App", () => {
             }),
         );
 
-        render(<App />);
+        render(<App useEventSource={useWebSocket} />);
 
         expect(screen.getByRole("heading", { level: 1, name: "endless-ssh-rs, an ssh honeypot" })).toBeDefined();
         expect(screen.getByText("connecting")).toBeDefined();

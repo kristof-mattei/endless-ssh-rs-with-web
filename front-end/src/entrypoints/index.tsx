@@ -6,9 +6,15 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import { App } from "../components/app";
+import { useDemoWebSocket } from "../hooks/use-demo-web-socket";
+import { useWebSocket } from "../hooks/use-web-sockets";
 
 polyfillCountryFlagEmojis(undefined, countryFlagsFontUrl);
 setWorkerUrl(maplibreWorkerUrl);
+
+// ?demo replaces the live WebSocket with locally generated random traffic
+const searchParameters = new URLSearchParams(globalThis.location.search);
+const useEventSource = searchParameters.has("demo") ? useDemoWebSocket : useWebSocket;
 
 const container = document.querySelector("#root");
 
@@ -17,6 +23,6 @@ const root = createRoot(container!);
 
 root.render(
     <StrictMode>
-        <App />
+        <App useEventSource={useEventSource} />
     </StrictMode>,
 );

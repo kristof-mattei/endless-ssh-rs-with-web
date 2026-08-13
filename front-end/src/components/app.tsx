@@ -2,7 +2,7 @@ import type * as React from "react";
 import { useReducer, useState } from "react";
 import { Temporal } from "temporal-polyfill";
 
-import { useWebSocket } from "../hooks/use-web-sockets";
+import type { WsEvent } from "../generated/WsEvent";
 import type { ConnectionStatus } from "../hooks/use-web-sockets";
 import { INITIAL_WS_STATE, wsReducer } from "../lib/ws-state";
 
@@ -39,13 +39,16 @@ function getTimezone(): string {
 
 const TIMEZONE = getTimezone();
 
-const CONNECTION_STATUS_STYLES: Record<ConnectionStatus, { dot: string; text: string }> = {
+type EventSourceStatus = "demo" | ConnectionStatus;
+
+const CONNECTION_STATUS_STYLES: Record<EventSourceStatus, { dot: string; text: string }> = {
     connecting: { dot: "bg-gray-500", text: "text-gray-400" },
+    demo: { dot: "bg-purple-500", text: "text-purple-400" },
     live: { dot: "bg-green-500", text: "text-green-400" },
     reconnecting: { dot: "bg-amber-500", text: "text-amber-400" },
 };
 
-const ConnectionBadge: React.FC<{ status: ConnectionStatus }> = ({ status }) => {
+const ConnectionBadge: React.FC<{ status: EventSourceStatus }> = ({ status }) => {
     const { dot, text } = CONNECTION_STATUS_STYLES[status];
 
     return (
@@ -56,14 +59,18 @@ const ConnectionBadge: React.FC<{ status: ConnectionStatus }> = ({ status }) => 
     );
 };
 
-export const App: React.FC = () => {
+interface Properties {
+    useEventSource: (options: { onEvent: (event: WsEvent) => void }) => { status: EventSourceStatus };
+}
+
+export const App: React.FC<Properties> = ({ useEventSource }) => {
     const [{ activeConnections, events, totalBytes, totalConnections, totalTimeSeconds }, dispatch] = useReducer(
         wsReducer,
         INITIAL_WS_STATE,
     );
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
-    const { status } = useWebSocket({ onEvent: dispatch });
+    const { status } = useEventSource({ onEvent: dispatch });
 
     return (
         <div className="min-h-screen bg-gray-950 p-4 text-white">
