@@ -28,6 +28,7 @@ export type WsEvent =
     latitude: number | null;
     longitude: number | null;
   }
+  | { "type": "bytes_sent"; ip: string; port: number; bytes_sent: number }
   | {
     "type": "disconnected";
     sequence: number;

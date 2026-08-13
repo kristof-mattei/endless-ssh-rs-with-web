@@ -37,6 +37,7 @@ const SPAWN_MIN_MS = 500;
 const SPAWN_MAX_MS = 3000;
 const LIFETIME_MIN_MS = 5000;
 const LIFETIME_MAX_MS = 60_000;
+const BYTES_TICK_MS = 2000;
 
 function randomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -88,6 +89,7 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
             const ip = randomIp();
             const port = randomInt(1024, 65_535);
             const connectedAt = Temporal.Now.instant();
+            const lifetimeMs = randomInt(LIFETIME_MIN_MS, LIFETIME_MAX_MS);
 
             onEvent({
                 type: "connected",
@@ -97,7 +99,20 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
                 ...geo,
             });
 
-            schedule(randomInt(LIFETIME_MIN_MS, LIFETIME_MAX_MS), () => {
+            let bytesSent = 0;
+
+            // every tick lands before the disconnect, so nothing needs cancelling
+            for (let at = BYTES_TICK_MS; at < lifetimeMs; at += BYTES_TICK_MS) {
+                bytesSent += randomInt(4, 16);
+
+                const total = bytesSent;
+
+                schedule(at, () => {
+                    onEvent({ type: "bytes_sent", ip, port, bytes_sent: total });
+                });
+            }
+
+            schedule(lifetimeMs, () => {
                 const disconnectedAt = Temporal.Now.instant();
                 const timeSpent = Math.round((disconnectedAt.epochMilliseconds - connectedAt.epochMilliseconds) / 1000);
 
@@ -111,7 +126,7 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
                     connected_at: connectedAt.toString(),
                     disconnected_at: disconnectedAt.toString(),
                     time_spent: timeSpent,
-                    bytes_sent: randomInt(2, 8) * timeSpent,
+                    bytes_sent: bytesSent,
                     ...geo,
                 });
             });

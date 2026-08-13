@@ -183,6 +183,11 @@ async fn listen_forever(
             time_spent += config.delay;
             bytes_sent += sent;
 
+            // try_send: a full channel drops this update, but the next one has the updated running total
+            let _r = context
+                .internal_events_tx
+                .try_send(ClientEvent::BytesSent { addr, bytes_sent });
+
             send_next = Instant::now() + config.delay;
         } else {
             // Send failed, ergo client is gone. If epoll was active it would have

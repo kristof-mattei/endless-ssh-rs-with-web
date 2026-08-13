@@ -9,6 +9,7 @@ export type ActiveConnectionInfo = {
   ip: string;
   port: number;
   connected_at: string;
+  bytes_sent: number;
   latitude: number | null;
   longitude: number | null;
   country_code: string | null;
