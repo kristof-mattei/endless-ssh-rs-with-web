@@ -1,4 +1,10 @@
 <!-- header goes here -->
+## [0.17.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.16.0..v0.17.0) - 2026-08-13
+
+### 🚀 Features
+
+- Add `?demo` mode with a fake WebSocket event source by [@kristof-mattei](https://github.com/kristof-mattei) ([`16ed115`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/16ed1154052f1160bb7a80f8aac3fa15a11581d9))
+- Show active connections by [@kristof-mattei](https://github.com/kristof-mattei) ([`0c9b3fe`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0c9b3fe001f5aeed7c825f1be1d2aceaeed4cfed))
 ## [0.16.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.15.0..v0.16.0) - 2026-08-13
 
 ### 🚀 Features
