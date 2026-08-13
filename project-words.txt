@@ -115,6 +115,7 @@ Twemoji
 typesystem
 Uninit
 uninlined
+unovis
 unrs
 unseparated
 unstub

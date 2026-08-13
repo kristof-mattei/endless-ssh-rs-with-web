@@ -3,6 +3,7 @@ catalogs:
     eslint: "10.8.1"
     vite: "8.2.1"
 allowBuilds:
+  maplibre-gl: false
   unrs-resolver: false
 overrides:
   "@codecov/vite-plugin>vite": "catalog:default"
