@@ -4,25 +4,10 @@ import { Temporal } from "temporal-polyfill";
 import type { DisconnectedEvent } from "../hooks/use-web-sockets";
 import { formatBytes, formatDuration, formatIp } from "../lib/formatting";
 
+import { CountryFlag } from "./country-flag";
+
 interface Properties {
     events: DisconnectedEvent[];
-}
-
-function countryFlag(code: null | string): string {
-    if (code?.length !== 2) {
-        return "🌐";
-    }
-
-    // prettier-ignore
-    const base = 0x01_F1_E6;
-    const upper = code.toUpperCase();
-    const cp0 = upper.codePointAt(0);
-    const cp1 = upper.codePointAt(1);
-
-    if (cp0 === undefined || cp1 === undefined) {
-        return "🌐";
-    }
-    return String.fromCodePoint(base + cp0 - 65) + String.fromCodePoint(base + cp1 - 65);
 }
 
 function disconnectedAtToHumanReadable(disconnectedAt: string): string {
@@ -43,15 +28,10 @@ const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
 
     return (
         <div className="col-span-full grid grid-cols-subgrid items-center rounded-sm bg-gray-800 px-3 py-2 text-sm">
-            <span
-                className="cursor-default flags-font text-lg"
-                title={event.country_name ?? event.country_code ?? undefined}
-            >
-                {countryFlag(event.country_code)}
-            </span>
+            <CountryFlag countryCode={event.country_code} countryName={event.country_name} />
             <span className="truncate text-gray-400">{event.city ?? event.country_name ?? "Unknown"}</span>
             <span className="truncate font-mono text-gray-300">{formatIp(event.ip)}</span>
-            <span className="truncate font-mono text-gray-300">{disconnectedAt}</span>
+            <span className="truncate pl-3 text-right font-mono text-gray-300">{disconnectedAt}</span>
             <span className="text-right text-red-400">{formatDuration(event.time_spent)}</span>
             <span className="text-right text-gray-500">{formatBytes(event.bytes_sent)}</span>
         </div>
