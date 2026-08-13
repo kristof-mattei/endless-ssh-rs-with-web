@@ -41,7 +41,7 @@ const ConnectionRow: React.FC<{ connection: ActiveConnectionInfo; now: Temporal.
     return (
         <div className="col-span-full grid grid-cols-subgrid items-center rounded-sm bg-gray-800 px-3 py-2 text-sm">
             <CountryFlag countryCode={connection.country_code} countryName={connection.country_name} />
-            <span className="truncate text-gray-400">{connection.city ?? connection.country_name ?? "Unknown"}</span>
+            <span className="truncate text-gray-400">{connection.city ?? "Unknown"}</span>
             <span className="truncate font-mono text-gray-300" title={ip}>
                 {ip}
             </span>
