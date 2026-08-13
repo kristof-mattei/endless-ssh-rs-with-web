@@ -57,7 +57,7 @@ export const ActiveConnections: React.FC<Properties> = ({ activeConnections }) =
 
     return (
         <div className="flex h-[350px] flex-col rounded-lg bg-gray-900 p-3">
-            <h3 className="mb-2 text-sm font-semibold text-gray-400">Current connections</h3>
+            <h3 className="mb-2 text-sm font-semibold text-gray-400">Active connections</h3>
 
             <div className="grid min-h-0 flex-1 grid-cols-[auto_minmax(0,max-content)_minmax(3rem,1fr)_max-content] content-start gap-x-3 gap-y-1 overflow-y-auto">
                 {activeConnections.length === 0 && (
