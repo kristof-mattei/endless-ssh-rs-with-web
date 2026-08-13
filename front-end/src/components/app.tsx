@@ -1,6 +1,5 @@
 import type * as React from "react";
 import { useReducer, useState } from "react";
-import { Temporal } from "temporal-polyfill";
 
 import type { WsEvent } from "../generated/WsEvent";
 import type { ConnectionStatus } from "../hooks/use-web-sockets";
@@ -13,32 +12,6 @@ import { StatsPanel } from "./stats-panel";
 import { TimeRangeSelector } from "./time-range-selector";
 import type { StatsData } from "./time-range-selector";
 import { WorldMap } from "./world-map";
-
-function getTimezone(): string {
-    const now: Temporal.ZonedDateTime = Temporal.Now.zonedDateTimeISO();
-
-    // signHH:MM as a string offset (e.g., -07:00)
-    const offset = now.offset;
-
-    const format = new Intl.DateTimeFormat([], {
-        timeZone: now.timeZoneId,
-        timeZoneName: "long",
-    });
-    const parts = format.formatToParts();
-
-    // long-form descriptive name
-    const timeZoneName = parts.find((p) => {
-        return p.type === "timeZoneName";
-    });
-
-    if (timeZoneName === undefined) {
-        return `GMT ${offset}`;
-    }
-
-    return `${timeZoneName.value}, GMT ${offset}`;
-}
-
-const TIMEZONE = getTimezone();
 
 type EventSourceStatus = "demo" | ConnectionStatus;
 
@@ -109,9 +82,6 @@ export const App: React.FC<Properties> = ({ useEventSource }) => {
             </section>
 
             <section>
-                <h2 className="mb-2 text-lg font-semibold text-gray-300">
-                    Recent disconnections (times in {TIMEZONE})
-                </h2>
                 <EventFeed events={events} />
             </section>
         </div>
