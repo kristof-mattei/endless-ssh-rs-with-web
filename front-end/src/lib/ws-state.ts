@@ -68,6 +68,7 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
                         ip: event.ip,
                         port: event.port,
                         connected_at: event.connected_at,
+                        bytes_sent: 0,
                         latitude: event.latitude,
                         longitude: event.longitude,
                         country_code: event.country_code,
@@ -75,6 +76,14 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
                         city: event.city,
                     },
                 ],
+            };
+        }
+        case "bytes_sent": {
+            return {
+                ...state,
+                activeConnections: state.activeConnections.map((c) => {
+                    return c.ip === event.ip && c.port === event.port ? { ...c, bytes_sent: event.bytes_sent } : c;
+                }),
             };
         }
         case "disconnected": {

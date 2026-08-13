@@ -63,6 +63,7 @@ function activeConnection(ip: string, overrides?: Partial<Omit<ActiveConnectionI
         ip,
         port: 50_000,
         connected_at: "2026-07-27T09:00:00Z",
+        bytes_sent: 0,
         latitude: null,
         longitude: null,
         country_code: null,
@@ -140,6 +141,31 @@ describe("wsReducer", () => {
                     return c.port;
                 }),
             ).toEqual([1111, 2222]);
+        });
+    });
+
+    describe("bytes_sent", () => {
+        it("updates only the matching connection", () => {
+            const state = applyEvents(INITIAL_WS_STATE, [
+                init(),
+                READY,
+                connected("198.51.100.7", 1111),
+                connected("198.51.100.7", 2222),
+                { type: "bytes_sent", ip: "198.51.100.7", port: 2222, bytes_sent: 96 },
+            ]);
+
+            expect(
+                state.activeConnections.map((c) => {
+                    return c.bytes_sent;
+                }),
+            ).toEqual([0, 96]);
+        });
+
+        it("ignores an update for an unknown connection", () => {
+            const before = applyEvents(INITIAL_WS_STATE, [init(), READY, connected("198.51.100.7", 1111)]);
+            const after = wsReducer(before, { type: "bytes_sent", ip: "198.51.100.8", port: 1111, bytes_sent: 96 });
+
+            expect(after.activeConnections).toEqual(before.activeConnections);
         });
     });
 

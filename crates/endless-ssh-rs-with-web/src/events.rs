@@ -19,6 +19,10 @@ pub enum ClientEvent {
         addr: SocketAddr,
         connected_at: OffsetDateTime,
     },
+    BytesSent {
+        addr: SocketAddr,
+        bytes_sent: usize,
+    },
     Disconnected {
         addr: SocketAddr,
         connected_at: OffsetDateTime,
@@ -56,6 +60,11 @@ pub enum WsEvent {
         latitude: Option<f64>,
         longitude: Option<f64>,
     },
+    BytesSent {
+        ip: IpAddr,
+        port: u16,
+        bytes_sent: usize,
+    },
     Disconnected {
         sequence: i64,
         ip: IpAddr,
@@ -89,6 +98,7 @@ pub struct ActiveConnectionInfo {
     #[serde(with = "time::serde::rfc3339")]
     #[cfg_attr(test, ts(type = "string"))]
     pub connected_at: OffsetDateTime,
+    pub bytes_sent: usize,
     pub latitude: Option<f64>,
     pub longitude: Option<f64>,
     pub country_code: Option<String>,
@@ -148,6 +158,7 @@ async fn handle_event(
                 ip: addr.ip(),
                 port: addr.port(),
                 connected_at,
+                bytes_sent: 0,
                 latitude: geo.as_ref().and_then(|g| g.latitude),
                 longitude: geo.as_ref().and_then(|g| g.longitude),
                 country_code: geo.as_ref().and_then(|g| g.country_code.clone()),
@@ -174,6 +185,19 @@ async fn handle_event(
 
             // ignore send errors, no WS clients connected is fine
             let _r = ws_broadcast_tx.send(ws_event);
+        },
+
+        ClientEvent::BytesSent { addr, bytes_sent } => {
+            if let Some(mut info) = active_connections.get_mut(&addr) {
+                info.bytes_sent = bytes_sent;
+            }
+
+            // ignore send errors, no WS clients connected is fine
+            let _r = ws_broadcast_tx.send(WsEvent::BytesSent {
+                ip: addr.ip(),
+                port: addr.port(),
+                bytes_sent,
+            });
         },
 
         ClientEvent::Disconnected {
