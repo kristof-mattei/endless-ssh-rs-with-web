@@ -1,4 +1,18 @@
 <!-- header goes here -->
+## [0.18.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.17.0..v0.18.0) - 2026-08-13
+
+### 🚀 Features
+
+- Show country name beside the flag by [@kristof-mattei](https://github.com/kristof-mattei) ([`a776e00`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a776e00208273590b9aacfcdbfbd7548ac988b05))
+- Stream live bytes sent per active connection by [@kristof-mattei](https://github.com/kristof-mattei) ([`2de9897`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2de9897664945e546aeba88d6f2f9e58c4228628))
+
+### 🐛 Bug Fixes
+
+- Rename the connections panel to "Active connections" by [@kristof-mattei](https://github.com/kristof-mattei) ([`d858b71`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d858b7160f2fc923b0277419e5f7c89722940a37))
+
+### 🚜 Refactor
+
+- Move the disconnections heading into `EventFeed` by [@kristof-mattei](https://github.com/kristof-mattei) ([`8afdf77`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8afdf77083550ab787b1964644e653253b0fc464))
 ## [0.17.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.16.0..v0.17.0) - 2026-08-13
 
 ### 🚀 Features
