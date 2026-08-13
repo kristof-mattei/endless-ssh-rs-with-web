@@ -6,6 +6,7 @@ import type { WsEvent } from "../generated/WsEvent";
 import type { ConnectionStatus } from "../hooks/use-web-sockets";
 import { INITIAL_WS_STATE, wsReducer } from "../lib/ws-state";
 
+import { ActiveConnections } from "./active-connections";
 import { EventFeed } from "./event-feed";
 import { StatsChart } from "./stats-chart";
 import { StatsPanel } from "./stats-panel";
@@ -91,7 +92,12 @@ export const App: React.FC<Properties> = ({ useEventSource }) => {
                     activeConnectionsCount={activeConnections.length}
                 />
 
-                <WorldMap activeConnections={activeConnections} />
+                <div className="grid gap-3 lg:grid-cols-4">
+                    <div className="lg:col-span-3">
+                        <WorldMap activeConnections={activeConnections} />
+                    </div>
+                    <ActiveConnections activeConnections={activeConnections} />
+                </div>
             </section>
 
             <section className="mb-6 space-y-2">
