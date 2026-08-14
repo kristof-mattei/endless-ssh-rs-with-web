@@ -9,7 +9,7 @@ import type { StatsRow } from "../generated/StatsRow";
 
 import { formatBytes, formatDuration } from "../lib/formatting";
 import type { BucketPoint, BucketPointValues } from "../lib/stats-buckets";
-import { aggregate } from "../lib/stats-buckets";
+import { aggregate, snapUpToBucket } from "../lib/stats-buckets";
 
 type Metric = keyof BucketPointValues;
 
@@ -144,7 +144,7 @@ function getTickValues(from: Temporal.Instant, to: Temporal.Instant, intervalMs:
     const values: number[] = [];
 
     for (let cursor = first; cursor.epochMilliseconds < endMs; cursor = cursor.add(step)) {
-        const bucketMs = Math.ceil(cursor.epochMilliseconds / intervalMs) * intervalMs;
+        const bucketMs = snapUpToBucket(cursor.epochMilliseconds, intervalMs);
 
         if (bucketMs < endMs) {
             values.push(bucketMs);
