@@ -205,7 +205,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                         onClick={() => {
                             handleChange(r.value);
                         }}
-                        className={`rounded-sm px-3 py-1 text-sm transition-colors ${
+                        className={`rounded-sm px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
                             selected === r.value
                                 ? "bg-blue-600 text-white"
                                 : "bg-gray-700 text-gray-300 hover:bg-gray-600"
@@ -223,7 +223,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                 disabled={isRefreshing}
                 title="Refresh"
                 aria-label="Refresh"
-                className="ml-2 rounded-sm bg-gray-700 px-3 py-1 text-sm text-gray-300 transition-colors hover:bg-gray-600"
+                className="ml-2 rounded-sm bg-gray-700 px-3 py-1 text-sm text-gray-300 transition-colors hover:bg-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
             >
                 <span aria-hidden="true" className={`inline-block ${isRefreshing ? "animate-spin" : ""}`}>
                     ↻
@@ -238,7 +238,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                 onChange={(event) => {
                     setRefreshSeconds(event.target.value === "off" ? null : Number(event.target.value));
                 }}
-                className="rounded-sm bg-gray-700 px-2 py-1 text-sm text-gray-300"
+                className="rounded-sm bg-gray-700 px-2 py-1 text-sm text-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
             >
                 <option value="off">Off</option>
                 {REFRESH_INTERVALS.map((interval) => {
@@ -255,7 +255,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                     Failed to load stats.{" "}
                     <button
                         type="button"
-                        className="underline"
+                        className="underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                         onClick={() => {
                             void refresh();
                         }}

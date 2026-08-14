@@ -350,7 +350,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                             onClick={() => {
                                 setMetric(metric.value);
                             }}
-                            className={`rounded-sm px-3 py-1 text-sm transition-colors ${
+                            className={`rounded-sm px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
                                 selectedMetric === metric.value
                                     ? "bg-blue-600 text-white"
                                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"
@@ -366,7 +366,11 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                 <p className="py-8 text-center text-gray-500">No data for selected range</p>
             ) : (
                 <ResponsiveContainer width="100%" height={220}>
-                    <Typed.BarChart data={points} margin={{ bottom: 8, left: 8, right: 16, top: 8 }}>
+                    <Typed.BarChart
+                        className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                        data={points}
+                        margin={{ bottom: 8, left: 8, right: 16, top: 8 }}
+                    >
                         <CartesianGrid stroke="#374151" strokeDasharray="3 3" vertical={false} />
                         <Typed.XAxis
                             axisLine={{ stroke: "#4b5563" }}
