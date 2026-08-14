@@ -11,6 +11,7 @@ import { StatsChart } from "./stats-chart";
 import { StatsPanel } from "./stats-panel";
 import { TimeRangeSelector } from "./time-range-selector";
 import type { StatsData } from "./time-range-selector";
+import { TopCountries } from "./top-countries";
 import { WorldMap } from "./world-map";
 
 type EventSourceStatus = "demo" | ConnectionStatus;
@@ -79,12 +80,17 @@ export const App: React.FC<Properties> = ({ useEventSource }) => {
                 <TimeRangeSelector isLive={status === "live"} onData={setStatsData} />
 
                 {statsData !== null && (
-                    <StatsChart
-                        rows={statsData.rows}
-                        bucketMs={statsData.bucketMs}
-                        from={statsData.from}
-                        to={statsData.to}
-                    />
+                    <div className="grid gap-3 lg:grid-cols-4">
+                        <div className="lg:col-span-3">
+                            <StatsChart
+                                rows={statsData.rows}
+                                bucketMs={statsData.bucketMs}
+                                from={statsData.from}
+                                to={statsData.to}
+                            />
+                        </div>
+                        <TopCountries rows={statsData.rows} />
+                    </div>
                 )}
             </section>
 

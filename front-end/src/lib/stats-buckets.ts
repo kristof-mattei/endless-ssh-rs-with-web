@@ -12,6 +12,42 @@ export type BucketPoint = {
     bucket: Temporal.Instant;
 } & BucketPointValues;
 
+export interface CountryTotals {
+    country_code: null | string;
+    connects: number;
+    bytes_sent: number;
+    time_spent: number;
+}
+
+export function topCountries(rows: StatsRow[], limit: number): CountryTotals[] {
+    const map = new Map<null | string, CountryTotals>();
+
+    for (const row of rows) {
+        const existing = map.get(row.country_code);
+
+        if (existing === undefined) {
+            map.set(row.country_code, {
+                country_code: row.country_code,
+                connects: row.connects,
+                bytes_sent: row.bytes_sent,
+                time_spent: row.time_spent,
+            });
+        } else {
+            existing.connects += row.connects;
+            existing.bytes_sent += row.bytes_sent;
+            existing.time_spent += row.time_spent;
+        }
+    }
+
+    return map
+        .values()
+        .toArray()
+        .sort((a, b) => {
+            return b.connects - a.connects;
+        })
+        .slice(0, limit);
+}
+
 export function aggregate(
     rows: StatsRow[],
     from: Temporal.Instant,

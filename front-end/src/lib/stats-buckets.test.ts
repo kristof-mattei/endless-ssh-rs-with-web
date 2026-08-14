@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { StatsRow } from "../generated/StatsRow";
 
-import { aggregate } from "../lib/stats-buckets";
+import { aggregate, topCountries } from "./stats-buckets";
 
 const MINUTE_MS = 60_000;
 
@@ -76,5 +76,49 @@ describe("aggregate", () => {
                 return p.bucket.toString();
             }),
         ).toEqual(["2026-01-01T00:01:00Z", "2026-01-01T00:02:00Z", "2026-01-01T00:03:00Z"]);
+    });
+});
+
+describe("topCountries", () => {
+    it("sums a country across buckets", () => {
+        const totals = topCountries(
+            [
+                row("2026-01-01T00:01:00Z", { connects: 2, bytes_sent: 100 }),
+                row("2026-01-01T00:02:00Z", { connects: 3, bytes_sent: 50 }),
+            ],
+            5,
+        );
+
+        expect(totals).toEqual([{ country_code: "US", connects: 5, bytes_sent: 150, time_spent: 20 }]);
+    });
+
+    it("sorts by connects descending and truncates to the limit", () => {
+        const totals = topCountries(
+            [
+                row("2026-01-01T00:01:00Z", { country_code: "US", connects: 1 }),
+                row("2026-01-01T00:01:00Z", { country_code: "DE", connects: 3 }),
+                row("2026-01-01T00:01:00Z", { country_code: "FR", connects: 2 }),
+            ],
+            2,
+        );
+
+        expect(
+            totals.map((t) => {
+                return t.country_code;
+            }),
+        ).toEqual(["DE", "FR"]);
+    });
+
+    it("groups rows without a country under one entry", () => {
+        const totals = topCountries(
+            [
+                row("2026-01-01T00:01:00Z", { country_code: null, connects: 1 }),
+                row("2026-01-01T00:02:00Z", { country_code: null, connects: 1 }),
+            ],
+            5,
+        );
+
+        expect(totals).toHaveLength(1);
+        expect(totals[0]).toMatchObject({ country_code: null, connects: 2 });
     });
 });
