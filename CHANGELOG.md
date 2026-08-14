@@ -1,4 +1,26 @@
 <!-- header goes here -->
+## [0.19.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.18.1..v0.19.0) - 2026-08-14
+
+### 🚀 Features
+
+- Detect half-dead websockets with a heartbeat and watchdog by [@kristof-mattei](https://github.com/kristof-mattei) ([`274318b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/274318bd3146a5705a11e89305222c1209d9e3c5))
+- Top attacker countries panel for the selected range by [@kristof-mattei](https://github.com/kristof-mattei) ([`2a8feb6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2a8feb6819ccb47c62f0b56eb0d673078b3ff82c))
+
+### 🐛 Bug Fixes
+
+- [**breaking**] Rebucket the rollup chain on `disconnected_at` by [@kristof-mattei](https://github.com/kristof-mattei) ([`e1e620f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e1e620f9ef594bd6b418072ec34dbda1c7d5b45a))
+- Pick the stats tier by retention and return the bucket width used by [@kristof-mattei](https://github.com/kristof-mattei) ([`7ef6fa2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7ef6fa2eeea722198d7d084f2ece315ba571f167))
+- Stop hardcoding "all time" at 365 days by [@kristof-mattei](https://github.com/kristof-mattei) ([`a93a7ec`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a93a7ec714d5970fa4d15344b1fdcdee629790d2))
+- Serve the open-ended stats query as weekly buckets past two years by [@kristof-mattei](https://github.com/kristof-mattei) ([`341f29b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/341f29b91aeeacb7a937af7182f1d7af47a1039d))
+
+### 🚜 Refactor
+
+- Track delivery progress only in the reducer by [@kristof-mattei](https://github.com/kristof-mattei) ([`cd7345f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/cd7345fbe1747a358df0bbda4fdac4736b65dbe2))
+
+### 🧪 Testing
+
+- Cover `formatDuration`, `CountryFlag`, and `aggregate` by [@kristof-mattei](https://github.com/kristof-mattei) ([`c056a07`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c056a073fecc2f4b01bccd0a5f00c2369a1d7d76))
+- Cover the heartbeat watchdog by [@kristof-mattei](https://github.com/kristof-mattei) ([`7f833bd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7f833bd956019249e6ed9692ff3cf872602c8b2c))
 ## [0.18.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.18.0..v0.18.1) - 2026-08-14
 
 ### 🐛 Bug Fixes
