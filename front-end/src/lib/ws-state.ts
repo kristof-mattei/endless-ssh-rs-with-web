@@ -51,6 +51,10 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
             // the server's replay-done marker, nothing to update
             return state;
         }
+        case "heartbeat": {
+            // liveness only, the hook's watchdog consumes it
+            return state;
+        }
         case "connected": {
             const isKnown = state.activeConnections.some((c) => {
                 return c.ip === event.ip && c.port === event.port;

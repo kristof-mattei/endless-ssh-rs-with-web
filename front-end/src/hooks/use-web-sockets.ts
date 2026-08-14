@@ -17,6 +17,9 @@ const BASE_BACKOFF_MS = 500;
 const MAX_BACKOFF_MS = 30_000;
 const STABLE_CONNECTION_MS = 5000;
 
+// three missed server heartbeats (30 seconds each); a half-dead connection never fires close on its own
+const WATCHDOG_TIMEOUT_MS = 90_000;
+
 // RFC 6455 close code 1000, Normal Closure
 const NORMAL_CLOSURE_CODE = 1000;
 
@@ -56,7 +59,17 @@ export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus }
         let socket: null | WebSocket = null;
         let retryTimer: null | ReturnType<typeof setTimeout> = null;
         let stableTimer: null | ReturnType<typeof setTimeout> = null;
+        let watchdogTimer: null | ReturnType<typeof setTimeout> = null;
         let backoff = BASE_BACKOFF_MS;
+
+        function clearWatchdog(): void {
+            if (watchdogTimer === null) {
+                return;
+            }
+
+            clearTimeout(watchdogTimer);
+            watchdogTimer = null;
+        }
 
         function connect(): void {
             const since = lastSequenceReference.current;
@@ -66,10 +79,21 @@ export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus }
             const ws = new WebSocket(url);
             socket = ws;
 
+            function armWatchdog(): void {
+                clearWatchdog();
+
+                watchdogTimer = setTimeout(() => {
+                    // nothing received within the window, the connection is half-dead: force the reconnect path
+                    closeSocket(ws);
+                }, WATCHDOG_TIMEOUT_MS);
+            }
+
             ws.addEventListener("open", () => {
                 if (isDisposed) {
                     return;
                 }
+
+                armWatchdog();
 
                 setStatus("live");
 
@@ -83,6 +107,9 @@ export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus }
                 if (isDisposed) {
                     return;
                 }
+
+                // any frame proves liveness, heartbeats included
+                armWatchdog();
 
                 if (typeof message.data !== "string") {
                     console.error("Ignoring non-text WebSocket frame", message.data);
@@ -120,6 +147,8 @@ export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus }
                     clearTimeout(stableTimer);
                     stableTimer = null;
                 }
+
+                clearWatchdog();
 
                 if (isDisposed) {
                     return;
@@ -173,6 +202,8 @@ export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus }
             if (stableTimer !== null) {
                 clearTimeout(stableTimer);
             }
+
+            clearWatchdog();
 
             if (socket !== null) {
                 closeSocket(socket);

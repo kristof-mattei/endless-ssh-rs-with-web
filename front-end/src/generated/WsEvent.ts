@@ -17,6 +17,7 @@ export type WsEvent =
     last_counted_id: number;
   }
   | { "type": "ready" }
+  | { "type": "heartbeat" }
   | {
     "type": "connected";
     ip: string;

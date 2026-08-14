@@ -48,6 +48,7 @@ pub enum WsEvent {
         last_counted_id: i64,
     },
     Ready,
+    Heartbeat,
     Connected {
         ip: IpAddr,
         port: u16,
