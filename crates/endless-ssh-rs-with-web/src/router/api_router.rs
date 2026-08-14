@@ -54,7 +54,7 @@ async fn stats_handler(
     };
 
     match db::get_stats(&state.db_pool, from_to).await {
-        Ok(rows) => Json(rows).into_response(),
+        Ok(response) => Json(response).into_response(),
         Err(error) => {
             event!(Level::ERROR, ?error, "Stats query failed");
 

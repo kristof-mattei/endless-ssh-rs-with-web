@@ -58,7 +58,7 @@ function formatYLabel(metric: Metric, value: number): string {
 }
 
 // Axis ticks and tooltip headers need different precision. Tick values from `getTickValues` sit on round boundaries (whole hours, midnights, month starts),
-// while the tooltip shows a single bucket at the interval from `getBucketIntervalMs`.
+// while the tooltip shows a single bucket at the interval the backend aggregated at.
 function formatDayTick(instant: Temporal.Instant): string {
     return instant.toLocaleString([], { day: "numeric", month: "short" });
 }
@@ -90,48 +90,14 @@ function getTickFormatter(spanHours: number): (instant: Temporal.Instant) => str
     return formatMonthTick;
 }
 
-function getBucketLabelOptions(spanHours: number): Intl.DateTimeFormatOptions {
-    if (spanHours <= 24) {
-        return { hour: "2-digit", minute: "2-digit" };
-    }
+const DAY_MS = 24 * 60 * 60 * 1000;
 
-    if (spanHours <= 24 * 30) {
+function getBucketLabelOptions(bucketMs: number): Intl.DateTimeFormatOptions {
+    if (bucketMs < DAY_MS) {
         return { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" };
     }
 
     return { day: "numeric", month: "short", year: "numeric" };
-}
-
-// Mirrors the bucket selections buttons, and thus the backend's representation.
-function getBucketIntervalMs(from: Temporal.Instant, to: Temporal.Instant): number {
-    const MILLISECONDS_IN_SECOND = 1000;
-    const SECONDS_IN_MINUTE = 60;
-    const MINUTES_IN_HOUR = 60;
-    const HOURS_IN_DAY = 24;
-
-    const spanHours = from.until(to).total("hours");
-
-    // last hour & last 24 hours
-    if (spanHours <= 24) {
-        // 1 min buckets
-        return SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND;
-    }
-
-    // last 7 days
-    if (spanHours <= 24 * 7) {
-        // 5 min buckets
-        return 5 * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND;
-    }
-
-    // last 30 days
-    if (spanHours <= 24 * 30) {
-        // 1 hour buckets
-        return MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND;
-    }
-
-    // all time
-    // 1 day buckets
-    return HOURS_IN_DAY * MINUTES_IN_HOUR * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND;
 }
 
 function getFirstTickAndStep(
@@ -176,12 +142,11 @@ function getFirstTickAndStep(
 // The x axis is categorical, one band per bucket, so recharts' default ticks land on arbitrary buckets.
 // Tick values are computed on local calendar boundaries instead, then snapped up to the bucket grid because
 // a boundary is only a bucket when the UTC offset divides the bucket interval.
-function getTickValues(from: Temporal.Instant, to: Temporal.Instant): number[] {
+function getTickValues(from: Temporal.Instant, to: Temporal.Instant, intervalMs: number): number[] {
     const spanHours = from.until(to).total("hours");
     const start = from.toZonedDateTimeISO(Temporal.Now.timeZoneId());
     const { first, step } = getFirstTickAndStep(start, spanHours);
 
-    const intervalMs = getBucketIntervalMs(from, to);
     const endMs = to.epochMilliseconds;
 
     const values: number[] = [];
@@ -197,7 +162,7 @@ function getTickValues(from: Temporal.Instant, to: Temporal.Instant): number[] {
     return values;
 }
 
-function aggregate(rows: StatsRow[], from: Temporal.Instant, to: Temporal.Instant): BucketPoint[] {
+function aggregate(rows: StatsRow[], from: Temporal.Instant, to: Temporal.Instant, intervalMs: number): BucketPoint[] {
     const map = new Map<number, BucketPoint>();
 
     for (const row of rows) {
@@ -221,7 +186,6 @@ function aggregate(rows: StatsRow[], from: Temporal.Instant, to: Temporal.Instan
 
     // Fill in zero-value entries for every bucket in [from, to) that has no data.
     // TimescaleDB aligns buckets to the Unix epoch, so rounding to intervalMs works.
-    const intervalMs = getBucketIntervalMs(from, to);
     const startMs = Math.ceil(from.epochMilliseconds / intervalMs) * intervalMs;
 
     for (let ms = startMs; ms < to.epochMilliseconds; ms += intervalMs) {
@@ -245,6 +209,7 @@ function aggregate(rows: StatsRow[], from: Temporal.Instant, to: Temporal.Instan
 
 interface Properties {
     rows: StatsRow[];
+    bucketMs: number;
     from: Temporal.Instant;
     to: Temporal.Instant;
 }
@@ -326,17 +291,17 @@ function useRechartsDevtools(): {
     return devtools;
 }
 
-export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
+export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) => {
     const developmentTools = useRechartsDevtools();
 
     const [selectedMetric, setMetric] = useState<Metric>("connects");
 
-    const points = aggregate(rows, from, to);
+    const points = aggregate(rows, from, to, bucketMs);
 
     const spanHours = from.until(to).total("hours");
     const formatTickLabel = getTickFormatter(spanHours);
-    const bucketLabelOptions = getBucketLabelOptions(spanHours);
-    const tickValues = getTickValues(from, to);
+    const bucketLabelOptions = getBucketLabelOptions(bucketMs);
+    const tickValues = getTickValues(from, to, bucketMs);
 
     return (
         <div className="rounded-lg bg-gray-800 p-4">
