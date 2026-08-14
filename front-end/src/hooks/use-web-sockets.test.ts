@@ -246,6 +246,36 @@ describe("useWebSocket", () => {
         expect(latestSocket().url).toContain("/api/ws?since=42");
     });
 
+    it("force-closes a half-dead connection when the watchdog expires", () => {
+        renderWebSocketHook();
+
+        openLatest();
+
+        advance(89_999);
+        expect(latestSocket().closeCalls).toEqual([]);
+
+        advance(1);
+        expect(latestSocket().closeCalls).toEqual([NORMAL_CLOSURE_CODE]);
+    });
+
+    it("re-arms the watchdog on any frame", () => {
+        renderWebSocketHook();
+
+        openLatest();
+        advance(60_000);
+
+        act(() => {
+            latestSocket().serverMessage(JSON.stringify({ type: "heartbeat" }));
+        });
+
+        // 120 seconds since open, but only 60 since the last frame
+        advance(60_000);
+        expect(latestSocket().closeCalls).toEqual([]);
+
+        advance(30_000);
+        expect(latestSocket().closeCalls).toEqual([NORMAL_CLOSURE_CODE]);
+    });
+
     it("ignores malformed and non-text frames", () => {
         const consoleError = vi.spyOn(console, "error").mockImplementation(() => {
             // suppress the expected noise
