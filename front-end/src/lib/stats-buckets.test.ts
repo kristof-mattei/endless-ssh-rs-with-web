@@ -136,16 +136,4 @@ describe("topCountries", () => {
         expect(totals).toHaveLength(1);
         expect(totals[0]).toMatchObject({ country_code: null, connects: 2 });
     });
-
-    it("takes the name from any row that has one", () => {
-        const totals = topCountries(
-            [
-                row("2026-01-01T00:01:00Z", { country_name: null }),
-                row("2026-01-01T00:02:00Z", { country_name: "United States" }),
-            ],
-            5,
-        );
-
-        expect(totals[0]).toMatchObject({ country_code: "US", country_name: "United States" });
-    });
 });

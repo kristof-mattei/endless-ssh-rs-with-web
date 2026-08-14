@@ -42,9 +42,6 @@ export function topCountries(rows: StatsRow[], limit: number): CountryTotals[] {
                 time_spent: row.time_spent,
             });
         } else {
-            // archived buckets can predate the stored name, any row that has one wins
-            existing.country_name ??= row.country_name;
-
             existing.connects += row.connects;
             existing.bytes_sent += row.bytes_sent;
             existing.time_spent += row.time_spent;

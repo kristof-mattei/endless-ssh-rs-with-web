@@ -266,13 +266,13 @@ const TIERS: [Tier; 4] = [
         retention: Some(SignedDuration::days(7)),
     },
     Tier {
-        table: "connections_1h_all",
+        table: "connections_1h",
         bucket_seconds: 3600,
         max_span: Some(SignedDuration::days(30)),
         retention: Some(SignedDuration::days(40)),
     },
     Tier {
-        table: "connections_1day_all",
+        table: "connections_1day",
         bucket_seconds: 86400,
         max_span: None,
         retention: None,
@@ -337,7 +337,7 @@ pub async fn get_stats(
     } else {
         // the 1day tier grows forever, so past two years of history the open-ended query serves weeks to keep the row count bounded
         let oldest: Option<OffsetDateTime> =
-            sqlx::query_scalar("SELECT MIN(bucket) FROM connections_1day_all")
+            sqlx::query_scalar("SELECT MIN(bucket) FROM connections_1day")
                 .fetch_one(pool)
                 .await?;
 
@@ -356,7 +356,7 @@ pub async fn get_stats(
             , sum(time_spent) AS time_spent
             , sum(bytes_sent)::bigint AS bytes_sent
         FROM
-            connections_1day_all
+            connections_1day
         GROUP BY
             time_bucket ('7 days', bucket)
             , country_code
@@ -380,7 +380,7 @@ pub async fn get_stats(
             , time_spent
             , bytes_sent
         FROM
-            connections_1day_all
+            connections_1day
         ORDER BY
             bucket
         ",
