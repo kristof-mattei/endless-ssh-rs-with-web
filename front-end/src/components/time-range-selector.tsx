@@ -53,7 +53,7 @@ async function fetchStats(range: Range, onData: (data: StatsData) => void, signa
     });
 
     if (!response.ok) {
-        return;
+        throw new Error(`stats fetch failed with ${String(response.status)}`);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- data from trusted backend
@@ -69,6 +69,7 @@ interface Properties {
 export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
     const [selected, setSelected] = useState<Range>("24h");
     const [isLoading, setIsLoading] = useState(true);
+    const [hasError, setHasError] = useState(false);
     const [refreshSeconds, setRefreshSeconds] = useState<null | number>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -86,14 +87,24 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
             try {
                 await fetchStats(range, onData, controller.signal);
             } catch (error) {
-                if (!(error instanceof DOMException && error.name === "AbortError")) {
-                    throw error;
+                if (error instanceof DOMException && error.name === "AbortError") {
+                    return;
                 }
+
+                if (abortReference.current === controller) {
+                    setHasError(true);
+                }
+
+                return;
             } finally {
                 // only the newest fetch owns the loading state
                 if (abortReference.current === controller) {
                     setIsLoading(false);
                 }
+            }
+
+            if (abortReference.current === controller) {
+                setHasError(false);
             }
         },
         [onData],
@@ -211,6 +222,20 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
                 })}
             </select>
             {isLoading && <span className="ml-2 text-xs text-gray-500">Loading...</span>}
+            {hasError && !isLoading && (
+                <span className="ml-2 text-xs text-red-400">
+                    Failed to load stats.{" "}
+                    <button
+                        type="button"
+                        className="underline"
+                        onClick={() => {
+                            void refresh();
+                        }}
+                    >
+                        Retry
+                    </button>
+                </span>
+            )}
         </div>
     );
 };
