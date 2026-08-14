@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::extract::{Query, State};
 use axum::response::IntoResponse;
@@ -10,6 +12,9 @@ use crate::db;
 use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, Limit};
 use crate::events::{ActiveConnectionInfo, WsEvent};
 use crate::state::ApplicationState;
+
+/// The client's watchdog assumes a multiple of this before declaring the connection half-dead.
+const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 
 #[derive(Debug, Deserialize)]
 pub struct WsQueryParams {
@@ -167,6 +172,8 @@ async fn handle_socket(
     send_ready_payload(&mut socket).await?;
 
     // forward live broadcast events, handling lag with a DB catch-up
+    let mut heartbeat = tokio::time::interval(HEARTBEAT_INTERVAL);
+
     loop {
         tokio::select! {
             biased;
@@ -182,6 +189,19 @@ async fn handle_socket(
             // outgoing events from the broadcast channel
             recv = broadcast_rx.recv() => {
                 handle_broadcast(&mut socket, &state, recv, &mut last_sequence).await?;
+            },
+
+            // browsers cannot observe protocol pings, so liveness needs an application-level message
+            _ = heartbeat.tick() => {
+                if socket
+                    .send(Message::Text(
+                        serde_json::to_string(&WsEvent::Heartbeat).unwrap().into(),
+                    ))
+                    .await
+                    .is_err()
+                {
+                    return Err(());
+                }
             },
         }
     }

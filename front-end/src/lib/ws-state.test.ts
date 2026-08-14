@@ -110,6 +110,14 @@ describe("wsReducer", () => {
         });
     });
 
+    describe("heartbeat", () => {
+        it("leaves the state untouched", () => {
+            const before = applyEvents(INITIAL_WS_STATE, [init()]);
+
+            expect(wsReducer(before, { type: "heartbeat" })).toBe(before);
+        });
+    });
+
     describe("connected", () => {
         it("adds a new connection", () => {
             const state = applyEvents(INITIAL_WS_STATE, [init(), READY, connected("198.51.100.7", 50_000)]);
