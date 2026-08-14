@@ -60,17 +60,21 @@ function latestSocket(): FakeWebSocket {
 }
 
 function renderWebSocketHook(): {
+    getSince: Mock<() => number>;
     onEvent: Mock<(event: WsEvent) => void>;
     result: { current: { status: ConnectionStatus } };
     unmount: () => void;
 } {
     const onEvent = vi.fn<(event: WsEvent) => void>();
-
-    const { result, unmount } = renderHook(() => {
-        return useWebSocket({ onEvent });
+    const getSince = vi.fn<() => number>(() => {
+        return 0;
     });
 
-    return { onEvent, result, unmount };
+    const { result, unmount } = renderHook(() => {
+        return useWebSocket({ getSince, onEvent });
+    });
+
+    return { getSince, onEvent, result, unmount };
 }
 
 function advance(milliseconds: number): void {
@@ -230,14 +234,11 @@ describe("useWebSocket", () => {
         expect(onEvent).toHaveBeenCalledWith({ type: "ready" });
     });
 
-    it("resumes from the last disconnected sequence", () => {
-        renderWebSocketHook();
+    it("dials the reconnect with the sequence getSince reports", () => {
+        const { getSince } = renderWebSocketHook();
 
         openLatest();
-
-        act(() => {
-            latestSocket().serverMessage(JSON.stringify({ sequence: 42, type: "disconnected" }));
-        });
+        getSince.mockReturnValue(42);
 
         dropLatest();
         advance(500);

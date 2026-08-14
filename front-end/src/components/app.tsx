@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
 import type { WsEvent } from "../generated/WsEvent";
 import type { ConnectionStatus } from "../hooks/use-web-sockets";
@@ -35,17 +35,28 @@ const ConnectionBadge: React.FC<{ status: EventSourceStatus }> = ({ status }) =>
 };
 
 interface Properties {
-    useEventSource: (options: { onEvent: (event: WsEvent) => void }) => { status: EventSourceStatus };
+    useEventSource: (options: { getSince: () => number; onEvent: (event: WsEvent) => void }) => {
+        status: EventSourceStatus;
+    };
 }
 
 export const App: React.FC<Properties> = ({ useEventSource }) => {
-    const [{ activeConnections, events, totalBytes, totalConnections, totalTimeSeconds }, dispatch] = useReducer(
-        wsReducer,
-        INITIAL_WS_STATE,
-    );
+    const [{ activeConnections, events, maxSeenSequence, totalBytes, totalConnections, totalTimeSeconds }, dispatch] =
+        useReducer(wsReducer, INITIAL_WS_STATE);
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
-    const { status } = useEventSource({ onEvent: dispatch });
+    // the reducer owns delivery progress, the hook reads it through this ref when building the reconnect URL
+    const maxSeenSequenceReference = useRef(0);
+
+    useEffect(() => {
+        maxSeenSequenceReference.current = maxSeenSequence;
+    }, [maxSeenSequence]);
+
+    const getSince = useCallback(() => {
+        return maxSeenSequenceReference.current;
+    }, []);
+
+    const { status } = useEventSource({ getSince, onEvent: dispatch });
 
     return (
         <div className="min-h-screen bg-gray-950 p-4 text-white">
