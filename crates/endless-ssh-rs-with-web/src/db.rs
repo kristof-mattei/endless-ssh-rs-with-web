@@ -212,7 +212,7 @@ pub struct StatsRow {
     pub bytes_sent: i64,
 }
 
-/// Pick the right aggregate tier and return rows for [from, to].
+/// Pick the right aggregate tier and return rows for [from, to).
 pub async fn get_stats(
     pool: &PgPool,
     from_to: Option<(OffsetDateTime, OffsetDateTime)>,
