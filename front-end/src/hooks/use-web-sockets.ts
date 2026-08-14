@@ -10,6 +10,10 @@ export type InitEvent = Extract<WsEvent, { type: "init" }>;
 export type ReadyEvent = Extract<WsEvent, { type: "ready" }>;
 
 interface Options {
+    /**
+    The highest `disconnected` sequence already applied. A reconnect replays everything after it.
+    */
+    getSince: () => number;
     onEvent: (event: WsEvent) => void;
 }
 
@@ -17,7 +21,7 @@ const BASE_BACKOFF_MS = 500;
 const MAX_BACKOFF_MS = 30_000;
 const STABLE_CONNECTION_MS = 5000;
 
-// three missed server heartbeats (30 seconds each); a half-dead connection never fires close on its own
+// three missed server heartbeats (30 seconds each), a half-dead connection never fires close on its own
 const WATCHDOG_TIMEOUT_MS = 90_000;
 
 // RFC 6455 close code 1000, Normal Closure
@@ -42,17 +46,17 @@ function closeSocket(ws: WebSocket): void {
     }
 }
 
-export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus } {
+export function useWebSocket({ getSince, onEvent }: Options): { status: ConnectionStatus } {
     const [status, setStatus] = useState<ConnectionStatus>("connecting");
 
-    const lastSequenceReference = useRef(0);
-
-    // stable callback reference
+    // stable callback references
     const onEventReference = useRef(onEvent);
+    const sinceGetterReference = useRef(getSince);
 
     useEffect(() => {
         onEventReference.current = onEvent;
-    }, [onEvent]);
+        sinceGetterReference.current = getSince;
+    }, [getSince, onEvent]);
 
     useEffect(() => {
         let isDisposed = false;
@@ -72,7 +76,7 @@ export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus }
         }
 
         function connect(): void {
-            const since = lastSequenceReference.current;
+            const since = sinceGetterReference.current();
 
             const url = `${globalThis.location.protocol === "https:" ? "wss" : "ws"}://${globalThis.location.host}/api/ws?since=${since.toString()}`;
 
@@ -130,13 +134,6 @@ export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus }
 
                 if (event === undefined) {
                     return;
-                }
-
-                // "disconnected" is the only sequenced event, sequence is the id of the
-                // persisted connection record, and reconnecting with ?since= replays every
-                // record after it. Live connections are rebuilt from the init snapshot instead.
-                if (event.type === "disconnected") {
-                    lastSequenceReference.current = event.sequence;
                 }
 
                 onEventReference.current(event);
