@@ -2,10 +2,12 @@ import type * as React from "react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Temporal } from "temporal-polyfill";
 
+import type { StatsResponse } from "../generated/StatsResponse";
 import type { StatsRow } from "../generated/StatsRow";
 
 export interface StatsData {
     rows: StatsRow[];
+    bucketMs: number;
     from: Temporal.Instant;
     to: Temporal.Instant;
 }
@@ -57,9 +59,14 @@ async function fetchStats(range: Range, onData: (data: StatsData) => void, signa
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- data from trusted backend
-    const rows = (await response.json()) as StatsRow[];
+    const data = (await response.json()) as StatsResponse;
 
-    onData({ rows, from: Temporal.Instant.from(from), to: Temporal.Instant.from(to) });
+    onData({
+        rows: data.rows,
+        bucketMs: data.bucket_seconds * 1000,
+        from: Temporal.Instant.from(from),
+        to: Temporal.Instant.from(to),
+    });
 }
 
 interface Properties {

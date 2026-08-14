@@ -82,6 +82,7 @@ RCVBUF
 Retag
 Retagging
 rewatched
+rfold
 rngs
 rollups
 rustflags
@@ -95,7 +96,6 @@ sigemptyset
 signum
 sigset
 skopeo
-skopeo's
 socketioxide
 socklen
 startswith

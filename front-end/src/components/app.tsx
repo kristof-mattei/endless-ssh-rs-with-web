@@ -78,7 +78,14 @@ export const App: React.FC<Properties> = ({ useEventSource }) => {
 
                 <TimeRangeSelector isLive={status === "live"} onData={setStatsData} />
 
-                {statsData !== null && <StatsChart rows={statsData.rows} from={statsData.from} to={statsData.to} />}
+                {statsData !== null && (
+                    <StatsChart
+                        rows={statsData.rows}
+                        bucketMs={statsData.bucketMs}
+                        from={statsData.from}
+                        to={statsData.to}
+                    />
+                )}
             </section>
 
             <section>

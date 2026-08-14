@@ -1,6 +1,7 @@
 mod conversions;
 pub mod types;
 
+use std::cmp::Ordering;
 use std::net::IpAddr;
 
 use futures::stream::Stream;
@@ -212,24 +213,95 @@ pub struct StatsRow {
     pub bytes_sent: i64,
 }
 
-/// Pick the right aggregate tier and return rows for [from, to).
+struct Tier {
+    table: &'static str,
+    bucket_seconds: u32,
+    /// Widest span this tier resolves. `None` means any.
+    max_span: Option<SignedDuration>,
+    /// `None` means kept forever.
+    retention: Option<SignedDuration>,
+}
+
+impl Tier {
+    /// The finest tier for which `covers` holds. The coarsest tier covers everything.
+    fn finest(covers: impl Fn(&Tier) -> bool) -> &'static Tier {
+        TIERS.iter().rfold(&TIERS[TIERS.len() - 1], |picked, tier| {
+            if covers(tier) { tier } else { picked }
+        })
+    }
+}
+
+impl PartialEq for Tier {
+    fn eq(&self, other: &Self) -> bool {
+        self.bucket_seconds == other.bucket_seconds
+    }
+}
+
+impl Eq for Tier {}
+
+impl PartialOrd for Tier {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Tier {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.bucket_seconds.cmp(&other.bucket_seconds)
+    }
+}
+
+const TIERS: [Tier; 4] = [
+    Tier {
+        table: "connections_1min",
+        bucket_seconds: 60,
+        max_span: Some(SignedDuration::hours(24)),
+        retention: Some(SignedDuration::hours(48)),
+    },
+    Tier {
+        table: "connections_5min",
+        bucket_seconds: 300,
+        max_span: Some(SignedDuration::days(7)),
+        retention: Some(SignedDuration::days(7)),
+    },
+    Tier {
+        table: "connections_1h_all",
+        bucket_seconds: 3600,
+        max_span: Some(SignedDuration::days(30)),
+        retention: Some(SignedDuration::days(40)),
+    },
+    Tier {
+        table: "connections_1day_all",
+        bucket_seconds: 86400,
+        max_span: None,
+        retention: None,
+    },
+];
+
+/// Stats rows plus the bucket width they were aggregated at.
+#[derive(Debug, Serialize)]
+#[cfg_attr(test, derive(ts_rs::TS), ts(export))]
+pub struct StatsResponse {
+    pub bucket_seconds: u32,
+    pub rows: Vec<StatsRow>,
+}
+
+/// Pick the finest tier whose retention still covers `from`, coarsened by span, and return rows for [from, to).
 pub async fn get_stats(
     pool: &PgPool,
     from_to: Option<(OffsetDateTime, OffsetDateTime)>,
-) -> Result<Vec<StatsRow>, sqlx::Error> {
-    let rows = if let Some((from, to)) = from_to {
+) -> Result<StatsResponse, sqlx::Error> {
+    let (tier, rows) = if let Some((from, to)) = from_to {
         let span = to - from;
-        let span_hours = span.whole_hours();
+        let age = OffsetDateTime::now_utc() - from;
 
-        let table = if span_hours <= 24 {
-            "connections_1min"
-        } else if span_hours <= 24 * 7 {
-            "connections_5min"
-        } else if span_hours <= 24 * 30 {
-            "connections_1h_all"
-        } else {
-            "connections_1day_all"
-        };
+        // coarsen for long spans to keep the row count bounded
+        let by_span = Tier::finest(|tier| tier.max_span.is_none_or(|max_span| span <= max_span));
+
+        let by_retention =
+            Tier::finest(|tier| tier.retention.is_none_or(|retention| age <= retention));
+
+        let tier = by_span.max(by_retention);
 
         let sql = format!(
             "
@@ -247,19 +319,23 @@ pub async fn get_stats(
         ORDER BY
             bucket
         ",
-            table
+            tier.table
         );
 
         // The dynamically injected table is a limited to 4 tables
         let safe_sql = AssertSqlSafe(sql);
 
-        sqlx::query(safe_sql)
+        let rows = sqlx::query(safe_sql)
             .bind(from)
             .bind(to)
             .fetch_all(pool)
-            .await?
+            .await?;
+
+        (tier, rows)
     } else {
-        sqlx::query(
+        let tier = TIERS.last().expect("`TIERS` is non-empty");
+
+        let rows = sqlx::query(
             "
         SELECT
             bucket
@@ -274,10 +350,13 @@ pub async fn get_stats(
         ",
         )
         .fetch_all(pool)
-        .await?
+        .await?;
+
+        (tier, rows)
     };
 
-    rows.into_iter()
+    let rows = rows
+        .into_iter()
         .map(|row| {
             Ok(StatsRow {
                 bucket: row.try_get("bucket")?,
@@ -287,7 +366,12 @@ pub async fn get_stats(
                 bytes_sent: row.try_get("bytes_sent")?,
             })
         })
-        .collect()
+        .collect::<Result<Vec<_>, sqlx::Error>>()?;
+
+    Ok(StatsResponse {
+        bucket_seconds: tier.bucket_seconds,
+        rows,
+    })
 }
 
 #[track_caller]
