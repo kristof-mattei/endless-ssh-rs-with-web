@@ -9,6 +9,7 @@ use sqlx::{Decode, Encode, Postgres, Type};
 use time::{OffsetDateTime, SignedDuration};
 
 use crate::db::conversions::{to_duration, to_inet, to_interval};
+use crate::geoip::{Coordinates, Country};
 
 #[derive(Copy, Clone)]
 pub enum Limit {
@@ -131,12 +132,9 @@ pub struct ConnectionRecord {
     pub disconnected_at: OffsetDateTime,
     pub time_spent: DbDuration,
     pub bytes_sent: i64,
-    // TODO narrow to 2 characters maybe?
-    pub country_code: Option<String>,
-    pub country_name: Option<String>,
+    pub country: Option<Country>,
     pub city: Option<String>,
-    pub latitude: Option<f64>,
-    pub longitude: Option<f64>,
+    pub coordinates: Option<Coordinates>,
 }
 
 /// All-time aggregate totals for the WebSocket init payload.

@@ -1,19 +1,22 @@
 mod conversions;
+mod legacy;
 pub mod types;
 
 use std::cmp::Ordering;
 use std::net::IpAddr;
 
+use futures::TryStreamExt as _;
 use futures::stream::Stream;
 use serde::Serialize;
 use sqlx::migrate::MigrateError;
-use sqlx::postgres::PgPoolOptions;
+use sqlx::postgres::{PgPoolOptions, PgRow};
 use sqlx::{AssertSqlSafe, PgExecutor, PgPool, Row as _};
+use thiserror::Error;
 use time::{OffsetDateTime, SignedDuration};
 use tracing::{Level, event};
 
 use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, DbPort, Limit};
-use crate::geoip::GeoInfo;
+use crate::geoip::{Coordinates, Country, GeoInfo};
 use crate::utils::serde::as_seconds;
 
 pub async fn create_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
@@ -23,8 +26,35 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
         .await
 }
 
-pub async fn run_migrations(pool: &PgPool) -> Result<(), MigrateError> {
-    sqlx::migrate!().run(pool).await
+#[derive(Error, Debug)]
+pub enum MigrationError {
+    #[error("database error: {0}")]
+    Database(
+        #[from]
+        #[source]
+        sqlx::Error,
+    ),
+    #[error("migration error: {0}")]
+    Migrate(
+        #[from]
+        #[source]
+        MigrateError,
+    ),
+    #[error(
+        "the database is at legacy migration version {0}, only version {final_legacy_version} migrates; run the previous release once to bring it there",
+        final_legacy_version = legacy::FINAL_LEGACY_VERSION
+    )]
+    UnsupportedLegacyVersion(i64),
+}
+
+pub async fn run_migrations(pool: &PgPool) -> Result<(), MigrationError> {
+    legacy::stash(pool).await?;
+
+    sqlx::migrate!().run(pool).await?;
+
+    legacy::restore(pool).await?;
+
+    Ok(())
 }
 
 #[expect(clippy::too_many_arguments, reason = "One argument per column")]
@@ -48,6 +78,9 @@ pub async fn insert_connection(
             );
         })
         .unwrap_or(i64::MAX);
+
+    let country = geo.and_then(|geo| geo.country.as_ref());
+    let coordinates = geo.and_then(|geo| geo.coordinates);
 
     let mut tx = pool.begin().await?;
 
@@ -85,11 +118,11 @@ pub async fn insert_connection(
         bytes_sent,
         DbIpAddr(ip_address) as _,
         i32::from(port),
-        geo.and_then(|g| g.country_code.clone()),
-        geo.and_then(|g| g.country_name.clone()),
+        country.map(|country| country.code.clone()),
+        country.map(|country| country.name.clone()),
         geo.and_then(|g| g.city.clone()),
-        geo.and_then(|g| g.latitude),
-        geo.and_then(|g| g.longitude)
+        coordinates.map(|coordinates| coordinates.latitude),
+        coordinates.map(|coordinates| coordinates.longitude)
     )
     .fetch_one(&mut *tx)
     .await?;
@@ -123,8 +156,7 @@ pub fn get_connections_since<'e, E>(
 where
     E: PgExecutor<'e> + 'e,
 {
-    sqlx::query_as!(
-        ConnectionRecord,
+    sqlx::query!(
         r#"
         SELECT
             id
@@ -168,6 +200,27 @@ where
         limit as _
     )
     .fetch(executor)
+    .map_ok(|row| ConnectionRecord {
+        id: row.id,
+        ip_address: row.ip_address,
+        port: row.port,
+        connected_at: row.connected_at,
+        disconnected_at: row.disconnected_at,
+        time_spent: row.time_spent,
+        bytes_sent: row.bytes_sent,
+        country: row.country_code.map(|code| Country {
+            name: row.country_name.unwrap_or_else(|| code.clone()),
+            code,
+        }),
+        city: row.city,
+        coordinates: row
+            .latitude
+            .zip(row.longitude)
+            .map(|(latitude, longitude)| Coordinates {
+                latitude,
+                longitude,
+            }),
+    })
 }
 
 pub async fn get_totals<'e, E>(executor: E) -> Result<AllTimeTotals, sqlx::Error>
@@ -205,12 +258,32 @@ pub struct StatsRow {
     #[serde(serialize_with = "time::serde::rfc3339::serialize")]
     #[cfg_attr(test, ts(type = "string"))]
     pub bucket: OffsetDateTime,
-    pub country_code: Option<String>,
+    pub country: Option<Country>,
     pub connects: i64,
     #[serde(serialize_with = "as_seconds")]
     #[cfg_attr(test, ts(type = "number"))]
     pub time_spent: SignedDuration,
     pub bytes_sent: i64,
+}
+
+impl TryFrom<PgRow> for StatsRow {
+    type Error = sqlx::Error;
+
+    fn try_from(row: PgRow) -> Result<Self, Self::Error> {
+        let code: Option<String> = row.try_get("country_code")?;
+        let name: Option<String> = row.try_get("country_name")?;
+
+        Ok(Self {
+            bucket: row.try_get("bucket")?,
+            country: code.map(|code| Country {
+                name: name.unwrap_or_else(|| code.clone()),
+                code,
+            }),
+            connects: row.try_get("connects")?,
+            time_spent: row.try_get::<DbDuration, _>("time_spent")?.into(),
+            bytes_sent: row.try_get("bytes_sent")?,
+        })
+    }
 }
 
 struct Tier {
@@ -265,13 +338,13 @@ const TIERS: [Tier; 4] = [
         retention: Some(SignedDuration::days(7)),
     },
     Tier {
-        table: "connections_1h_all",
+        table: "connections_1h",
         bucket_seconds: 3600,
         max_span: Some(SignedDuration::days(30)),
         retention: Some(SignedDuration::days(40)),
     },
     Tier {
-        table: "connections_1day_all",
+        table: "connections_1day",
         bucket_seconds: 86400,
         max_span: None,
         retention: None,
@@ -287,27 +360,26 @@ pub struct StatsResponse {
 }
 
 /// Pick the finest tier whose retention still covers `from`, coarsened by span, and return rows for [from, to).
-pub async fn get_stats(
+async fn get_stats_ranged(
     pool: &PgPool,
-    from_to: Option<(OffsetDateTime, OffsetDateTime)>,
+    (from, to): (OffsetDateTime, OffsetDateTime),
 ) -> Result<StatsResponse, sqlx::Error> {
-    let (bucket_seconds, rows) = if let Some((from, to)) = from_to {
-        let span = to - from;
-        let age = OffsetDateTime::now_utc() - from;
+    let span = to - from;
+    let age = OffsetDateTime::now_utc() - from;
 
-        // coarsen for long spans to keep the row count bounded
-        let by_span = Tier::finest(|tier| tier.max_span.is_none_or(|max_span| span <= max_span));
+    // coarsen for long spans to keep the row count bounded
+    let by_span = Tier::finest(|tier| tier.max_span.is_none_or(|max_span| span <= max_span));
 
-        let by_retention =
-            Tier::finest(|tier| tier.retention.is_none_or(|retention| age <= retention));
+    let by_retention = Tier::finest(|tier| tier.retention.is_none_or(|retention| age <= retention));
 
-        let tier = by_span.max(by_retention);
+    let tier = by_span.max(by_retention);
 
-        let sql = format!(
-            "
+    let sql = format!(
+        "
         SELECT
             bucket
             , country_code
+            , country_name
             , connects
             , time_spent
             , bytes_sent
@@ -319,93 +391,108 @@ pub async fn get_stats(
         ORDER BY
             bucket
         ",
-            tier.table
-        );
+        tier.table
+    );
 
-        // The dynamically injected table is a limited to 4 tables
-        let safe_sql = AssertSqlSafe(sql);
+    // the injected name comes from `TIERS`, a closed set
+    let safe_sql = AssertSqlSafe(sql);
 
-        let rows = sqlx::query(safe_sql)
-            .bind(from)
-            .bind(to)
-            .fetch_all(pool)
+    let rows = sqlx::query(safe_sql)
+        .bind(from)
+        .bind(to)
+        .fetch_all(pool)
+        .await?
+        .into_iter()
+        .map(StatsRow::try_from)
+        .collect::<Result<Vec<_>, _>>()?;
+
+    Ok(StatsResponse {
+        bucket_seconds: tier.bucket_seconds,
+        rows,
+    })
+}
+
+/// Return every `connections_1day` row.
+async fn get_stats_all(pool: &PgPool) -> Result<StatsResponse, sqlx::Error> {
+    // the 1day tier grows forever, so past two years of history the open-ended query serves weeks to keep the row count bounded
+    let oldest: Option<OffsetDateTime> =
+        sqlx::query_scalar("SELECT MIN(bucket) FROM connections_1day")
+            .fetch_one(pool)
             .await?;
 
-        (tier.bucket_seconds, rows)
-    } else {
-        // the 1day tier grows forever, so past two years of history the open-ended query serves weeks to keep the row count bounded
-        let oldest: Option<OffsetDateTime> =
-            sqlx::query_scalar("SELECT MIN(bucket) FROM connections_1day_all")
-                .fetch_one(pool)
-                .await?;
+    let serve_weekly = oldest
+        .is_some_and(|oldest| OffsetDateTime::now_utc() - oldest > SignedDuration::days(2 * 365));
 
-        let serve_weekly = oldest.is_some_and(|oldest| {
-            OffsetDateTime::now_utc() - oldest > SignedDuration::days(2 * 365)
-        });
-
-        if serve_weekly {
-            let rows = sqlx::query(
-                "
+    if serve_weekly {
+        let rows = sqlx::query(
+            "
         SELECT
             time_bucket ('7 days', bucket) AS bucket
             , country_code
+            , country_name
             , sum(connects)::bigint AS connects
             , sum(time_spent) AS time_spent
             , sum(bytes_sent)::bigint AS bytes_sent
         FROM
-            connections_1day_all
+            connections_1day
         GROUP BY
             time_bucket ('7 days', bucket)
             , country_code
+            , country_name
         ORDER BY
             bucket
         ",
-            )
-            .fetch_all(pool)
-            .await?;
+        )
+        .fetch_all(pool)
+        .await?
+        .into_iter()
+        .map(StatsRow::try_from)
+        .collect::<Result<Vec<_>, _>>()?;
 
-            (7 * 86400, rows)
-        } else {
-            let rows = sqlx::query(
-                "
+        return Ok(StatsResponse {
+            bucket_seconds: 7 * 86400,
+            rows,
+        });
+    }
+
+    let rows = sqlx::query(
+        "
         SELECT
             bucket
             , country_code
+            , country_name
             , connects
             , time_spent
             , bytes_sent
         FROM
-            connections_1day_all
+            connections_1day
         ORDER BY
             bucket
         ",
-            )
-            .fetch_all(pool)
-            .await?;
+    )
+    .fetch_all(pool)
+    .await?
+    .into_iter()
+    .map(StatsRow::try_from)
+    .collect::<Result<Vec<_>, _>>()?;
 
-            let tier = TIERS.last().expect("`TIERS` is non-empty");
-
-            (tier.bucket_seconds, rows)
-        }
-    };
-
-    let rows = rows
-        .into_iter()
-        .map(|row| {
-            Ok(StatsRow {
-                bucket: row.try_get("bucket")?,
-                country_code: row.try_get("country_code")?,
-                connects: row.try_get("connects")?,
-                time_spent: row.try_get::<DbDuration, _>("time_spent")?.into(),
-                bytes_sent: row.try_get("bytes_sent")?,
-            })
-        })
-        .collect::<Result<Vec<_>, sqlx::Error>>()?;
+    let tier = TIERS.last().expect("`TIERS` is non-empty");
 
     Ok(StatsResponse {
-        bucket_seconds,
+        bucket_seconds: tier.bucket_seconds,
         rows,
     })
+}
+
+/// Aggregated rows for [from, to), or the whole 1day tier when no range is given.
+pub async fn get_stats(
+    pool: &PgPool,
+    from_to: Option<(OffsetDateTime, OffsetDateTime)>,
+) -> Result<StatsResponse, sqlx::Error> {
+    match from_to {
+        Some(from_to) => get_stats_ranged(pool, from_to).await,
+        None => get_stats_all(pool).await,
+    }
 }
 
 #[track_caller]

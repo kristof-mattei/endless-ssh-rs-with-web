@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Temporal } from "temporal-polyfill";
 
+import type { Country } from "../generated/Country";
 import type { WsEvent } from "../generated/WsEvent";
 
 interface Options {
@@ -9,28 +10,27 @@ interface Options {
 
 interface DemoLocation {
     city: string;
-    country_code: string;
-    country_name: string;
+    country: Country;
     latitude: number;
     longitude: number;
 }
 
 const LOCATIONS: DemoLocation[] = [
-    { city: "Shanghai", country_code: "CN", country_name: "China", latitude: 31.23, longitude: 121.47 },
-    { city: "Beijing", country_code: "CN", country_name: "China", latitude: 39.9, longitude: 116.41 },
-    { city: "Moscow", country_code: "RU", country_name: "Russia", latitude: 55.76, longitude: 37.62 },
-    { city: "Amsterdam", country_code: "NL", country_name: "Netherlands", latitude: 52.37, longitude: 4.9 },
-    { city: "Frankfurt", country_code: "DE", country_name: "Germany", latitude: 50.11, longitude: 8.68 },
-    { city: "London", country_code: "GB", country_name: "United Kingdom", latitude: 51.51, longitude: -0.13 },
-    { city: "New York", country_code: "US", country_name: "United States", latitude: 40.71, longitude: -74.01 },
-    { city: "Los Angeles", country_code: "US", country_name: "United States", latitude: 34.05, longitude: -118.24 },
-    { city: "São Paulo", country_code: "BR", country_name: "Brazil", latitude: -23.55, longitude: -46.63 },
-    { city: "Mumbai", country_code: "IN", country_name: "India", latitude: 19.08, longitude: 72.88 },
-    { city: "Singapore", country_code: "SG", country_name: "Singapore", latitude: 1.35, longitude: 103.82 },
-    { city: "Seoul", country_code: "KR", country_name: "South Korea", latitude: 37.57, longitude: 126.98 },
-    { city: "Tokyo", country_code: "JP", country_name: "Japan", latitude: 35.68, longitude: 139.65 },
-    { city: "Sydney", country_code: "AU", country_name: "Australia", latitude: -33.87, longitude: 151.21 },
-    { city: "Hanoi", country_code: "VN", country_name: "Vietnam", latitude: 21.03, longitude: 105.85 },
+    { city: "Shanghai", country: { code: "CN", name: "China" }, latitude: 31.23, longitude: 121.47 },
+    { city: "Beijing", country: { code: "CN", name: "China" }, latitude: 39.9, longitude: 116.41 },
+    { city: "Moscow", country: { code: "RU", name: "Russia" }, latitude: 55.76, longitude: 37.62 },
+    { city: "Amsterdam", country: { code: "NL", name: "Netherlands" }, latitude: 52.37, longitude: 4.9 },
+    { city: "Frankfurt", country: { code: "DE", name: "Germany" }, latitude: 50.11, longitude: 8.68 },
+    { city: "London", country: { code: "GB", name: "United Kingdom" }, latitude: 51.51, longitude: -0.13 },
+    { city: "New York", country: { code: "US", name: "United States" }, latitude: 40.71, longitude: -74.01 },
+    { city: "Los Angeles", country: { code: "US", name: "United States" }, latitude: 34.05, longitude: -118.24 },
+    { city: "São Paulo", country: { code: "BR", name: "Brazil" }, latitude: -23.55, longitude: -46.63 },
+    { city: "Mumbai", country: { code: "IN", name: "India" }, latitude: 19.08, longitude: 72.88 },
+    { city: "Singapore", country: { code: "SG", name: "Singapore" }, latitude: 1.35, longitude: 103.82 },
+    { city: "Seoul", country: { code: "KR", name: "South Korea" }, latitude: 37.57, longitude: 126.98 },
+    { city: "Tokyo", country: { code: "JP", name: "Japan" }, latitude: 35.68, longitude: 139.65 },
+    { city: "Sydney", country: { code: "AU", name: "Australia" }, latitude: -33.87, longitude: 151.21 },
+    { city: "Hanoi", country: { code: "VN", name: "Vietnam" }, latitude: 21.03, longitude: 105.85 },
 ];
 
 const SPAWN_MIN_MS = 500;
@@ -79,11 +79,12 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
             const location = Math.random() < 0.1 ? undefined : LOCATIONS[randomInt(0, LOCATIONS.length - 1)];
 
             const geo = {
-                country_code: location?.country_code ?? null,
-                country_name: location?.country_name ?? null,
+                country: location?.country ?? null,
                 city: location?.city ?? null,
-                latitude: location === undefined ? null : jitter(location.latitude),
-                longitude: location === undefined ? null : jitter(location.longitude),
+                coordinates:
+                    location === undefined
+                        ? null
+                        : { latitude: jitter(location.latitude), longitude: jitter(location.longitude) },
             };
 
             const ip = randomIp();

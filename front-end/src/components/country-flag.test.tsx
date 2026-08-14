@@ -5,7 +5,7 @@ import { CountryFlag } from "./country-flag";
 
 describe("CountryFlag", () => {
     it("renders the regional indicator pair for a country code", () => {
-        render(<CountryFlag countryCode="US" countryName="United States" />);
+        render(<CountryFlag country={{ code: "US", name: "United States" }} />);
 
         expect(screen.getByText("🇺🇸")).toBeDefined();
         expect(screen.getByText("United States")).toBeDefined();
@@ -13,26 +13,26 @@ describe("CountryFlag", () => {
     });
 
     it("uppercases a lowercase code", () => {
-        render(<CountryFlag countryCode="nl" countryName={null} />);
+        render(<CountryFlag country={{ code: "nl", name: "Netherlands" }} />);
 
         expect(screen.getByText("🇳🇱")).toBeDefined();
     });
 
-    it("falls back to the code for the tooltip when the name is missing", () => {
-        render(<CountryFlag countryCode="DE" countryName={null} />);
+    it("renders the code as the label when the name fell back to it", () => {
+        render(<CountryFlag country={{ code: "DE", name: "DE" }} />);
 
+        expect(screen.getByText("🇩🇪")).toBeDefined();
         expect(screen.getByTitle("DE")).toBeDefined();
     });
 
-    it("renders no flag for a null code", () => {
-        render(<CountryFlag countryCode={null} countryName="Atlantis" />);
+    it("renders no flag for a null country", () => {
+        render(<CountryFlag country={null} />);
 
-        expect(screen.getByText("Atlantis")).toBeDefined();
         expect(screen.queryByText(/\p{Regional_Indicator}/v)).toBeNull();
     });
 
     it("renders no flag for a code that is not two characters", () => {
-        render(<CountryFlag countryCode="USA" countryName={null} />);
+        render(<CountryFlag country={{ code: "USA", name: "United States" }} />);
 
         expect(screen.queryByText(/\p{Regional_Indicator}/v)).toBeNull();
     });

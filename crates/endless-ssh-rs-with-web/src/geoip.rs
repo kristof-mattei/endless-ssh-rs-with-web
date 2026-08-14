@@ -5,6 +5,7 @@ use http::HeaderMap;
 use http::header::ETAG;
 use maxminddb::{Mmap, geoip2};
 use memmap2::MmapOptions;
+use serde::Serialize;
 use thiserror::Error;
 use tracing::{Level, event};
 
@@ -24,14 +25,26 @@ enum MmapError {
     ),
 }
 
+#[derive(Debug, Clone, Copy, Serialize)]
+#[cfg_attr(test, derive(ts_rs::TS), ts(export))]
+pub struct Coordinates {
+    pub latitude: f64,
+    pub longitude: f64,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[cfg_attr(test, derive(ts_rs::TS), ts(export))]
+pub struct Country {
+    /// Two-character ISO 3166-1 alpha-2 country code. See <https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>.
+    pub code: String,
+    pub name: String,
+}
+
 #[derive(Debug, Clone)]
 pub struct GeoInfo {
-    /// Two-character ISO 3166-1 alpha-2 country code. See <https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>.
-    pub country_code: Option<String>,
-    pub country_name: Option<String>,
+    pub country: Option<Country>,
     pub city: Option<String>,
-    pub latitude: Option<f64>,
-    pub longitude: Option<f64>,
+    pub coordinates: Option<Coordinates>,
 }
 
 pub struct GeoIpReader {
@@ -85,21 +98,26 @@ impl GeoIpReader {
             .decode::<geoip2::City>()
             .ok()??;
 
-        let country_code = city.country.iso_code.map(str::to_owned);
-
-        let country_name = city.country.names.english.map(|s| (*s).to_owned());
+        let country = city.country.iso_code.map(|code| Country {
+            code: code.to_owned(),
+            name: city.country.names.english.unwrap_or(code).to_owned(),
+        });
 
         let city_name = city.city.names.english.map(|s| (*s).to_owned());
 
-        let latitude = city.location.latitude;
-        let longitude = city.location.longitude;
+        let coordinates =
+            city.location
+                .latitude
+                .zip(city.location.longitude)
+                .map(|(latitude, longitude)| Coordinates {
+                    latitude,
+                    longitude,
+                });
 
         Some(GeoInfo {
-            country_code,
-            country_name,
+            country,
             city: city_name,
-            latitude,
-            longitude,
+            coordinates,
         })
     }
 

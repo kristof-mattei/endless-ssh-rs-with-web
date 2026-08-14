@@ -1,15 +1,17 @@
 import type React from "react";
 
+import type { Country } from "../generated/Country";
+
 interface Properties {
-    countryCode: null | string;
-    countryName: null | string;
+    country: Country | null;
 }
 
-function countryFlag(code: null | string): null | string {
-    if (code?.length !== 2) {
+function countryFlag(code: string): null | string {
+    if (code.length !== 2) {
         return null;
     }
 
+    // oxfmt would lowercase these digits, unicorn/number-literal-case requires uppercase
     // oxfmt-ignore
     const base = 0x01_F1_E6;
     const upper = code.toUpperCase();
@@ -22,11 +24,11 @@ function countryFlag(code: null | string): null | string {
     return String.fromCodePoint(base + cp0 - 65) + String.fromCodePoint(base + cp1 - 65);
 }
 
-export const CountryFlag: React.FC<Properties> = ({ countryCode, countryName }) => {
+export const CountryFlag: React.FC<Properties> = ({ country }) => {
     return (
-        <span className="cursor-default" title={countryName ?? countryCode ?? undefined}>
-            <span className="flags-font text-lg">{countryFlag(countryCode)}</span>
-            {countryName !== null && <span className="ms-1.5 text-gray-400">{countryName}</span>}
+        <span className="cursor-default" title={country?.name}>
+            <span className="flags-font text-lg">{country === null ? null : countryFlag(country.code)}</span>
+            {country !== null && <span className="ms-1.5 text-gray-400">{country.name}</span>}
         </span>
     );
 };

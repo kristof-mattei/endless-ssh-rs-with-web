@@ -1,5 +1,6 @@
 import { Temporal } from "temporal-polyfill";
 
+import type { Country } from "../generated/Country";
 import type { StatsRow } from "../generated/StatsRow";
 
 export interface BucketPointValues {
@@ -22,7 +23,7 @@ export function snapUpToBucket(ms: number, intervalMs: number): number {
 export interface CountryTotals {
     bytes_sent: number;
     connects: number;
-    country_code: null | string;
+    country: Country | null;
     time_spent: number;
 }
 
@@ -30,11 +31,12 @@ export function topCountries(rows: StatsRow[], limit: number): CountryTotals[] {
     const map = new Map<null | string, CountryTotals>();
 
     for (const row of rows) {
-        const existing = map.get(row.country_code);
+        const code = row.country?.code ?? null;
+        const existing = map.get(code);
 
         if (existing === undefined) {
-            map.set(row.country_code, {
-                country_code: row.country_code,
+            map.set(code, {
+                country: row.country,
                 connects: row.connects,
                 bytes_sent: row.bytes_sent,
                 time_spent: row.time_spent,
