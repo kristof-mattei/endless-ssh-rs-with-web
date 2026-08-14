@@ -226,9 +226,9 @@ pub async fn get_stats(
         } else if span_hours <= 24 * 7 {
             "connections_5min"
         } else if span_hours <= 24 * 30 {
-            "connections_1h"
+            "connections_1h_all"
         } else {
-            "connections_1day"
+            "connections_1day_all"
         };
 
         let sql = format!(
@@ -268,7 +268,7 @@ pub async fn get_stats(
             , time_spent
             , bytes_sent
         FROM
-            connections_1day
+            connections_1day_all
         ORDER BY
             bucket
         ",

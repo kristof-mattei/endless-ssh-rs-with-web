@@ -70,6 +70,7 @@ ossdata
 pathbuf
 pgadmin
 pgsql
+pkey
 portproxy
 postprocessors
 prereleased
@@ -82,11 +83,13 @@ Retag
 Retagging
 rewatched
 rngs
+rollups
 rustflags
 samply
 sccache
 sendline
 setsockopt
+setval
 sigaction
 sigemptyset
 signum
