@@ -41,7 +41,7 @@ jobs:
 
   cargo-build:
     name: Cargo build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - *checkout
 
@@ -75,7 +75,7 @@ jobs:
 
   cargo-fmt:
     name: Cargo fmt
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs:
       - changes
     if: |
@@ -101,7 +101,7 @@ jobs:
 
   cargo-test-and-report:
     name: Cargo test (and report)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       checks: write
       contents: read
@@ -228,7 +228,7 @@ jobs:
 
   cargo-clippy-and-report:
     name: Cargo clippy (and report)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     needs:
       - changes
     if: |
