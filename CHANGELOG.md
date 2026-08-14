@@ -1,4 +1,26 @@
 <!-- header goes here -->
+## [0.18.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.18.0..v0.18.1) - 2026-08-14
+
+### 🐛 Bug Fixes
+
+- Surface stats fetch failures with an error and retry by [@kristof-mattei](https://github.com/kristof-mattei) ([`36eca4d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/36eca4da9a7da5afc56feca98b198a5411ee08a8))
+- Refetch stats when the socket recovers or the tab becomes visible by [@kristof-mattei](https://github.com/kristof-mattei) ([`983dd24`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/983dd245b683cb56e25d97d36f3913649171df52))
+- Add `aria-pressed` to toggle buttons and `role="log"` to the event feed by [@kristof-mattei](https://github.com/kristof-mattei) ([`f3758e7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f3758e71e093c240cc50a5b607f1dc4fe2e090d2))
+- Raise rollup retention above the downstream `start_offset` by [@kristof-mattei](https://github.com/kristof-mattei) ([`9d525e3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9d525e328af839f5d6c9171f42378f6044c1b1ee))
+- Enable real-time aggregation on `connections_1h` and `connections_1day` by [@kristof-mattei](https://github.com/kristof-mattei) ([`927b1a6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/927b1a67d622dd6b18c854d3312bab6f9cce2e94))
+- Restyle the focus ring to match the selection color by [@kristof-mattei](https://github.com/kristof-mattei) ([`3cdc3df`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3cdc3df7979bd071dabb79251562f70f13fca408))
+
+### 📚 Documentation
+
+- Correct `get_stats` range to half-open `[from, to)` by [@kristof-mattei](https://github.com/kristof-mattei) ([`0aa2e41`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0aa2e41314663db3d8307e505d35c69be81d1778))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Limit linting to commits in this PR by [@kristof-mattei](https://github.com/kristof-mattei) ([`8127689`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8127689917ff740aa31b0869a623cb0caf3892b0))
+- *(ci)* Create fake version-bump patch to build locally by [@kristof-mattei](https://github.com/kristof-mattei) ([`acebe1b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/acebe1b114af910b7d02ff73045345456c46c17c))
+- *(ci)* Pin ubuntu runner image by [@kristof-mattei](https://github.com/kristof-mattei) ([`9eb5dc0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9eb5dc0f429dd33e486282c4d640f2d690053962))
+- *(ci)* Pin ubuntu runner image by [@kristof-mattei](https://github.com/kristof-mattei) ([`8db2333`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8db2333bd02d0bf951bb05f3afbb8196ae2261dd))
+- Pass `--all-features` in `generate-test-report.sh` by [@kristof-mattei](https://github.com/kristof-mattei) ([`16b162a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/16b162ab665208b514e43270457bdf66db5f01c8))
 ## [0.18.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.17.0..v0.18.0) - 2026-08-13
 
 ### 🚀 Features
