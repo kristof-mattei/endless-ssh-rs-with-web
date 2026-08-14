@@ -8,24 +8,6 @@ import { CountryFlag } from "./country-flag";
 
 const TOP_COUNTRIES_LIMIT = 5;
 
-const REGION_NAMES = new Intl.DisplayNames([], { type: "region" });
-
-function countryName(code: null | string): null | string {
-    if (code === null) {
-        return null;
-    }
-
-    const name = ((): string | undefined => {
-        try {
-            return REGION_NAMES.of(code);
-        } catch {
-            return undefined;
-        }
-    })();
-
-    return name ?? code;
-}
-
 interface Properties {
     rows: StatsRow[];
 }
@@ -53,7 +35,7 @@ export const TopCountries: React.FC<Properties> = ({ rows }) => {
                                 ) : (
                                     <CountryFlag
                                         countryCode={country.country_code}
-                                        countryName={countryName(country.country_code)}
+                                        countryName={country.country_name}
                                     />
                                 )}
                             </span>
