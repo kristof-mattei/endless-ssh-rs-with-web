@@ -121,6 +121,7 @@ uninlined
 unrs
 unseparated
 unstub
+uppercases
 usernamehw
 vadimcn
 venv
