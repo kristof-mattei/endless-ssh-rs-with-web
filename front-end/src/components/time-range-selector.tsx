@@ -63,10 +63,11 @@ async function fetchStats(range: Range, onData: (data: StatsData) => void, signa
 }
 
 interface Properties {
+    isLive: boolean;
     onData: (data: StatsData) => void;
 }
 
-export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
+export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
     const [selected, setSelected] = useState<Range>("24h");
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
@@ -112,6 +113,32 @@ export const TimeRangeSelector: React.FC<Properties> = ({ onData }) => {
 
     useEffect(() => {
         void doFetch(selected);
+    }, [doFetch, selected]);
+
+    // the range resolves to absolute instants at fetch time, so a fetch is stale after any
+    // gap: refetch when the socket recovers and when the tab becomes visible again
+    const wasLiveReference = useRef(isLive);
+
+    useEffect(() => {
+        if (isLive && !wasLiveReference.current) {
+            void doFetch(selected);
+        }
+
+        wasLiveReference.current = isLive;
+    }, [doFetch, isLive, selected]);
+
+    useEffect(() => {
+        const refetchWhenVisible = (): void => {
+            if (document.visibilityState === "visible") {
+                void doFetch(selected);
+            }
+        };
+
+        document.addEventListener("visibilitychange", refetchWhenVisible);
+
+        return () => {
+            document.removeEventListener("visibilitychange", refetchWhenVisible);
+        };
     }, [doFetch, selected]);
 
     const stopIntervalTimer = useCallback(() => {
