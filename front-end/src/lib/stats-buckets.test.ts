@@ -11,6 +11,7 @@ function row(bucket: string, overrides?: Partial<Omit<StatsRow, "bucket">>): Sta
     return {
         bucket,
         country_code: "US",
+        country_name: "United States",
         connects: 1,
         time_spent: 10,
         bytes_sent: 100,
@@ -101,7 +102,9 @@ describe("topCountries", () => {
             5,
         );
 
-        expect(totals).toEqual([{ country_code: "US", connects: 5, bytes_sent: 150, time_spent: 20 }]);
+        expect(totals).toEqual([
+            { country_code: "US", country_name: "United States", connects: 5, bytes_sent: 150, time_spent: 20 },
+        ]);
     });
 
     it("sorts by connects descending and truncates to the limit", () => {
@@ -124,13 +127,25 @@ describe("topCountries", () => {
     it("groups rows without a country under one entry", () => {
         const totals = topCountries(
             [
-                row("2026-01-01T00:01:00Z", { country_code: null, connects: 1 }),
-                row("2026-01-01T00:02:00Z", { country_code: null, connects: 1 }),
+                row("2026-01-01T00:01:00Z", { country_code: null, country_name: null, connects: 1 }),
+                row("2026-01-01T00:02:00Z", { country_code: null, country_name: null, connects: 1 }),
             ],
             5,
         );
 
         expect(totals).toHaveLength(1);
         expect(totals[0]).toMatchObject({ country_code: null, connects: 2 });
+    });
+
+    it("takes the name from any row that has one", () => {
+        const totals = topCountries(
+            [
+                row("2026-01-01T00:01:00Z", { country_name: null }),
+                row("2026-01-01T00:02:00Z", { country_name: "United States" }),
+            ],
+            5,
+        );
+
+        expect(totals[0]).toMatchObject({ country_code: "US", country_name: "United States" });
     });
 });
