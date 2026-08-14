@@ -68,7 +68,10 @@ export const EventFeed: React.FC<Properties> = ({ events }) => {
     return (
         <>
             <h2 className="mb-2 text-lg font-semibold text-gray-300">Recent disconnections (times in {TIMEZONE})</h2>
-            <div className="grid max-h-100 grid-cols-[auto_minmax(0,12rem)_minmax(0,max-content)_minmax(0,1fr)_max-content_max-content] gap-x-3 gap-y-1 overflow-y-auto">
+            <div
+                role="log"
+                className="grid max-h-100 grid-cols-[auto_minmax(0,12rem)_minmax(0,max-content)_minmax(0,1fr)_max-content_max-content] gap-x-3 gap-y-1 overflow-y-auto"
+            >
                 {events.length === 0 && (
                     <p className="col-span-full py-6 text-center text-gray-500">Waiting for connections…</p>
                 )}

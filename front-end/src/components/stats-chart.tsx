@@ -346,6 +346,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, from, to }) => {
                         <button
                             key={metric.value}
                             type="button"
+                            aria-pressed={selectedMetric === metric.value}
                             onClick={() => {
                                 setMetric(metric.value);
                             }}
