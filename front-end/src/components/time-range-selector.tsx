@@ -201,6 +201,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                     <button
                         key={r.value}
                         type="button"
+                        aria-pressed={selected === r.value}
                         onClick={() => {
                             handleChange(r.value);
                         }}
