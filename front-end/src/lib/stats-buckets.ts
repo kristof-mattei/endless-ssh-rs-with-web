@@ -12,6 +12,13 @@ export type BucketPoint = {
     bucket: Temporal.Instant;
 } & BucketPointValues;
 
+// TimescaleDB's bucket origin, a Monday, so weekly buckets run Monday to Sunday. Every narrower width divides a day evenly, so only the weekly grid depends on the anchor.
+const BUCKET_ANCHOR_MS = Temporal.Instant.from("2000-01-03T00:00:00Z").epochMilliseconds;
+
+export function snapUpToBucket(ms: number, intervalMs: number): number {
+    return BUCKET_ANCHOR_MS + Math.ceil((ms - BUCKET_ANCHOR_MS) / intervalMs) * intervalMs;
+}
+
 export interface CountryTotals {
     country_code: null | string;
     connects: number;
@@ -76,8 +83,7 @@ export function aggregate(
     }
 
     // Fill in zero-value entries for every bucket in [from, to) that has no data.
-    // TimescaleDB aligns buckets to the Unix epoch, so rounding to intervalMs works.
-    const startMs = Math.ceil(from.epochMilliseconds / intervalMs) * intervalMs;
+    const startMs = snapUpToBucket(from.epochMilliseconds, intervalMs);
 
     for (let ms = startMs; ms < to.epochMilliseconds; ms += intervalMs) {
         if (!map.has(ms)) {

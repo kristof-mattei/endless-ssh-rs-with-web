@@ -63,6 +63,18 @@ describe("aggregate", () => {
         ).toEqual(["2026-01-01T00:01:00Z", "2026-01-01T00:02:00Z", "2026-01-01T00:03:00Z", "2026-01-01T00:04:00Z"]);
     });
 
+    it("anchors weekly buckets on Mondays like TimescaleDB", () => {
+        const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+        const points = aggregate([], instant("2026-01-01T00:00:00Z"), instant("2026-01-20T00:00:00Z"), WEEK_MS);
+
+        expect(
+            points.map((p) => {
+                return p.bucket.toString();
+            }),
+        ).toEqual(["2026-01-05T00:00:00Z", "2026-01-12T00:00:00Z", "2026-01-19T00:00:00Z"]);
+    });
+
     it("sorts buckets ascending regardless of row order", () => {
         const points = aggregate(
             [row("2026-01-01T00:03:00Z"), row("2026-01-01T00:01:00Z")],

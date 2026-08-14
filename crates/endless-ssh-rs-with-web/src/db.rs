@@ -291,7 +291,7 @@ pub async fn get_stats(
     pool: &PgPool,
     from_to: Option<(OffsetDateTime, OffsetDateTime)>,
 ) -> Result<StatsResponse, sqlx::Error> {
-    let (tier, rows) = if let Some((from, to)) = from_to {
+    let (bucket_seconds, rows) = if let Some((from, to)) = from_to {
         let span = to - from;
         let age = OffsetDateTime::now_utc() - from;
 
@@ -331,12 +331,43 @@ pub async fn get_stats(
             .fetch_all(pool)
             .await?;
 
-        (tier, rows)
+        (tier.bucket_seconds, rows)
     } else {
-        let tier = TIERS.last().expect("`TIERS` is non-empty");
+        // the 1day tier grows forever, so past two years of history the open-ended query serves weeks to keep the row count bounded
+        let oldest: Option<OffsetDateTime> =
+            sqlx::query_scalar("SELECT MIN(bucket) FROM connections_1day_all")
+                .fetch_one(pool)
+                .await?;
 
-        let rows = sqlx::query(
-            "
+        let serve_weekly = oldest.is_some_and(|oldest| {
+            OffsetDateTime::now_utc() - oldest > SignedDuration::days(2 * 365)
+        });
+
+        if serve_weekly {
+            let rows = sqlx::query(
+                "
+        SELECT
+            time_bucket ('7 days', bucket) AS bucket
+            , country_code
+            , sum(connects)::bigint AS connects
+            , sum(time_spent) AS time_spent
+            , sum(bytes_sent)::bigint AS bytes_sent
+        FROM
+            connections_1day_all
+        GROUP BY
+            time_bucket ('7 days', bucket)
+            , country_code
+        ORDER BY
+            bucket
+        ",
+            )
+            .fetch_all(pool)
+            .await?;
+
+            (7 * 86400, rows)
+        } else {
+            let rows = sqlx::query(
+                "
         SELECT
             bucket
             , country_code
@@ -348,11 +379,14 @@ pub async fn get_stats(
         ORDER BY
             bucket
         ",
-        )
-        .fetch_all(pool)
-        .await?;
+            )
+            .fetch_all(pool)
+            .await?;
 
-        (tier, rows)
+            let tier = TIERS.last().expect("`TIERS` is non-empty");
+
+            (tier.bucket_seconds, rows)
+        }
     };
 
     let rows = rows
@@ -369,7 +403,7 @@ pub async fn get_stats(
         .collect::<Result<Vec<_>, sqlx::Error>>()?;
 
     Ok(StatsResponse {
-        bucket_seconds: tier.bucket_seconds,
+        bucket_seconds,
         rows,
     })
 }
