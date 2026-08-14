@@ -76,7 +76,7 @@ export const App: React.FC<Properties> = ({ useEventSource }) => {
             <section className="mb-6 space-y-2">
                 <h2 className="text-lg font-semibold text-gray-300">Stats</h2>
 
-                <TimeRangeSelector onData={setStatsData} />
+                <TimeRangeSelector isLive={status === "live"} onData={setStatsData} />
 
                 {statsData !== null && <StatsChart rows={statsData.rows} from={statsData.from} to={statsData.to} />}
             </section>
