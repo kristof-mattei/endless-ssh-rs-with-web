@@ -29,17 +29,15 @@ const REFRESH_INTERVALS: Array<{ label: string; seconds: number }> = [
     { label: "5m", seconds: 300 },
 ];
 
-function rangeToParameters(range: Range): { from: string; to: string } {
+function rangeToParameters(range: Exclude<Range, "all">): { from: string; to: string } {
     const now = Temporal.Now.instant();
     const to = now.toString();
 
-    const msMap: Record<Range, number> = {
+    const msMap: Record<Exclude<Range, "all">, number> = {
         "1h": 60 * 60 * 1000,
         "24h": 24 * 60 * 60 * 1000,
         "7d": 7 * 24 * 60 * 60 * 1000,
         "30d": 30 * 24 * 60 * 60 * 1000,
-        // now it's 1 year, we'll figure out a better way
-        all: 365 * 24 * 60 * 60 * 1000,
     };
 
     const from = now.subtract({ milliseconds: msMap[range] });
@@ -48,11 +46,15 @@ function rangeToParameters(range: Range): { from: string; to: string } {
 }
 
 async function fetchStats(range: Range, onData: (data: StatsData) => void, signal: AbortSignal): Promise<void> {
-    const { from, to } = rangeToParameters(range);
+    // "all" is the no-parameter query, open-ended on both sides
+    const parameters = range === "all" ? null : rangeToParameters(range);
 
-    const response = await fetch(`/api/stats?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, {
-        signal,
-    });
+    const url =
+        parameters === null
+            ? "/api/stats"
+            : `/api/stats?from=${encodeURIComponent(parameters.from)}&to=${encodeURIComponent(parameters.to)}`;
+
+    const response = await fetch(url, { signal });
 
     if (!response.ok) {
         throw new Error(`stats fetch failed with ${String(response.status)}`);
@@ -61,11 +63,21 @@ async function fetchStats(range: Range, onData: (data: StatsData) => void, signa
     // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- data from trusted backend
     const data = (await response.json()) as StatsResponse;
 
+    // rows are ordered by bucket, so an open-ended range spans first row to now
+    const to = parameters === null ? Temporal.Now.instant() : Temporal.Instant.from(parameters.to);
+    const first = data.rows.at(0);
+    const from =
+        parameters === null
+            ? first === undefined
+                ? to
+                : Temporal.Instant.from(first.bucket)
+            : Temporal.Instant.from(parameters.from);
+
     onData({
         rows: data.rows,
         bucketMs: data.bucket_seconds * 1000,
-        from: Temporal.Instant.from(from),
-        to: Temporal.Instant.from(to),
+        from,
+        to,
     });
 }
 
