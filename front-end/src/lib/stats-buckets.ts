@@ -21,6 +21,7 @@ export function snapUpToBucket(ms: number, intervalMs: number): number {
 
 export interface CountryTotals {
     country_code: null | string;
+    country_name: null | string;
     connects: number;
     bytes_sent: number;
     time_spent: number;
@@ -35,11 +36,15 @@ export function topCountries(rows: StatsRow[], limit: number): CountryTotals[] {
         if (existing === undefined) {
             map.set(row.country_code, {
                 country_code: row.country_code,
+                country_name: row.country_name,
                 connects: row.connects,
                 bytes_sent: row.bytes_sent,
                 time_spent: row.time_spent,
             });
         } else {
+            // archived buckets can predate the stored name, any row that has one wins
+            existing.country_name ??= row.country_name;
+
             existing.connects += row.connects;
             existing.bytes_sent += row.bytes_sent;
             existing.time_spent += row.time_spent;

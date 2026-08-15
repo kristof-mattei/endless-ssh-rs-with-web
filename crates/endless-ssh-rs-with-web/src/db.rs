@@ -206,6 +206,7 @@ pub struct StatsRow {
     #[cfg_attr(test, ts(type = "string"))]
     pub bucket: OffsetDateTime,
     pub country_code: Option<String>,
+    pub country_name: Option<String>,
     pub connects: i64,
     #[serde(serialize_with = "as_seconds")]
     #[cfg_attr(test, ts(type = "number"))]
@@ -308,6 +309,7 @@ pub async fn get_stats(
         SELECT
             bucket
             , country_code
+            , country_name
             , connects
             , time_spent
             , bytes_sent
@@ -349,6 +351,7 @@ pub async fn get_stats(
         SELECT
             time_bucket ('7 days', bucket) AS bucket
             , country_code
+            , country_name
             , sum(connects)::bigint AS connects
             , sum(time_spent) AS time_spent
             , sum(bytes_sent)::bigint AS bytes_sent
@@ -357,6 +360,7 @@ pub async fn get_stats(
         GROUP BY
             time_bucket ('7 days', bucket)
             , country_code
+            , country_name
         ORDER BY
             bucket
         ",
@@ -371,6 +375,7 @@ pub async fn get_stats(
         SELECT
             bucket
             , country_code
+            , country_name
             , connects
             , time_spent
             , bytes_sent
@@ -395,6 +400,7 @@ pub async fn get_stats(
             Ok(StatsRow {
                 bucket: row.try_get("bucket")?,
                 country_code: row.try_get("country_code")?,
+                country_name: row.try_get("country_name")?,
                 connects: row.try_get("connects")?,
                 time_spent: row.try_get::<DbDuration, _>("time_spent")?.into(),
                 bytes_sent: row.try_get("bytes_sent")?,
