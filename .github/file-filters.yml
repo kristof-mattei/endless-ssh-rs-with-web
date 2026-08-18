@@ -4,6 +4,7 @@ shared: &shared
   - "build-scripts/**"
 docker:
   - *shared
+  - ".dockerignore"
   - Dockerfile
 rust:
   - *shared
@@ -18,3 +19,4 @@ typescript:
   - "front-end/**"
   - "package.json"
   - "pnpm-lock.yaml"
+  - "tsconfig.json"
