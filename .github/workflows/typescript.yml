@@ -16,6 +16,7 @@ jobs:
         name: Check out code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           show-progress: false
 
       - &install_pnpm
@@ -40,7 +41,7 @@ jobs:
     runs-on: ubuntu-slim
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: read # dorny/paths-filter reads the PR's changed files
     outputs:
       typescript: ${{ steps.filter.outputs.typescript }}
     steps:
@@ -58,7 +59,7 @@ jobs:
     runs-on: ubuntu-26.04
     permissions:
       contents: read
-      id-token: write
+      id-token: write # the codecov plugin in vite.config.ts authenticates over OIDC during the build
     needs:
       - warm-up-cache
     steps:
@@ -83,7 +84,7 @@ jobs:
     name: Lint the code
     runs-on: ubuntu-26.04
     permissions:
-      checks: write
+      checks: write # eslint-annotate-action creates a check run
       contents: read
     needs:
       - changes
@@ -102,20 +103,41 @@ jobs:
 
       - name: Run lint
         shell: bash
+        id: lint
+        continue-on-error: true
         run: |
-          pnpm run lint --format=json --output-file reports/lint-report.json || true
+          pnpm run lint --format=json --output-file reports/lint-report.json
+
+      - name: Print lint results
+        shell: bash
+        run: |
+          if [[ ! -f reports/lint-report.json ]]; then
+            echo "reports/lint-report.json is missing: ESLint crashed before writing the report, check the Run lint step"
+            exit 1
+          fi
 
           # hack to print results in the console
           node --print "require('./node_modules/eslint/lib/cli-engine/formatters/stylish.js')(require('./reports/lint-report.json'))"
 
       - name: Annotate Code Linting Results
+        # fork PRs run with a read-only token, which cannot create check runs
+        if: |
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: ataylorme/eslint-annotate-action@5a8d8ab89a57679e90c32750e0f382e9d8570750 # 4.0.0
         with:
-          fail-on-error: true
-          fail-on-warning: true
+          fail-on-error: false
+          fail-on-warning: false
           markdown-report-on-step-summary: true
           only-pr-files: false
           report-json: reports/lint-report.json
+
+      - name: Fail if lint failed
+        shell: bash
+        if: |
+          steps.lint.outcome != 'success'
+        run: |
+          echo "Lint failed"
+          exit 1
 
   npm-test:
     name: Test the code
@@ -123,11 +145,11 @@ jobs:
     needs:
       - warm-up-cache
     permissions:
-      checks: write
+      checks: write # publish-unit-test-result-action creates a check run
       contents: read
-      id-token: write
-      issues: read
-      pull-requests: write
+      id-token: write # codecov-action authenticates over OIDC
+      issues: read # publish-unit-test-result-action needs this in private repos
+      pull-requests: write # publish-unit-test-result-action comments the test summary
     steps:
       - *checkout
 
@@ -145,6 +167,10 @@ jobs:
           pnpm run test --reporter=default --reporter=github-actions --reporter=junit --coverage.reporter=text --coverage.reporter=lcovonly
 
       - name: Upload test results
+        # fork PRs run with a read-only token, which cannot create check runs or PR comments
+        if: |
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: EnricoMi/publish-unit-test-result-action@d0a4676d0e0b938bc201470d88276b7c74c712b3 # v2.24.0
         with:
           check_name: Test results for TypeScript
@@ -159,6 +185,10 @@ jobs:
           echo "TYPESCRIPT=$(pnpm tsc --version)" >> "$GITHUB_ENV"
 
       - name: Upload coverage results (to Codecov.io)
+        # fork PRs run without id-token, so OIDC upload cannot work. Push runs must keep uploading to preserve base coverage
+        if: |
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           disable_search: true
@@ -173,6 +203,9 @@ jobs:
           use_oidc: true
 
       - name: Upload test results (to Codecov.io)
+        if: |
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           disable_search: true
@@ -232,6 +265,7 @@ jobs:
       - npm-dependencies
       - npm-lint
       - npm-test
+      - warm-up-cache
     if: |
       !cancelled()
     steps:
