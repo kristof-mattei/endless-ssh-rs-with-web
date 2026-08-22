@@ -206,6 +206,7 @@ pub struct StatsRow {
     #[cfg_attr(test, ts(type = "string"))]
     pub bucket: OffsetDateTime,
     pub country_code: Option<String>,
+    pub country_name: Option<String>,
     pub connects: i64,
     #[serde(serialize_with = "as_seconds")]
     #[cfg_attr(test, ts(type = "number"))]
@@ -265,13 +266,13 @@ const TIERS: [Tier; 4] = [
         retention: Some(SignedDuration::days(7)),
     },
     Tier {
-        table: "connections_1h_all",
+        table: "connections_1h",
         bucket_seconds: 3600,
         max_span: Some(SignedDuration::days(30)),
         retention: Some(SignedDuration::days(40)),
     },
     Tier {
-        table: "connections_1day_all",
+        table: "connections_1day",
         bucket_seconds: 86400,
         max_span: None,
         retention: None,
@@ -308,6 +309,7 @@ pub async fn get_stats(
         SELECT
             bucket
             , country_code
+            , country_name
             , connects
             , time_spent
             , bytes_sent
@@ -335,7 +337,7 @@ pub async fn get_stats(
     } else {
         // the 1day tier grows forever, so past two years of history the open-ended query serves weeks to keep the row count bounded
         let oldest: Option<OffsetDateTime> =
-            sqlx::query_scalar("SELECT MIN(bucket) FROM connections_1day_all")
+            sqlx::query_scalar("SELECT MIN(bucket) FROM connections_1day")
                 .fetch_one(pool)
                 .await?;
 
@@ -349,14 +351,16 @@ pub async fn get_stats(
         SELECT
             time_bucket ('7 days', bucket) AS bucket
             , country_code
+            , country_name
             , sum(connects)::bigint AS connects
             , sum(time_spent) AS time_spent
             , sum(bytes_sent)::bigint AS bytes_sent
         FROM
-            connections_1day_all
+            connections_1day
         GROUP BY
             time_bucket ('7 days', bucket)
             , country_code
+            , country_name
         ORDER BY
             bucket
         ",
@@ -371,11 +375,12 @@ pub async fn get_stats(
         SELECT
             bucket
             , country_code
+            , country_name
             , connects
             , time_spent
             , bytes_sent
         FROM
-            connections_1day_all
+            connections_1day
         ORDER BY
             bucket
         ",
@@ -395,6 +400,7 @@ pub async fn get_stats(
             Ok(StatsRow {
                 bucket: row.try_get("bucket")?,
                 country_code: row.try_get("country_code")?,
+                country_name: row.try_get("country_name")?,
                 connects: row.try_get("connects")?,
                 time_spent: row.try_get::<DbDuration, _>("time_spent")?.into(),
                 bytes_sent: row.try_get("bytes_sent")?,

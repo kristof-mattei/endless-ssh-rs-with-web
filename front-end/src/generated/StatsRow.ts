@@ -6,6 +6,7 @@
 export type StatsRow = {
   bucket: string;
   country_code: string | null;
+  country_name: string | null;
   connects: number;
   time_spent: number;
   bytes_sent: number;
