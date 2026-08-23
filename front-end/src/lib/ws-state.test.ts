@@ -3,9 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
 import type { WsEvent } from "../generated/WsEvent";
 import type { ConnectedEvent, DisconnectedEvent, InitEvent, ReadyEvent } from "../hooks/use-web-sockets";
-
 import type { WsState } from "./ws-state";
-
 import { INITIAL_WS_STATE, wsReducer } from "./ws-state";
 
 function init(overrides?: Partial<Omit<InitEvent, "type">>): InitEvent {
@@ -123,8 +121,8 @@ describe("wsReducer", () => {
             const state = applyEvents(INITIAL_WS_STATE, [init(), READY, connected("198.51.100.7", 50_000)]);
 
             expect(
-                state.activeConnections.map((c) => {
-                    return c.ip;
+                state.activeConnections.map((connection) => {
+                    return connection.ip;
                 }),
             ).toEqual(["198.51.100.7"]);
         });
@@ -145,8 +143,8 @@ describe("wsReducer", () => {
             ]);
 
             expect(
-                state.activeConnections.map((c) => {
-                    return c.port;
+                state.activeConnections.map((connection) => {
+                    return connection.port;
                 }),
             ).toEqual([1111, 2222]);
         });
@@ -163,8 +161,8 @@ describe("wsReducer", () => {
             ]);
 
             expect(
-                state.activeConnections.map((c) => {
-                    return c.bytes_sent;
+                state.activeConnections.map((connection) => {
+                    return connection.bytes_sent;
                 }),
             ).toEqual([0, 96]);
         });
@@ -188,8 +186,8 @@ describe("wsReducer", () => {
             ]);
 
             expect(
-                state.activeConnections.map((c) => {
-                    return c.ip;
+                state.activeConnections.map((connection) => {
+                    return connection.ip;
                 }),
             ).toEqual(["198.51.100.8"]);
             expect(
@@ -209,8 +207,8 @@ describe("wsReducer", () => {
             ]);
 
             expect(
-                state.activeConnections.map((c) => {
-                    return c.port;
+                state.activeConnections.map((connection) => {
+                    return connection.port;
                 }),
             ).toEqual([2222]);
         });
@@ -244,8 +242,8 @@ describe("wsReducer", () => {
             ]);
 
             expect(
-                state.activeConnections.map((c) => {
-                    return c.ip;
+                state.activeConnections.map((connection) => {
+                    return connection.ip;
                 }),
             ).toEqual(["2001:db8::2"]);
         });

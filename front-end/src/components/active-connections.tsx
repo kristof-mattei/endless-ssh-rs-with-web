@@ -1,10 +1,9 @@
-import type * as React from "react";
+import type React from "react";
 import { useEffect, useState } from "react";
 import { Temporal } from "temporal-polyfill";
 
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
 import { formatBytes, formatDuration, formatIp } from "../lib/formatting";
-
 import { CountryFlag } from "./country-flag";
 
 interface Properties {
@@ -21,7 +20,7 @@ function useNow(): Temporal.Instant {
             setNow(Temporal.Now.instant());
         }, 1000);
 
-        return () => {
+        return (): void => {
             clearInterval(id);
         };
     }, []);
@@ -45,10 +44,10 @@ const ConnectionRow: React.FC<{ connection: ActiveConnectionInfo; now: Temporal.
             <span className="truncate font-mono text-gray-300" title={ip}>
                 {ip}
             </span>
-            <span className="text-right text-green-400">
+            <span className="text-end text-green-400">
                 {formatDuration(secondsConnected(connection.connected_at, now))}
             </span>
-            <span className="text-right text-gray-500">{formatBytes(connection.bytes_sent)}</span>
+            <span className="text-end text-gray-500">{formatBytes(connection.bytes_sent)}</span>
         </div>
     );
 };
@@ -57,18 +56,18 @@ export const ActiveConnections: React.FC<Properties> = ({ activeConnections }) =
     const now = useNow();
 
     return (
-        <div className="flex h-[350px] flex-col rounded-lg bg-gray-900 p-3">
-            <h3 className="mb-2 text-sm font-semibold text-gray-400">Active connections</h3>
+        <div className="flex flex-col rounded-lg bg-gray-900 p-3 block-[350px]">
+            <h3 className="mbe-2 text-sm font-semibold text-gray-400">Active connections</h3>
 
-            <div className="grid min-h-0 flex-1 grid-cols-[auto_minmax(0,max-content)_minmax(3rem,1fr)_max-content_max-content] content-start gap-x-3 gap-y-1 overflow-y-auto">
+            <div className="grid flex-1 grid-cols-[auto_minmax(0,max-content)_minmax(3rem,1fr)_max-content_max-content] content-start gap-x-3 gap-y-1 overflow-y-auto min-block-0">
                 {activeConnections.length === 0 && (
                     <p className="col-span-full py-6 text-center text-gray-500">No active connections</p>
                 )}
                 {activeConnections.map((connection) => {
                     return (
                         <ConnectionRow
-                            key={`${connection.ip}:${connection.port.toString()}`}
                             connection={connection}
+                            key={`${connection.ip}:${connection.port.toString()}`}
                             now={now}
                         />
                     );

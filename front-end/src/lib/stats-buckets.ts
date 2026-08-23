@@ -20,9 +20,9 @@ export function snapUpToBucket(ms: number, intervalMs: number): number {
 }
 
 export interface CountryTotals {
-    country_code: null | string;
-    connects: number;
     bytes_sent: number;
+    connects: number;
+    country_code: null | string;
     time_spent: number;
 }
 
@@ -49,18 +49,18 @@ export function topCountries(rows: StatsRow[], limit: number): CountryTotals[] {
     return map
         .values()
         .toArray()
-        .sort((a, b) => {
-            return b.connects - a.connects;
+        .sort((left, right) => {
+            return right.connects - left.connects;
         })
         .slice(0, limit);
 }
 
-export function aggregate(
-    rows: StatsRow[],
-    from: Temporal.Instant,
-    to: Temporal.Instant,
-    intervalMs: number,
-): BucketPoint[] {
+export interface InstantRange {
+    from: Temporal.Instant;
+    to: Temporal.Instant;
+}
+
+export function aggregate(rows: StatsRow[], { from, to }: InstantRange, intervalMs: number): BucketPoint[] {
     const map = new Map<number, BucketPoint>();
 
     for (const row of rows) {
@@ -99,7 +99,7 @@ export function aggregate(
     return map
         .values()
         .toArray()
-        .sort((a, b) => {
-            return Temporal.Instant.compare(a.bucket, b.bucket);
+        .sort((left, right) => {
+            return Temporal.Instant.compare(left.bucket, right.bucket);
         });
 }

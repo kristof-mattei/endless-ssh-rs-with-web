@@ -1,10 +1,9 @@
-import type * as React from "react";
+import type React from "react";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
-import type { WsEvent } from "../generated/WsEvent";
-import type { ConnectionStatus } from "../hooks/use-web-sockets";
+import type { EventSourceStatus } from "../hooks/use-event-source";
+import { useEventSource } from "../hooks/use-event-source";
 import { INITIAL_WS_STATE, wsReducer } from "../lib/ws-state";
-
 import { ActiveConnections } from "./active-connections";
 import { EventFeed } from "./event-feed";
 import { StatsChart } from "./stats-chart";
@@ -13,8 +12,6 @@ import { TimeRangeSelector } from "./time-range-selector";
 import type { StatsData } from "./time-range-selector";
 import { TopCountries } from "./top-countries";
 import { WorldMap } from "./world-map";
-
-type EventSourceStatus = "demo" | ConnectionStatus;
 
 const CONNECTION_STATUS_STYLES: Record<EventSourceStatus, { dot: string; text: string }> = {
     connecting: { dot: "bg-gray-500", text: "text-gray-400" },
@@ -28,19 +25,13 @@ const ConnectionBadge: React.FC<{ status: EventSourceStatus }> = ({ status }) =>
 
     return (
         <span className={`flex items-center gap-1.5 text-sm ${text}`}>
-            <span aria-hidden="true" className={`size-2 rounded-full ${dot}`} />
+            <span aria-hidden="true" className={`rounded-full block-2 inline-2 ${dot}`} />
             {status}
         </span>
     );
 };
 
-interface Properties {
-    useEventSource: (options: { getSince: () => number; onEvent: (event: WsEvent) => void }) => {
-        status: EventSourceStatus;
-    };
-}
-
-export const App: React.FC<Properties> = ({ useEventSource }) => {
+export const App: React.FC = () => {
     const [{ activeConnections, events, maxSeenSequence, totalBytes, totalConnections, totalTimeSeconds }, dispatch] =
         useReducer(wsReducer, INITIAL_WS_STATE);
     const [statsData, setStatsData] = useState<null | StatsData>(null);
@@ -59,22 +50,22 @@ export const App: React.FC<Properties> = ({ useEventSource }) => {
     const { status } = useEventSource({ getSince, onEvent: dispatch });
 
     return (
-        <div className="min-h-screen bg-gray-950 p-4 text-white">
+        <div className="bg-gray-950 p-4 text-white min-block-screen">
             <header>
                 <h1 className="text-2xl font-bold">endless-ssh-rs, an ssh honeypot</h1>
             </header>
 
-            <section className="mb-6 space-y-2">
+            <section className="mbe-6 space-y-2">
                 <div className="flex items-center gap-2">
                     <h2 className="text-lg font-semibold text-gray-300">Live attack map</h2>
                     <ConnectionBadge status={status} />
                 </div>
 
                 <StatsPanel
-                    totalConnections={totalConnections}
-                    totalBytesSent={totalBytes}
-                    totalSecondsWasted={totalTimeSeconds}
                     activeConnectionsCount={activeConnections.length}
+                    totalBytesSent={totalBytes}
+                    totalConnections={totalConnections}
+                    totalSecondsWasted={totalTimeSeconds}
                 />
 
                 <div className="grid gap-3 lg:grid-cols-4">
@@ -85,7 +76,7 @@ export const App: React.FC<Properties> = ({ useEventSource }) => {
                 </div>
             </section>
 
-            <section className="mb-6 space-y-2">
+            <section className="mbe-6 space-y-2">
                 <h2 className="text-lg font-semibold text-gray-300">Stats</h2>
 
                 <TimeRangeSelector isLive={status === "live"} onData={setStatsData} />
@@ -94,9 +85,9 @@ export const App: React.FC<Properties> = ({ useEventSource }) => {
                     <div className="grid gap-3 lg:grid-cols-4">
                         <div className="lg:col-span-3">
                             <StatsChart
-                                rows={statsData.rows}
                                 bucketMs={statsData.bucketMs}
                                 from={statsData.from}
+                                rows={statsData.rows}
                                 to={statsData.to}
                             />
                         </div>

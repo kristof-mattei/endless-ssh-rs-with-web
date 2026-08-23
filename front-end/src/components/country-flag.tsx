@@ -1,4 +1,4 @@
-import type * as React from "react";
+import type React from "react";
 
 interface Properties {
     countryCode: null | string;
@@ -10,7 +10,7 @@ function countryFlag(code: null | string): null | string {
         return null;
     }
 
-    // prettier-ignore
+    // oxfmt-ignore
     const base = 0x01_F1_E6;
     const upper = code.toUpperCase();
     const cp0 = upper.codePointAt(0);
@@ -26,7 +26,7 @@ export const CountryFlag: React.FC<Properties> = ({ countryCode, countryName }) 
     return (
         <span className="cursor-default" title={countryName ?? countryCode ?? undefined}>
             <span className="flags-font text-lg">{countryFlag(countryCode)}</span>
-            {countryName !== null && <span className="ml-1.5 text-gray-400">{countryName}</span>}
+            {countryName !== null && <span className="ms-1.5 text-gray-400">{countryName}</span>}
         </span>
     );
 };
