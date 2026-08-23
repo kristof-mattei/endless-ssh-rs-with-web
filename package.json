@@ -51,7 +51,7 @@
         "@vitest/coverage-v8": "4.1.11",
         "@vitest/ui": "4.1.11",
         "babel-plugin-react-compiler": "1.0.0",
-        "cspell": "10.0.1",
+        "cspell": "10.1.0",
         "dependency-cruiser": "18.2.0",
         "eslint": "catalog:default",
         "eslint-config-love": "155.0.0",
