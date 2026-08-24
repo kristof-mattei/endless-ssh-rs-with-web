@@ -1,4 +1,58 @@
 <!-- header goes here -->
+## [0.20.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.19.0..v0.20.0) - 2026-08-24
+
+### 🚀 Features
+
+- Oxlint by [@kristof-mattei](https://github.com/kristof-mattei) ([`ddbb700`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ddbb700949662d28fc44fd2a5a7a9f3e69104a9f))
+- [**breaking**] Replace the migration history with one clean-sheet schema by [@kristof-mattei](https://github.com/kristof-mattei) ([`17513e2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/17513e2713f484d5daf7d2f3123bc24dd508f2b3))
+
+### 🐛 Bug Fixes
+
+- *(ci)* Restore id-token: write on npm-build so codecov bundle analysis uploads again by [@kristof-mattei](https://github.com/kristof-mattei) ([`64e7792`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/64e779211316d6452eb3b19842ad1470c8fd26ec))
+- *(ci)* Authenticate container cleanup against ghcr.io and stop treating failed manifest inspection as an image without children by [@kristof-mattei](https://github.com/kristof-mattei) ([`8eb8a22`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8eb8a22d60d0804195ed56b5380f19a3d27c6478))
+- *(ci)* Scope write permissions to the jobs that use them and stop interpolating refs into `run` blocks by [@kristof-mattei](https://github.com/kristof-mattei) ([`6b2b147`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6b2b14758fa385e339e26cc4cfdab1699eb026eb))
+- *(ci)* Strip only the leading `v` from the release tag by [@kristof-mattei](https://github.com/kristof-mattei) ([`44ca0e0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/44ca0e0aa4ca7638f1ffbe6b4ad5694f273b9a05))
+- *(ci)* Stop persisting checkout credentials where no step talks to a remote by [@kristof-mattei](https://github.com/kristof-mattei) ([`866f6db`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/866f6db6b3ebd095584c22467814a35795c355ff))
+- *(ci)* Stop passing every repo secret to `rust.yml` by [@kristof-mattei](https://github.com/kristof-mattei) ([`241883e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/241883ee6b62a354fd9e6b64a9f9a2611fdad277))
+- *(ci)* Pass `matrix.platform` through the environment by [@kristof-mattei](https://github.com/kristof-mattei) ([`2ef98aa`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2ef98aaa389b5f7032853e89c88734ffc0cca4e7))
+- *(ci)* Pass template expansions into `run` blocks through the environment by [@kristof-mattei](https://github.com/kristof-mattei) ([`43d08d5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/43d08d57d34bbddcfd45228902554688565f1c74))
+- *(ci)* Strip only the leading `v` from the calculated version by [@kristof-mattei](https://github.com/kristof-mattei) ([`20872a0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/20872a0f475c4a6fb8e4125973f8f008e9511172))
+- *(deps)* Update temporal-polyfill (npm) to v1.0.4 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d39a944`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d39a944e7e67161969f65f3b6073154e4a672db5))
+- *(deps)* Update temporal-polyfill (npm) to v1.0.4 (#3266) by [@renovate[bot]](https://github.com/renovate[bot]) in #3266 ([`534c54d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/534c54d2afdb10874ed96aa7c9023b784502aa62))
+- *(deps)* Update rust crate tower-proxy to v0.9.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`2e44a82`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2e44a825e4ebd7a53561bef532386de54c41bef7))
+- *(deps)* Update rust crate tower-proxy to v0.9.1 (#3268) by [@renovate[bot]](https://github.com/renovate[bot]) in #3268 ([`de6c8c4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/de6c8c49bdaa646c3d06efe4e6b850b7d7f5b7c7))
+- *(deps)* Update rust crate uuid to v1.24.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`8d3aa36`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8d3aa3657417a6c923f0e4b860d7ef33c8528431))
+- *(deps)* Update rust crate uuid to v1.24.1 (#3269) by [@renovate[bot]](https://github.com/renovate[bot]) in #3269 ([`ada26e9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ada26e936dc9351968e0dba529a85e27e14bf198))
+- *(deps)* Update rust crate tower-proxy to v0.10.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`6855538`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/685553825ee9cdcc58ca2d8d33ea467d83a299f0))
+- *(deps)* Update rust crate tower-proxy to v0.10.0 (#3270) by [@renovate[bot]](https://github.com/renovate[bot]) in #3270 ([`11a18db`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/11a18dbeee12e62c39726f4c037d713e659167b2))
+- *(deps)* Update maplibre-gl (npm) to v6.4.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`1953513`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/19535134a9546b330160438ba33ccd94cb0d8119))
+- *(deps)* Update maplibre-gl (npm) to v6.4.0 (#3277) by [@renovate[bot]](https://github.com/renovate[bot]) in #3277 ([`f13eb0c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f13eb0c65a5350708e68201dffdf6c12979d760c))
+- *(deps)* Update maplibre-gl (npm) to v6.4.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d7e5ac0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d7e5ac0b7786e7ef2faf92d61af3996197e51bdc))
+- *(deps)* Update maplibre-gl (npm) to v6.4.1 (#3286) by [@renovate[bot]](https://github.com/renovate[bot]) in #3286 ([`bcd758e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bcd758eddb1daf56138c43f27bdb2f39cda8e3bb))
+- *(deps)* Update maplibre-gl (npm) to v6.5.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`e6022ac`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e6022ac951ab739c9f629ae43da661e4776d3fd3))
+- *(deps)* Update maplibre-gl (npm) to v6.5.0 (#3299) by [@renovate[bot]](https://github.com/renovate[bot]) in #3299 ([`eaaa49d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/eaaa49db3dac169b82f146a72bfbc223139748b9))
+- *(deps)* Update rust crate uuid to v1.25.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`34af9cc`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/34af9cc8ce596ad40b23f4a7eda0adee1ce56543))
+- *(deps)* Update rust crate uuid to v1.25.0 (#3300) by [@renovate[bot]](https://github.com/renovate[bot]) in #3300 ([`bb4289a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bb4289ac672595253be5584ab52fa5ec6f153bd4))
+- *(deps)* Update rust crate maxminddb to v0.30.3 by [@renovate[bot]](https://github.com/renovate[bot]) ([`83ff8da`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/83ff8da0862647f33e36df45ee554e9387c1ddd7))
+- *(deps)* Update rust crate maxminddb to v0.30.3 (#3306) by [@renovate[bot]](https://github.com/renovate[bot]) in #3306 ([`83f5577`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/83f55775d6d26dacf741cacb6545d4fc72417851))
+- Disable sort locally to keep variables sorted by [@kristof-mattei](https://github.com/kristof-mattei) ([`fad0ea6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fad0ea6d714f9db95a34e50775c9531615014baf))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Deployed crates link to deployed version by [@kristof-mattei](https://github.com/kristof-mattei) ([`ae46c65`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ae46c657952d31fcb445012cf3fd2dbaa5cf3137))
+- *(ci)* Change extension by [@kristof-mattei](https://github.com/kristof-mattei) ([`caef7ed`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/caef7edbe2e0c93acb8901da1824164d3a7bd686))
+- *(ci)* Add a zizmor workflow and require it on PRs by [@kristof-mattei](https://github.com/kristof-mattei) ([`4a8efba`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4a8efbada863a16937ba2470fec25bad309049da))
+- *(ci)* Zizmor pedantic by [@kristof-mattei](https://github.com/kristof-mattei) ([`9c24bf6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9c24bf6d8ec472e1796cc076412ca84e724ad5f4))
+- *(ci)* Variable rename for correctness by [@kristof-mattei](https://github.com/kristof-mattei) ([`977f466`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/977f46626a8c80585c74d9030a2dc55bb32d8e59))
+- *(ci)* Enforce spellcheck by [@kristof-mattei](https://github.com/kristof-mattei) ([`e2d8f88`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e2d8f8887c4453056511c3e395626e112e3fa203))
+- *(ci)* Codeql concurrency by [@kristof-mattei](https://github.com/kristof-mattei) ([`8aefc58`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8aefc58251a58004ff9bfaf9a9bcda1f4978ef62))
+- *(ci)* Skip result uploads on fork PRs by [@kristof-mattei](https://github.com/kristof-mattei) ([`50d29e2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/50d29e2b1bf4d7bac2dd86da4a85414f9b69596a))
+- *(ci)* Fork writing to cache-to prevention by [@kristof-mattei](https://github.com/kristof-mattei) ([`4f859d2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4f859d2d20f025e760067a190310e4d688c5cf85))
+- *(ci)* Remove non-existent file by [@kristof-mattei](https://github.com/kristof-mattei) ([`f68ab8e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f68ab8e285ef955ec70c085fe9f8aa66c8f912e9))
+- *(ci)* Fix permissions by [@kristof-mattei](https://github.com/kristof-mattei) ([`950ce38`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/950ce3863c99614fcd2fbf3d2eaf3a4374306e98))
+- Add spellcheck file update by [@kristof-mattei](https://github.com/kristof-mattei) ([`a0f305b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a0f305bf272041886dc77b9ba83297d2153c25d5))
+- Disable lint, this is for library code by [@kristof-mattei](https://github.com/kristof-mattei) ([`c9b621e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c9b621e63a1aee05704c8fa65e5820470d0b7be6))
+- Sort `package.json` keys into oxfmt's canonical order by [@kristof-mattei](https://github.com/kristof-mattei) ([`beee173`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/beee173ca1b945016bf979600389defc4a966ab4))
 ## [0.19.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.18.1..v0.19.0) - 2026-08-14
 
 ### 🚀 Features
