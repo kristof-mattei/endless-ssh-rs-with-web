@@ -46,7 +46,7 @@ function randomInt(min: number, max: number): number {
 function randomIp(): string {
     if (Math.random() < 0.2) {
         const groups = Array.from({ length: 8 }, () => {
-            return randomInt(0, 0xff_ff).toString(16);
+            return randomInt(0, 65_535).toString(16);
         });
 
         return groups.join(":");
@@ -65,10 +65,10 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
         let sequence = 0;
         const timers = new Set<ReturnType<typeof setTimeout>>();
 
-        function schedule(ms: number, callback: () => void): void {
+        function schedule(ms: number, task: () => void): void {
             const id = setTimeout(() => {
                 timers.delete(id);
-                callback();
+                task();
             }, ms);
 
             timers.add(id);
@@ -145,7 +145,7 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
 
         spawn();
 
-        return () => {
+        return (): void => {
             for (const id of timers) {
                 clearTimeout(id);
             }

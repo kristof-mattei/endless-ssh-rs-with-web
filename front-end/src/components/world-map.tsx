@@ -1,7 +1,6 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import "../styles/world-map.css";
-
-import type * as React from "react";
+import type React from "react";
 import { Map, Marker } from "react-map-gl/maplibre";
 
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
@@ -13,24 +12,26 @@ interface Properties {
 }
 
 export const WorldMap: React.FC<Properties> = ({ activeConnections }) => {
-    const dots = activeConnections.filter((c): c is { latitude: number; longitude: number } & ActiveConnectionInfo => {
-        return c.latitude !== null && c.longitude !== null;
-    });
+    const dots = activeConnections.filter(
+        (connection): connection is { latitude: number; longitude: number } & ActiveConnectionInfo => {
+            return connection.latitude !== null && connection.longitude !== null;
+        },
+    );
 
     return (
-        <div className="w-full overflow-hidden rounded-lg" style={{ height: "350px" }}>
+        <div className="overflow-hidden rounded-lg inline-full" style={{ height: "350px" }}>
             <Map
+                attributionControl={{ compact: true }}
                 initialViewState={{ longitude: 0, latitude: 20, zoom: 1 }}
                 mapStyle={MAP_STYLE}
                 style={{ width: "100%", height: "100%" }}
-                attributionControl={{ compact: true }}
             >
                 {dots.map((dot) => {
                     return (
                         <Marker
                             key={`${dot.ip}:${dot.port.toString()}`}
-                            longitude={dot.longitude}
                             latitude={dot.latitude}
+                            longitude={dot.longitude}
                         >
                             <div
                                 style={{

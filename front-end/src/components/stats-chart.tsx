@@ -2,11 +2,9 @@ import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 import type { TooltipContentProps } from "recharts";
 import { Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, createHorizontalChart } from "recharts";
-
 import { Temporal } from "temporal-polyfill";
 
 import type { StatsRow } from "../generated/StatsRow";
-
 import { formatBytes, formatDuration } from "../lib/formatting";
 import type { BucketPoint, BucketPointValues } from "../lib/stats-buckets";
 import { aggregate, snapUpToBucket } from "../lib/stats-buckets";
@@ -23,10 +21,10 @@ const Typed = createHorizontalChart<BucketPoint, number>()({
     Bar,
 });
 
-const METRICS: ReadonlyArray<{ value: Metric; label: string }> = [
-    { value: "connects", label: "Connections" },
-    { value: "bytes_sent", label: "Bytes wasted" },
-    { value: "time_spent", label: "Time wasted" },
+const METRICS: readonly { label: string; value: Metric }[] = [
+    { label: "Connections", value: "connects" },
+    { label: "Bytes wasted", value: "bytes_sent" },
+    { label: "Time wasted", value: "time_spent" },
 ];
 
 function formatYLabel(metric: Metric, value: number): string {
@@ -37,7 +35,7 @@ function formatYLabel(metric: Metric, value: number): string {
         case "time_spent": {
             return formatDuration(value);
         }
-        default: {
+        case "connects": {
             if (value >= 1_000_000) {
                 return `${(value / 1_000_000).toFixed(1)}M`;
             }
@@ -155,9 +153,9 @@ function getTickValues(from: Temporal.Instant, to: Temporal.Instant, intervalMs:
 }
 
 interface Properties {
-    rows: StatsRow[];
     bucketMs: number;
     from: Temporal.Instant;
+    rows: StatsRow[];
     to: Temporal.Instant;
 }
 
@@ -192,8 +190,8 @@ export const CustomTooltipContent: (
                 {METRICS.map((metric) => {
                     return (
                         <li
-                            key={metric.value}
                             className="recharts-tooltip-item"
+                            key={metric.value}
                             style={{ display: "block", paddingBottom: 4, paddingTop: 4, ...itemStyle }}
                         >
                             <span className="recharts-tooltip-item-name">{metric.label}</span>
@@ -241,9 +239,9 @@ function useRechartsDevtools(): {
 export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) => {
     const developmentTools = useRechartsDevtools();
 
-    const [selectedMetric, setMetric] = useState<Metric>("connects");
+    const [selectedMetric, setSelectedMetric] = useState<Metric>("connects");
 
-    const points = aggregate(rows, from, to, bucketMs);
+    const points = aggregate(rows, { from, to }, bucketMs);
 
     const spanHours = from.until(to).total("hours");
     const formatTickLabel = getTickFormatter(spanHours);
@@ -252,21 +250,21 @@ export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) =
 
     return (
         <div className="rounded-lg bg-gray-800 p-4">
-            <div className="mb-3 flex items-center gap-2">
+            <div className="mbe-3 flex items-center gap-2">
                 {METRICS.map((metric) => {
                     return (
                         <button
-                            key={metric.value}
-                            type="button"
                             aria-pressed={selectedMetric === metric.value}
-                            onClick={() => {
-                                setMetric(metric.value);
-                            }}
                             className={`rounded-sm px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
                                 selectedMetric === metric.value
                                     ? "bg-blue-600 text-white"
                                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                             }`}
+                            key={metric.value}
+                            onClick={() => {
+                                setSelectedMetric(metric.value);
+                            }}
+                            type="button"
                         >
                             {metric.label}
                         </button>
@@ -277,7 +275,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) =
             {points.length === 0 ? (
                 <p className="py-8 text-center text-gray-500">No data for selected range</p>
             ) : (
-                <ResponsiveContainer width="100%" height={220}>
+                <ResponsiveContainer height={220} width="100%">
                     <Typed.BarChart
                         className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                         data={points}
@@ -295,20 +293,20 @@ export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) =
                             tickFormatter={(ms: number) => {
                                 return formatTickLabel(Temporal.Instant.fromEpochMilliseconds(ms));
                             }}
-                            tickLine={true}
+                            tickLine
                             ticks={tickValues}
                         />
                         <Typed.YAxis
-                            tickFormatter={(v: number) => {
-                                return formatYLabel(selectedMetric, v);
-                            }}
-                            tick={{ fill: "#9ca3af", fontSize: 11 }}
-                            width="auto"
                             axisLine={false}
+                            tick={{ fill: "#9ca3af", fontSize: 11 }}
+                            tickFormatter={(value: number) => {
+                                return formatYLabel(selectedMetric, value);
+                            }}
                             tickLine={false}
+                            width="auto"
                         />
                         <Typed.Tooltip
-                            cursor={{ fill: "rgba(255,255,255,0.04)" }}
+                            content={CustomTooltipContent}
                             contentStyle={{
                                 background: "#1f2937",
                                 border: "1px solid #374151",
@@ -316,11 +314,8 @@ export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) =
                                 color: "#e5e7eb",
                                 fontSize: "12px",
                             }}
-                            labelStyle={{ fontWeight: 600, color: "#e5e7eb", marginBottom: "4px" }}
+                            cursor={{ fill: "rgba(255,255,255,0.04)" }}
                             itemStyle={{ color: "#9ca3af" }}
-                            content={(properties) => {
-                                return <CustomTooltipContent {...properties} />;
-                            }}
                             labelFormatter={(label: ReactNode) => {
                                 return typeof label === "number"
                                     ? Temporal.Instant.fromEpochMilliseconds(label).toLocaleString(
@@ -329,17 +324,18 @@ export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) =
                                       )
                                     : label;
                             }}
+                            labelStyle={{ fontWeight: 600, color: "#e5e7eb", marginBottom: "4px" }}
                         />
-                        {METRICS.map((m) => {
+                        {METRICS.map((metric) => {
                             return (
                                 <Typed.Bar
-                                    key={m.value}
-                                    dataKey={(p: BucketPoint) => {
-                                        return p[m.value];
+                                    dataKey={(point: BucketPoint) => {
+                                        return point[metric.value];
                                     }}
-                                    name={m.label}
                                     fill="#2563eb"
-                                    hide={m.value !== selectedMetric}
+                                    hide={metric.value !== selectedMetric}
+                                    key={metric.value}
+                                    name={metric.label}
                                     radius={[2, 2, 0, 0]}
                                 />
                             );

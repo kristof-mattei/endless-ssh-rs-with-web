@@ -10,9 +10,7 @@ export type InitEvent = Extract<WsEvent, { type: "init" }>;
 export type ReadyEvent = Extract<WsEvent, { type: "ready" }>;
 
 interface Options {
-    /**
-    The highest `disconnected` sequence already applied. A reconnect replays everything after it.
-    */
+    /** The highest `disconnected` sequence already applied. A reconnect replays everything after it. */
     getSince: () => number;
     onEvent: (event: WsEvent) => void;
 }
@@ -123,7 +121,7 @@ export function useWebSocket({ getSince, onEvent }: Options): { status: Connecti
 
                 const event = ((): undefined | WsEvent => {
                     try {
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- trusted source
+                        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- trusted source
                         return JSON.parse(message.data) as WsEvent;
                     } catch (error) {
                         console.error("Ignoring malformed WebSocket frame", error);
@@ -186,7 +184,7 @@ export function useWebSocket({ getSince, onEvent }: Options): { status: Connecti
         globalThis.addEventListener("online", retryNow);
         document.addEventListener("visibilitychange", onVisibilityChange);
 
-        return () => {
+        return (): void => {
             isDisposed = true;
 
             globalThis.removeEventListener("online", retryNow);

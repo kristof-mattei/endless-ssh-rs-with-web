@@ -1,14 +1,12 @@
 import { render, screen } from "@testing-library/react";
-import type * as React from "react";
+import type React from "react";
 import { describe, expect, it, vi } from "vitest";
-
-import { useWebSocket } from "../hooks/use-web-sockets";
 
 import { App } from "./app";
 
 // maplibre requires WebGL, absent in jsdom
 vi.mock("react-map-gl/maplibre", () => {
-    // eslint-disable-next-line unicorn/consistent-function-scoping -- the factory is hoisted, outer scope is not initialized when it runs
+    // oxlint-disable-next-line unicorn/consistent-function-scoping -- the factory is hoisted, outer scope is not initialized when it runs
     const Passthrough = ({ children }: { children?: React.ReactNode }): React.JSX.Element => {
         return <div>{children}</div>;
     };
@@ -22,12 +20,12 @@ class InertWebSocket {
 
     public readonly readyState: number = InertWebSocket.CONNECTING;
 
-    // eslint-disable-next-line @typescript-eslint/class-methods-use-this -- stateless stub
+    // oxlint-disable-next-line typescript/class-methods-use-this -- stateless stub
     public addEventListener(): void {
         // never connects, never emits
     }
 
-    // eslint-disable-next-line @typescript-eslint/class-methods-use-this -- stateless stub
+    // oxlint-disable-next-line typescript/class-methods-use-this -- stateless stub
     public close(): void {
         // nothing to close
     }
@@ -44,7 +42,7 @@ describe("App", () => {
             }),
         );
 
-        render(<App useEventSource={useWebSocket} />);
+        render(<App />);
 
         expect(screen.getByRole("heading", { level: 1, name: "endless-ssh-rs, an ssh honeypot" })).toBeDefined();
         expect(screen.getByText("connecting")).toBeDefined();

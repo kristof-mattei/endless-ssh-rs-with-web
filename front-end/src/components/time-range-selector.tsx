@@ -1,4 +1,4 @@
-import type * as React from "react";
+import type React from "react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Temporal } from "temporal-polyfill";
 
@@ -6,15 +6,15 @@ import type { StatsResponse } from "../generated/StatsResponse";
 import type { StatsRow } from "../generated/StatsRow";
 
 export interface StatsData {
-    rows: StatsRow[];
     bucketMs: number;
     from: Temporal.Instant;
+    rows: StatsRow[];
     to: Temporal.Instant;
 }
 
 type Range = "1h" | "24h" | "30d" | "7d" | "all";
 
-const RANGES: Array<{ label: string; value: Range }> = [
+const RANGES: { label: string; value: Range }[] = [
     { label: "Last hour", value: "1h" },
     { label: "Last 24 h", value: "24h" },
     { label: "Last 7 days", value: "7d" },
@@ -22,7 +22,7 @@ const RANGES: Array<{ label: string; value: Range }> = [
     { label: "All time", value: "all" },
 ];
 
-const REFRESH_INTERVALS: Array<{ label: string; seconds: number }> = [
+const REFRESH_INTERVALS: { label: string; seconds: number }[] = [
     { label: "10s", seconds: 10 },
     { label: "30s", seconds: 30 },
     { label: "1m", seconds: 60 },
@@ -45,6 +45,13 @@ function rangeToParameters(range: Exclude<Range, "all">): { from: string; to: st
     return { from: from.toString(), to };
 }
 
+// rows are ordered by bucket, so an open-ended range starts at the first row, or collapses to `to` without rows
+function openEndedFrom(rows: StatsRow[], to: Temporal.Instant): Temporal.Instant {
+    const first = rows.at(0);
+
+    return first === undefined ? to : Temporal.Instant.from(first.bucket);
+}
+
 async function fetchStats(range: Range, onData: (data: StatsData) => void, signal: AbortSignal): Promise<void> {
     // "all" is the no-parameter query, open-ended on both sides
     const parameters = range === "all" ? null : rangeToParameters(range);
@@ -60,18 +67,11 @@ async function fetchStats(range: Range, onData: (data: StatsData) => void, signa
         throw new Error(`stats fetch failed with ${String(response.status)}`);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-type-assertion -- data from trusted backend
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- data from trusted backend
     const data = (await response.json()) as StatsResponse;
 
-    // rows are ordered by bucket, so an open-ended range spans first row to now
     const to = parameters === null ? Temporal.Now.instant() : Temporal.Instant.from(parameters.to);
-    const first = data.rows.at(0);
-    const from =
-        parameters === null
-            ? first === undefined
-                ? to
-                : Temporal.Instant.from(first.bucket)
-            : Temporal.Instant.from(parameters.from);
+    const from = parameters === null ? openEndedFrom(data.rows, to) : Temporal.Instant.from(parameters.from);
 
     onData({
         rows: data.rows,
@@ -107,23 +107,21 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
             try {
                 await fetchStats(range, onData, controller.signal);
             } catch (error) {
-                if (error instanceof DOMException && error.name === "AbortError") {
-                    return;
-                }
-
+                // only the newest fetch owns the loading and error state
                 if (abortReference.current === controller) {
-                    setHasError(true);
+                    setIsLoading(false);
+
+                    if (!(error instanceof DOMException && error.name === "AbortError")) {
+                        setHasError(true);
+                    }
                 }
 
                 return;
-            } finally {
-                // only the newest fetch owns the loading state
-                if (abortReference.current === controller) {
-                    setIsLoading(false);
-                }
             }
 
+            // only the newest fetch owns the loading and error state
             if (abortReference.current === controller) {
+                setIsLoading(false);
                 setHasError(false);
             }
         },
@@ -131,6 +129,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
     );
 
     useEffect(() => {
+        // oxlint-disable-next-line react/set-state-in-effect -- doFetch only sets state after the fetch resolves, oxlint's port does not see the await boundary
         void doFetch(selected);
     }, [doFetch, selected]);
 
@@ -155,7 +154,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
 
         document.addEventListener("visibilitychange", refetchWhenVisible);
 
-        return () => {
+        return (): void => {
             document.removeEventListener("visibilitychange", refetchWhenVisible);
         };
     }, [doFetch, selected]);
@@ -205,44 +204,43 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
         // re-anchor the auto-refresh countdown to this fetch
         startIntervalTimer();
 
-        try {
-            await doFetch(selected);
-        } finally {
-            setIsRefreshing(false);
-        }
+        // doFetch reports failures through the error state and never throws
+        await doFetch(selected);
+
+        setIsRefreshing(false);
     }, [doFetch, selected, startIntervalTimer]);
 
     return (
         <div className="flex items-center gap-2">
             <span className="text-sm text-gray-400">Time range:</span>
-            {RANGES.map((r) => {
+            {RANGES.map((range) => {
                 return (
                     <button
-                        key={r.value}
-                        type="button"
-                        aria-pressed={selected === r.value}
-                        onClick={() => {
-                            handleChange(r.value);
-                        }}
+                        aria-pressed={selected === range.value}
                         className={`rounded-sm px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
-                            selected === r.value
+                            selected === range.value
                                 ? "bg-blue-600 text-white"
                                 : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                         }`}
+                        key={range.value}
+                        onClick={() => {
+                            handleChange(range.value);
+                        }}
+                        type="button"
                     >
-                        {r.label}
+                        {range.label}
                     </button>
                 );
             })}
             <button
-                type="button"
+                aria-label="Refresh"
+                className="ms-2 rounded-sm bg-gray-700 px-3 py-1 text-sm text-gray-300 transition-colors hover:bg-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                disabled={isRefreshing}
                 onClick={() => {
                     void refresh();
                 }}
-                disabled={isRefreshing}
                 title="Refresh"
-                aria-label="Refresh"
-                className="ml-2 rounded-sm bg-gray-700 px-3 py-1 text-sm text-gray-300 transition-colors hover:bg-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                type="button"
             >
                 <span aria-hidden="true" className={`inline-block ${isRefreshing ? "animate-spin" : ""}`}>
                     ↻
@@ -252,12 +250,12 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                 Auto-refresh:
             </label>
             <select
+                className="rounded-sm bg-gray-700 px-2 py-1 text-sm text-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                 id={autoRefreshId}
-                value={refreshSeconds ?? "off"}
                 onChange={(event) => {
                     setRefreshSeconds(event.target.value === "off" ? null : Number(event.target.value));
                 }}
-                className="rounded-sm bg-gray-700 px-2 py-1 text-sm text-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                value={refreshSeconds ?? "off"}
             >
                 <option value="off">Off</option>
                 {REFRESH_INTERVALS.map((interval) => {
@@ -268,16 +266,16 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                     );
                 })}
             </select>
-            {isLoading && <span className="ml-2 text-xs text-gray-500">Loading...</span>}
+            {isLoading && <span className="ms-2 text-xs text-gray-500">Loading...</span>}
             {hasError && !isLoading && (
-                <span className="ml-2 text-xs text-red-400">
+                <span className="ms-2 text-xs text-red-400">
                     Failed to load stats.{" "}
                     <button
-                        type="button"
                         className="underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                         onClick={() => {
                             void refresh();
                         }}
+                        type="button"
                     >
                         Retry
                     </button>
