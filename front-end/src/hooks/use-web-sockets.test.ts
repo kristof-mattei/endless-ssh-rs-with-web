@@ -10,12 +10,14 @@ import { useWebSocket } from "./use-web-sockets";
 const NORMAL_CLOSURE_CODE = 1000;
 
 class FakeWebSocket extends EventTarget {
-    public static readonly CLOSED = 3;
-    public static readonly CLOSING = 2;
+    /* oxlint-disable perfectionist/sort-classes -- prefer numeric sort here */
     public static readonly CONNECTING = 0;
-    public static instances: FakeWebSocket[] = [];
     public static readonly OPEN = 1;
+    public static readonly CLOSING = 2;
+    public static readonly CLOSED = 3;
+    /* oxlint-enable perfectionist/sort-classes */
 
+    public static instances: FakeWebSocket[] = [];
     public closeCalls: (number | undefined)[] = [];
     public readyState: number = FakeWebSocket.CONNECTING;
     public readonly url: string;
