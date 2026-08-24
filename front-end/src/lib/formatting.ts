@@ -5,32 +5,31 @@ export function formatBytes(bytes: number): string {
     return prettyBytes(bytes);
 }
 
-export function formatDuration(seconds: number): string {
-    const d = Math.floor(seconds / 86_400);
-    const h = Math.floor((seconds % 86_400) / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = Math.floor(seconds % 60);
+export function formatDuration(totalSeconds: number): string {
+    const days = Math.floor(totalSeconds / 86_400);
+    const hours = Math.floor((totalSeconds % 86_400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = Math.floor(totalSeconds % 60);
 
     const parts: string[] = [];
 
-    // eslint-disable-next-line unicorn/consistent-boolean-name -- doesn't make sense here
     let hitNoneZero = false;
 
-    if (d > 0) {
-        parts.push(`${d.toString()}d`);
+    if (days > 0) {
+        parts.push(`${days.toString()}d`);
         hitNoneZero = true;
     }
 
-    if (hitNoneZero || h > 0) {
-        parts.push(`${h.toString()}h`);
+    if (hitNoneZero || hours > 0) {
+        parts.push(`${hours.toString()}h`);
         hitNoneZero = true;
     }
 
-    if (hitNoneZero || m > 0) {
-        parts.push(`${m.toString()}m`);
+    if (hitNoneZero || minutes > 0) {
+        parts.push(`${minutes.toString()}m`);
     }
 
-    parts.push(`${s.toString()}s`);
+    parts.push(`${seconds.toString()}s`);
     return parts.join(" ");
 }
 

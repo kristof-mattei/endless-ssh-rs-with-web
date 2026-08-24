@@ -56,8 +56,8 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
             return state;
         }
         case "connected": {
-            const isKnown = state.activeConnections.some((c) => {
-                return c.ip === event.ip && c.port === event.port;
+            const isKnown = state.activeConnections.some((connection) => {
+                return connection.ip === event.ip && connection.port === event.port;
             });
 
             if (isKnown) {
@@ -85,8 +85,10 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
         case "bytes_sent": {
             return {
                 ...state,
-                activeConnections: state.activeConnections.map((c) => {
-                    return c.ip === event.ip && c.port === event.port ? { ...c, bytes_sent: event.bytes_sent } : c;
+                activeConnections: state.activeConnections.map((connection) => {
+                    return connection.ip === event.ip && connection.port === event.port
+                        ? { ...connection, bytes_sent: event.bytes_sent }
+                        : connection;
                 }),
             };
         }
@@ -99,8 +101,8 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
 
             const next: WsState = {
                 ...state,
-                activeConnections: state.activeConnections.filter((c) => {
-                    return !isSameConnection(c, event);
+                activeConnections: state.activeConnections.filter((connection) => {
+                    return !isSameConnection(connection, event);
                 }),
                 events: [...state.events, event].slice(-MAX_EVENTS),
                 maxSeenSequence: event.sequence,

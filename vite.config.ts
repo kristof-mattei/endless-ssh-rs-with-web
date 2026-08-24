@@ -45,7 +45,7 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
             svgr(),
             react(),
             babel({
-                presets: [reactCompilerPreset()],
+                presets: [reactCompilerPreset({ panicThreshold: "all_errors" })],
             }),
             checker({ typescript: true }),
             tailwindcss(),
@@ -81,7 +81,7 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
         },
         test: {
             coverage: {
-                exclude: [...coverageConfigDefaults.exclude, "./dependency-cruiser.config.mjs"],
+                exclude: [...coverageConfigDefaults.exclude, "./dependency-cruiser.config.ts"],
                 reporter: ["json", "html", "text"],
                 provider: "v8",
                 reportsDirectory: "../../coverage/vitest",

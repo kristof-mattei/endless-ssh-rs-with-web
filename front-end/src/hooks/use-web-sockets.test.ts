@@ -3,7 +3,6 @@ import type { Mock } from "vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { WsEvent } from "../generated/WsEvent";
-
 import type { ConnectionStatus } from "./use-web-sockets";
 import { useWebSocket } from "./use-web-sockets";
 
@@ -11,16 +10,15 @@ import { useWebSocket } from "./use-web-sockets";
 const NORMAL_CLOSURE_CODE = 1000;
 
 class FakeWebSocket extends EventTarget {
-    public static readonly CONNECTING = 0;
-    public static readonly OPEN = 1;
-    public static readonly CLOSING = 2;
     public static readonly CLOSED = 3;
-
+    public static readonly CLOSING = 2;
+    public static readonly CONNECTING = 0;
     public static instances: FakeWebSocket[] = [];
+    public static readonly OPEN = 1;
 
-    public readonly url: string;
+    public closeCalls: (number | undefined)[] = [];
     public readyState: number = FakeWebSocket.CONNECTING;
-    public closeCalls: Array<number | undefined> = [];
+    public readonly url: string;
 
     public constructor(url: string) {
         super();
@@ -95,17 +93,17 @@ function dropLatest(): void {
     });
 }
 
-beforeEach(() => {
-    vi.useFakeTimers();
-    FakeWebSocket.instances = [];
-    vi.stubGlobal("WebSocket", FakeWebSocket);
-});
-
-afterEach(() => {
-    vi.useRealTimers();
-});
-
 describe("useWebSocket", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        FakeWebSocket.instances = [];
+        vi.stubGlobal("WebSocket", FakeWebSocket);
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
     it("starts in connecting and dials with the replay cursor at 0", () => {
         const { result } = renderWebSocketHook();
 
