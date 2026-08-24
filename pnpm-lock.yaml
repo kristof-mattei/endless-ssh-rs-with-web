@@ -49,8 +49,8 @@ importers:
         specifier: 2.0.1
         version: 2.0.1(vite@8.2.2(@types/node@26.2.0)(jiti@2.7.0)(yaml@2.9.0))
       '@recharts/devtools':
-        specifier: 0.0.16
-        version: 0.0.16(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1))
+        specifier: 0.0.18
+        version: 0.0.18(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1))
       '@rolldown/plugin-babel':
         specifier: 0.2.3
         version: 0.2.3(@babel/core@7.29.7(supports-color@7.2.0))(@babel/runtime@7.29.7)(rolldown@1.2.5)(vite@8.2.2(@types/node@26.2.0)(jiti@2.7.0)(yaml@2.9.0))
@@ -979,8 +979,8 @@ packages:
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
 
-  '@recharts/devtools@0.0.16':
-    resolution: {integrity: sha512-ohU7bDIRzUXDOEUBLtigkYtYNHPzIpFa6GX1f2oeQWqgySZsCujjXNXEwJ09MzVeQ+tvJ09Tnj25FjeJrMHV9w==}
+  '@recharts/devtools@0.0.18':
+    resolution: {integrity: sha512-8+jKlYvL8dh5cW3l+wuAPw6IS6ua3mHqgazWsk0QjeEYP5VwVWasyOgk7OONLss9CGIBWFLTIXHn9noMVRFKmA==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
@@ -3912,7 +3912,7 @@ snapshots:
 
   '@polka/url@1.0.0-next.29': {}
 
-  '@recharts/devtools@0.0.16(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1))':
+  '@recharts/devtools@0.0.18(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(recharts@3.10.1(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react-is@17.0.2)(react@19.2.8)(redux@5.0.1))':
     dependencies:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
