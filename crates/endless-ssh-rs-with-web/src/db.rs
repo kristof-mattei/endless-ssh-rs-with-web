@@ -1,5 +1,4 @@
 mod conversions;
-mod legacy;
 pub mod types;
 
 use std::cmp::Ordering;
@@ -11,7 +10,6 @@ use serde::Serialize;
 use sqlx::migrate::MigrateError;
 use sqlx::postgres::{PgPoolOptions, PgRow};
 use sqlx::{AssertSqlSafe, PgExecutor, PgPool, Row as _};
-use thiserror::Error;
 use time::{OffsetDateTime, SignedDuration};
 use tracing::{Level, event};
 
@@ -26,35 +24,8 @@ pub async fn create_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
         .await
 }
 
-#[derive(Error, Debug)]
-pub enum MigrationError {
-    #[error("database error: {0}")]
-    Database(
-        #[from]
-        #[source]
-        sqlx::Error,
-    ),
-    #[error("migration error: {0}")]
-    Migrate(
-        #[from]
-        #[source]
-        MigrateError,
-    ),
-    #[error(
-        "the database is at legacy migration version {0}, only version {final_legacy_version} migrates; run the previous release once to bring it there",
-        final_legacy_version = legacy::FINAL_LEGACY_VERSION
-    )]
-    UnsupportedLegacyVersion(i64),
-}
-
-pub async fn run_migrations(pool: &PgPool) -> Result<(), MigrationError> {
-    legacy::stash(pool).await?;
-
-    sqlx::migrate!().run(pool).await?;
-
-    legacy::restore(pool).await?;
-
-    Ok(())
+pub async fn run_migrations(pool: &PgPool) -> Result<(), MigrateError> {
+    sqlx::migrate!().run(pool).await
 }
 
 #[expect(clippy::too_many_arguments, reason = "One argument per column")]
