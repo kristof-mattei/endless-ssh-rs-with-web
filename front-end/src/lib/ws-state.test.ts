@@ -26,11 +26,9 @@ function connected(ip: string, port: number): ConnectedEvent {
         ip,
         port,
         connected_at: "2026-07-27T10:00:00Z",
-        country_code: null,
-        country_name: null,
+        country: null,
         city: null,
-        latitude: 51.2,
-        longitude: 4.4,
+        coordinates: { latitude: 51.2, longitude: 4.4 },
     };
 }
 
@@ -47,11 +45,9 @@ function disconnected(
         disconnected_at: "2026-07-27T10:01:00Z",
         time_spent: 60,
         bytes_sent: 1000,
-        country_code: null,
-        country_name: null,
+        country: null,
         city: null,
-        latitude: null,
-        longitude: null,
+        coordinates: null,
         ...overrides,
     };
 }
@@ -62,10 +58,8 @@ function activeConnection(ip: string, overrides?: Partial<Omit<ActiveConnectionI
         port: 50_000,
         connected_at: "2026-07-27T09:00:00Z",
         bytes_sent: 0,
-        latitude: null,
-        longitude: null,
-        country_code: null,
-        country_name: null,
+        coordinates: null,
+        country: null,
         city: null,
         ...overrides,
     };

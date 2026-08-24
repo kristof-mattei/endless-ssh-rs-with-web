@@ -53,7 +53,7 @@ const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
 
     return (
         <div className="col-span-full grid grid-cols-subgrid items-center rounded-sm bg-gray-800 px-3 py-2 text-sm">
-            <CountryFlag countryCode={event.country_code} countryName={event.country_name} />
+            <CountryFlag country={event.country} />
             <span className="truncate text-gray-400">{event.city ?? "Unknown"}</span>
             <span className="truncate font-mono text-gray-300">{formatIp(event.ip)}</span>
             <span className="truncate ps-3 text-end font-mono text-gray-300">{disconnectedAt}</span>

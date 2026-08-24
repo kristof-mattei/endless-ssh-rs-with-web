@@ -76,11 +76,9 @@ async fn send_connection_record(
         disconnected_at: record.disconnected_at,
         time_spent: record.time_spent.into(),
         bytes_sent: usize::try_from(record.bytes_sent).unwrap_or(0),
-        country_code: record.country_code,
-        country_name: record.country_name,
+        country: record.country,
         city: record.city,
-        latitude: record.latitude,
-        longitude: record.longitude,
+        coordinates: record.coordinates,
     };
     match serde_json::to_string(&ws_event) {
         Ok(json) => {

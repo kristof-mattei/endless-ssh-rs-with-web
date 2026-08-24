@@ -4,6 +4,7 @@ import type React from "react";
 import { Map, Marker } from "react-map-gl/maplibre";
 
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
+import type { Coordinates } from "../generated/Coordinates";
 
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
@@ -13,8 +14,8 @@ interface Properties {
 
 export const WorldMap: React.FC<Properties> = ({ activeConnections }) => {
     const dots = activeConnections.filter(
-        (connection): connection is { latitude: number; longitude: number } & ActiveConnectionInfo => {
-            return connection.latitude !== null && connection.longitude !== null;
+        (connection): connection is { coordinates: Coordinates } & ActiveConnectionInfo => {
+            return connection.coordinates !== null;
         },
     );
 
@@ -30,8 +31,8 @@ export const WorldMap: React.FC<Properties> = ({ activeConnections }) => {
                     return (
                         <Marker
                             key={`${dot.ip}:${dot.port.toString()}`}
-                            latitude={dot.latitude}
-                            longitude={dot.longitude}
+                            latitude={dot.coordinates.latitude}
+                            longitude={dot.coordinates.longitude}
                         >
                             <div
                                 style={{

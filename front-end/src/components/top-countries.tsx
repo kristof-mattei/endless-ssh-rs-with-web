@@ -7,24 +7,6 @@ import { CountryFlag } from "./country-flag";
 
 const TOP_COUNTRIES_LIMIT = 5;
 
-const REGION_NAMES = new Intl.DisplayNames([], { type: "region" });
-
-function countryName(code: null | string): null | string {
-    if (code === null) {
-        return null;
-    }
-
-    const name = ((): string | undefined => {
-        try {
-            return REGION_NAMES.of(code);
-        } catch {
-            return undefined;
-        }
-    })();
-
-    return name ?? code;
-}
-
 interface Properties {
     rows: StatsRow[];
 }
@@ -40,24 +22,21 @@ export const TopCountries: React.FC<Properties> = ({ rows }) => {
                 {countries.length === 0 && (
                     <p className="col-span-full py-6 text-center text-gray-500">No data for selected range</p>
                 )}
-                {countries.map((country) => {
+                {countries.map((entry) => {
                     return (
                         <div
                             className="col-span-full grid grid-cols-subgrid items-center rounded-sm bg-gray-900 px-3 py-2 text-sm"
-                            key={country.country_code ?? "unknown"}
+                            key={entry.country?.code ?? "unknown"}
                         >
                             <span className="truncate">
-                                {country.country_code === null ? (
+                                {entry.country === null ? (
                                     <span className="text-gray-400">Unknown</span>
                                 ) : (
-                                    <CountryFlag
-                                        countryCode={country.country_code}
-                                        countryName={countryName(country.country_code)}
-                                    />
+                                    <CountryFlag country={entry.country} />
                                 )}
                             </span>
-                            <span className="text-end text-gray-300">{country.connects.toLocaleString()}</span>
-                            <span className="text-end text-gray-500">{formatBytes(country.bytes_sent)}</span>
+                            <span className="text-end text-gray-300">{entry.connects.toLocaleString()}</span>
+                            <span className="text-end text-gray-500">{formatBytes(entry.bytes_sent)}</span>
                         </div>
                     );
                 })}

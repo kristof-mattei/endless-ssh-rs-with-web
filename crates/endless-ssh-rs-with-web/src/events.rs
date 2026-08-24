@@ -9,7 +9,7 @@ use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
 use crate::db;
-use crate::geoip::GeoIpReader;
+use crate::geoip::{Coordinates, Country, GeoIpReader};
 use crate::utils::serde::as_seconds;
 
 /// Internal event bus.
@@ -55,11 +55,9 @@ pub enum WsEvent {
         #[serde(with = "time::serde::rfc3339")]
         #[cfg_attr(test, ts(type = "string"))]
         connected_at: OffsetDateTime,
-        country_code: Option<String>,
-        country_name: Option<String>,
+        country: Option<Country>,
         city: Option<String>,
-        latitude: Option<f64>,
-        longitude: Option<f64>,
+        coordinates: Option<Coordinates>,
     },
     BytesSent {
         ip: IpAddr,
@@ -80,11 +78,9 @@ pub enum WsEvent {
         #[cfg_attr(test, ts(type = "number"))]
         time_spent: SignedDuration,
         bytes_sent: usize,
-        country_code: Option<String>,
-        country_name: Option<String>,
+        country: Option<Country>,
         city: Option<String>,
-        latitude: Option<f64>,
-        longitude: Option<f64>,
+        coordinates: Option<Coordinates>,
     },
 }
 
@@ -100,10 +96,8 @@ pub struct ActiveConnectionInfo {
     #[cfg_attr(test, ts(type = "string"))]
     pub connected_at: OffsetDateTime,
     pub bytes_sent: usize,
-    pub latitude: Option<f64>,
-    pub longitude: Option<f64>,
-    pub country_code: Option<String>,
-    pub country_name: Option<String>,
+    pub coordinates: Option<Coordinates>,
+    pub country: Option<Country>,
     pub city: Option<String>,
 }
 
@@ -160,26 +154,21 @@ async fn handle_event(
                 port: addr.port(),
                 connected_at,
                 bytes_sent: 0,
-                latitude: geo.as_ref().and_then(|g| g.latitude),
-                longitude: geo.as_ref().and_then(|g| g.longitude),
-                country_code: geo.as_ref().and_then(|g| g.country_code.clone()),
-                country_name: geo.as_ref().and_then(|g| g.country_name.clone()),
+                coordinates: geo.as_ref().and_then(|g| g.coordinates),
+                country: geo.as_ref().and_then(|g| g.country.clone()),
                 city: geo.as_ref().and_then(|g| g.city.clone()),
             };
 
-            let country_code = geo.as_mut().and_then(|geo| geo.country_code.take());
-            let country_name = geo.as_mut().and_then(|geo| geo.country_name.take());
+            let country = geo.as_mut().and_then(|geo| geo.country.take());
             let city = geo.as_mut().and_then(|geo| geo.city.take());
 
             let ws_event = WsEvent::Connected {
                 ip: info.ip,
                 port: info.port,
                 connected_at,
-                country_code,
-                country_name,
+                country,
                 city,
-                latitude: info.latitude,
-                longitude: info.longitude,
+                coordinates: info.coordinates,
             };
 
             active_connections.insert(addr, info);
@@ -225,8 +214,7 @@ async fn handle_event(
             .await
             {
                 Ok(sequence) => {
-                    let country_code = geo.as_mut().and_then(|geo| geo.country_code.take());
-                    let country_name = geo.as_mut().and_then(|geo| geo.country_name.take());
+                    let country = geo.as_mut().and_then(|geo| geo.country.take());
                     let city = geo.as_mut().and_then(|geo| geo.city.take());
 
                     let ws_event = WsEvent::Disconnected {
@@ -237,11 +225,9 @@ async fn handle_event(
                         disconnected_at,
                         time_spent,
                         bytes_sent,
-                        country_code,
-                        country_name,
+                        country,
                         city,
-                        latitude: geo.as_ref().and_then(|g| g.latitude),
-                        longitude: geo.as_ref().and_then(|g| g.longitude),
+                        coordinates: geo.as_ref().and_then(|g| g.coordinates),
                     };
 
                     // ignore send errors, no WS clients connected yet is fine
