@@ -1,4 +1,21 @@
 <!-- header goes here -->
+## [0.21.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.20.0..v0.21.0) - 2026-08-25
+
+### 🚀 Features
+
+- Remove legacy migration path by [@kristof-mattei](https://github.com/kristof-mattei) ([`0dd14ea`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0dd14eae11c72329e60982dc3e024254a9782471))
+- Store the dashboard state in the url by [@kristof-mattei](https://github.com/kristof-mattei) ([`6a5ed1c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6a5ed1c2742d035ef699d633054323e2c04f65f1))
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update maplibre-gl (npm) to v6.6.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`f785f59`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f785f59a5f0ec9dd22dbc23a86a3c9e8ac81d4db))
+- *(deps)* Update maplibre-gl (npm) to v6.6.0 (#3323) by [@renovate[bot]](https://github.com/renovate[bot]) in #3323 ([`13189a5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/13189a50a7fa958e05571764b08c6da48d372cc6))
+- Swap `OnEarlyDrop` and `TraceLayer` to make sure we can surface errors (but log them as debug) by [@kristof-mattei](https://github.com/kristof-mattei) ([`64c5a5d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/64c5a5d3338fb47abea395b2848edabdd9f27c2f))
+- Bind the dev server to 127.0.0.1 otherwise it doesn't work with WSL by [@kristof-mattei](https://github.com/kristof-mattei) ([`25e853e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/25e853eb2100a6a4a30f99bdfa411bc37abd4de6))
+
+### ⚙️ Miscellaneous Tasks
+
+- Enforce one component per file by [@kristof-mattei](https://github.com/kristof-mattei) ([`9c76c03`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9c76c03c1b311b7424f458a20d14ab0708f2a6f6))
 ## [0.20.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.19.0..v0.20.0) - 2026-08-24
 
 ### 🚀 Features
