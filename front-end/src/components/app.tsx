@@ -2,6 +2,7 @@
 import type React from "react";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
+import { useCanonicalUrl } from "../hooks/use-canonical-url";
 import { useEventSource } from "../hooks/use-event-source";
 import { INITIAL_WS_STATE, wsReducer } from "../lib/ws-state";
 import { ActiveConnections } from "./active-connections";
@@ -18,6 +19,8 @@ export const App: React.FC = () => {
     const [{ activeConnections, events, maxSeenSequence, totalBytes, totalConnections, totalTimeSeconds }, dispatch] =
         useReducer(wsReducer, INITIAL_WS_STATE);
     const [statsData, setStatsData] = useState<null | StatsData>(null);
+
+    useCanonicalUrl();
 
     // the reducer owns delivery progress, the hook reads it through this ref when building the reconnect URL
     const maxSeenSequenceReference = useRef(0);

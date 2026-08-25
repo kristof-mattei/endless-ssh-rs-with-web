@@ -62,6 +62,7 @@ multiplatform
 netsh
 nextest
 nsec
+nuqs
 oldact
 ossdata
 pathbuf

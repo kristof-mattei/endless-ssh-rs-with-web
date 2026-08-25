@@ -1,10 +1,11 @@
+import { useQueryState } from "nuqs";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 import { Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, createHorizontalChart } from "recharts";
 import { Temporal } from "temporal-polyfill";
 
 import type { StatsRow } from "../generated/StatsRow";
-import type { Metric } from "../lib/metrics";
+import { DASHBOARD_PARAMS } from "../lib/dashboard-params";
 import { METRICS, formatMetricValue } from "../lib/metrics";
 import type { BucketPoint } from "../lib/stats-buckets";
 import { aggregate, snapUpToBucket } from "../lib/stats-buckets";
@@ -164,7 +165,7 @@ function useRechartsDevtools(): {
 export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) => {
     const developmentTools = useRechartsDevtools();
 
-    const [selectedMetric, setSelectedMetric] = useState<Metric>("connects");
+    const [selectedMetric, setSelectedMetric] = useQueryState("metric", DASHBOARD_PARAMS.metric);
 
     const points = aggregate(rows, { from, to }, bucketMs);
 
@@ -187,7 +188,7 @@ export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) =
                             }`}
                             key={metric.value}
                             onClick={() => {
-                                setSelectedMetric(metric.value);
+                                void setSelectedMetric(metric.value);
                             }}
                             type="button"
                         >

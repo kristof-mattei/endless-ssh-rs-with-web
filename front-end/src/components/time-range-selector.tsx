@@ -1,9 +1,13 @@
+import { useQueryState } from "nuqs";
 import type React from "react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Temporal } from "temporal-polyfill";
 
 import type { StatsResponse } from "../generated/StatsResponse";
 import type { StatsRow } from "../generated/StatsRow";
+import type { Range } from "../lib/dashboard-params";
+import { DASHBOARD_PARAMS, RANGES, RANGE_SLUGS, REFRESH_INTERVALS, REFRESH_SLUGS } from "../lib/dashboard-params";
+import type { InstantRange } from "../lib/stats-buckets";
 
 export interface StatsData {
     bucketMs: number;
@@ -12,37 +16,10 @@ export interface StatsData {
     to: Temporal.Instant;
 }
 
-type Range = "1h" | "24h" | "30d" | "7d" | "all";
+function windowToRange(window: Temporal.DurationLike): InstantRange {
+    const to = Temporal.Now.instant();
 
-const RANGES: { label: string; value: Range }[] = [
-    { label: "Last hour", value: "1h" },
-    { label: "Last 24 h", value: "24h" },
-    { label: "Last 7 days", value: "7d" },
-    { label: "Last 30 days", value: "30d" },
-    { label: "All time", value: "all" },
-];
-
-const REFRESH_INTERVALS: { label: string; seconds: number }[] = [
-    { label: "10s", seconds: 10 },
-    { label: "30s", seconds: 30 },
-    { label: "1m", seconds: 60 },
-    { label: "5m", seconds: 300 },
-];
-
-function rangeToParameters(range: Exclude<Range, "all">): { from: string; to: string } {
-    const now = Temporal.Now.instant();
-    const to = now.toString();
-
-    const msMap: Record<Exclude<Range, "all">, number> = {
-        "1h": 60 * 60 * 1000,
-        "24h": 24 * 60 * 60 * 1000,
-        "7d": 7 * 24 * 60 * 60 * 1000,
-        "30d": 30 * 24 * 60 * 60 * 1000,
-    };
-
-    const from = now.subtract({ milliseconds: msMap[range] });
-
-    return { from: from.toString(), to };
+    return { from: to.subtract(window), to };
 }
 
 // rows are ordered by bucket, so an open-ended range starts at the first row, or collapses to `to` without rows
@@ -53,13 +30,13 @@ function openEndedFrom(rows: StatsRow[], to: Temporal.Instant): Temporal.Instant
 }
 
 async function fetchStats(range: Range, onData: (data: StatsData) => void, signal: AbortSignal): Promise<void> {
-    // "all" is the no-parameter query, open-ended on both sides
-    const parameters = range === "all" ? null : rangeToParameters(range);
+    const { window } = RANGES[range];
+    const requested = window === null ? null : windowToRange(window);
 
     const url =
-        parameters === null
+        requested === null
             ? "/api/stats"
-            : `/api/stats?from=${encodeURIComponent(parameters.from)}&to=${encodeURIComponent(parameters.to)}`;
+            : `/api/stats?from=${encodeURIComponent(requested.from.toString())}&to=${encodeURIComponent(requested.to.toString())}`;
 
     const response = await fetch(url, { signal });
 
@@ -70,8 +47,8 @@ async function fetchStats(range: Range, onData: (data: StatsData) => void, signa
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- data from trusted backend
     const data = (await response.json()) as StatsResponse;
 
-    const to = parameters === null ? Temporal.Now.instant() : Temporal.Instant.from(parameters.to);
-    const from = parameters === null ? openEndedFrom(data.rows, to) : Temporal.Instant.from(parameters.from);
+    const to = requested?.to ?? Temporal.Now.instant();
+    const from = requested?.from ?? openEndedFrom(data.rows, to);
 
     onData({
         rows: data.rows,
@@ -87,11 +64,13 @@ interface Properties {
 }
 
 export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
-    const [selected, setSelected] = useState<Range>("24h");
+    const [selected, setSelected] = useQueryState("range", DASHBOARD_PARAMS.range);
+    const [refreshLabel, setRefreshLabel] = useQueryState("refresh", DASHBOARD_PARAMS.refresh);
     const [isLoading, setIsLoading] = useState(true);
     const [hasError, setHasError] = useState(false);
-    const [refreshSeconds, setRefreshSeconds] = useState<null | number>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const { interval: refreshInterval } = REFRESH_INTERVALS[refreshLabel];
 
     const abortReference = useRef<AbortController | null>(null);
     const intervalReference = useRef<null | ReturnType<typeof setInterval>>(null);
@@ -129,7 +108,8 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
     );
 
     useEffect(() => {
-        // oxlint-disable-next-line react/set-state-in-effect -- doFetch only sets state after the fetch resolves, oxlint's port does not see the await boundary
+        // oxlint-disable-next-line react/set-state-in-effect -- this effect is the range-change handler, the range arrives from the URL so back and forward reach it the same way a click does
+        setIsLoading(true);
         void doFetch(selected);
     }, [doFetch, selected]);
 
@@ -171,14 +151,14 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
     const startIntervalTimer = useCallback(() => {
         stopIntervalTimer();
 
-        if (refreshSeconds === null) {
+        if (refreshInterval === null) {
             return;
         }
 
         intervalReference.current = setInterval(() => {
             void doFetch(selected);
-        }, refreshSeconds * 1000);
-    }, [doFetch, refreshSeconds, selected, stopIntervalTimer]);
+        }, Temporal.Duration.from(refreshInterval).total("milliseconds"));
+    }, [doFetch, refreshInterval, selected, stopIntervalTimer]);
 
     useEffect(() => {
         startIntervalTimer();
@@ -186,16 +166,16 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
         return stopIntervalTimer;
     }, [startIntervalTimer, stopIntervalTimer]);
 
+    // re-selecting the current range would otherwise push a history entry whose back step is a no-op
     const handleChange = useCallback(
         (range: Range) => {
             if (range === selected) {
                 return;
             }
 
-            setSelected(range);
-            setIsLoading(true);
+            void setSelected(range);
         },
-        [selected],
+        [selected, setSelected],
     );
 
     const refresh = useCallback(async () => {
@@ -213,22 +193,22 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
     return (
         <div className="flex items-center gap-2">
             <span className="text-sm text-gray-400">Time range:</span>
-            {RANGES.map((range) => {
+            {RANGE_SLUGS.map((range) => {
                 return (
                     <button
-                        aria-pressed={selected === range.value}
+                        aria-pressed={selected === range}
                         className={`rounded-sm px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
-                            selected === range.value
+                            selected === range
                                 ? "bg-blue-600 text-white"
                                 : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                         }`}
-                        key={range.value}
+                        key={range}
                         onClick={() => {
-                            handleChange(range.value);
+                            handleChange(range);
                         }}
                         type="button"
                     >
-                        {range.label}
+                        {RANGES[range].label}
                     </button>
                 );
             })}
@@ -253,15 +233,18 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                 className="rounded-sm bg-gray-700 px-2 py-1 text-sm text-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                 id={autoRefreshId}
                 onChange={(event) => {
-                    setRefreshSeconds(event.target.value === "off" ? null : Number(event.target.value));
+                    const chosen = REFRESH_SLUGS.find((slug) => {
+                        return slug === event.target.value;
+                    });
+
+                    void setRefreshLabel(chosen ?? "off");
                 }}
-                value={refreshSeconds ?? "off"}
+                value={refreshLabel}
             >
-                <option value="off">Off</option>
-                {REFRESH_INTERVALS.map((interval) => {
+                {REFRESH_SLUGS.map((slug) => {
                     return (
-                        <option key={interval.seconds} value={interval.seconds}>
-                            {interval.label}
+                        <option key={slug} value={slug}>
+                            {REFRESH_INTERVALS[slug].label}
                         </option>
                     );
                 })}
