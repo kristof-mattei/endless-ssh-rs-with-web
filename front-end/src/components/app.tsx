@@ -1,10 +1,11 @@
+/* oxlint-disable import/max-dependencies -- App renders every dashboard section */
 import type React from "react";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
-import type { EventSourceStatus } from "../hooks/use-event-source";
 import { useEventSource } from "../hooks/use-event-source";
 import { INITIAL_WS_STATE, wsReducer } from "../lib/ws-state";
 import { ActiveConnections } from "./active-connections";
+import { ConnectionBadge } from "./connection-badge";
 import { EventFeed } from "./event-feed";
 import { StatsChart } from "./stats-chart";
 import { StatsPanel } from "./stats-panel";
@@ -12,24 +13,6 @@ import { TimeRangeSelector } from "./time-range-selector";
 import type { StatsData } from "./time-range-selector";
 import { TopCountries } from "./top-countries";
 import { WorldMap } from "./world-map";
-
-const CONNECTION_STATUS_STYLES: Record<EventSourceStatus, { dot: string; text: string }> = {
-    connecting: { dot: "bg-gray-500", text: "text-gray-400" },
-    demo: { dot: "bg-purple-500", text: "text-purple-400" },
-    live: { dot: "bg-green-500", text: "text-green-400" },
-    reconnecting: { dot: "bg-amber-500", text: "text-amber-400" },
-};
-
-const ConnectionBadge: React.FC<{ status: EventSourceStatus }> = ({ status }) => {
-    const { dot, text } = CONNECTION_STATUS_STYLES[status];
-
-    return (
-        <span className={`flex items-center gap-1.5 text-sm ${text}`}>
-            <span aria-hidden="true" className={`rounded-full block-2 inline-2 ${dot}`} />
-            {status}
-        </span>
-    );
-};
 
 export const App: React.FC = () => {
     const [{ activeConnections, events, maxSeenSequence, totalBytes, totalConnections, totalTimeSeconds }, dispatch] =

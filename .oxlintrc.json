@@ -224,8 +224,7 @@
         "react/invariant": "error",
         "react/memo-dependencies": "error",
         "react/no-deriving-state-in-effects": "error",
-        // local deviation from the seed, remove once every file holds one component
-        "react/no-multi-comp": "off",
+        "react/no-multi-comp": "error",
         "react/rule-suppression": "error",
         "react/syntax": "error",
         "react/todo": "error",
