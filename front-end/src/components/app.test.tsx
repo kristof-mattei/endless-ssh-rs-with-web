@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import type React from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -42,7 +43,7 @@ describe("App", () => {
             }),
         );
 
-        render(<App />);
+        render(<App />, { wrapper: NuqsTestingAdapter });
 
         expect(screen.getByRole("heading", { level: 1, name: "endless-ssh-rs, an ssh honeypot" })).toBeDefined();
         expect(screen.getByText("connecting")).toBeDefined();

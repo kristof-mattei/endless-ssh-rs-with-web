@@ -2,6 +2,7 @@ import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
 import countryFlagsFontUrl from "country-flag-emoji-polyfill/dist/TwemojiCountryFlags.woff2";
 import { setWorkerUrl } from "maplibre-gl";
 import maplibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+import { NuqsAdapter } from "nuqs/adapters/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
@@ -17,6 +18,8 @@ const root = createRoot(container!);
 
 root.render(
     <StrictMode>
-        <App />
+        <NuqsAdapter>
+            <App />
+        </NuqsAdapter>
     </StrictMode>,
 );
