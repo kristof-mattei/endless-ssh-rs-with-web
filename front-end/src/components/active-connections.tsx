@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { Temporal } from "temporal-polyfill";
 
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
-import { formatBytes, formatDuration, formatIp } from "../lib/formatting";
-import { CountryFlag } from "./country-flag";
+import { ConnectionRow } from "./connection-row";
 
 interface Properties {
     activeConnections: ActiveConnectionInfo[];
@@ -27,30 +26,6 @@ function useNow(): Temporal.Instant {
 
     return now;
 }
-
-function secondsConnected(connectedAt: string, now: Temporal.Instant): number {
-    const milliseconds = now.epochMilliseconds - Temporal.Instant.from(connectedAt).epochMilliseconds;
-
-    return Math.max(0, Math.floor(milliseconds / 1000));
-}
-
-const ConnectionRow: React.FC<{ connection: ActiveConnectionInfo; now: Temporal.Instant }> = ({ connection, now }) => {
-    const ip = formatIp(connection.ip);
-
-    return (
-        <div className="col-span-full grid grid-cols-subgrid items-center rounded-sm bg-gray-800 px-3 py-2 text-sm">
-            <CountryFlag country={connection.country} />
-            <span className="truncate text-gray-400">{connection.city ?? "Unknown"}</span>
-            <span className="truncate font-mono text-gray-300" title={ip}>
-                {ip}
-            </span>
-            <span className="text-end text-green-400">
-                {formatDuration(secondsConnected(connection.connected_at, now))}
-            </span>
-            <span className="text-end text-gray-500">{formatBytes(connection.bytes_sent)}</span>
-        </div>
-    );
-};
 
 export const ActiveConnections: React.FC<Properties> = ({ activeConnections }) => {
     const now = useNow();

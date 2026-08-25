@@ -1,15 +1,14 @@
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useEffect, useState } from "react";
-import type { TooltipContentProps } from "recharts";
 import { Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, createHorizontalChart } from "recharts";
 import { Temporal } from "temporal-polyfill";
 
 import type { StatsRow } from "../generated/StatsRow";
-import { formatBytes, formatDuration } from "../lib/formatting";
-import type { BucketPoint, BucketPointValues } from "../lib/stats-buckets";
+import type { Metric } from "../lib/metrics";
+import { METRICS, formatMetricValue } from "../lib/metrics";
+import type { BucketPoint } from "../lib/stats-buckets";
 import { aggregate, snapUpToBucket } from "../lib/stats-buckets";
-
-type Metric = keyof BucketPointValues;
+import { StatsTooltip } from "./stats-tooltip";
 
 // recharts hands axis values to d3, which coerces object keys via `valueOf()`.
 // `Temporal.Instant.prototype.valueOf` throws by design, so the axis carries
@@ -20,32 +19,6 @@ const Typed = createHorizontalChart<BucketPoint, number>()({
     Tooltip,
     Bar,
 });
-
-const METRICS: readonly { label: string; value: Metric }[] = [
-    { label: "Connections", value: "connects" },
-    { label: "Bytes wasted", value: "bytes_sent" },
-    { label: "Time wasted", value: "time_spent" },
-];
-
-function formatYLabel(metric: Metric, value: number): string {
-    switch (metric) {
-        case "bytes_sent": {
-            return formatBytes(value);
-        }
-        case "time_spent": {
-            return formatDuration(value);
-        }
-        case "connects": {
-            if (value >= 1_000_000) {
-                return `${(value / 1_000_000).toFixed(1)}M`;
-            }
-            if (value >= 1000) {
-                return `${(value / 1000).toFixed(1)}k`;
-            }
-            return value.toFixed(0);
-        }
-    }
-}
 
 // Axis ticks and tooltip headers need different precision. Tick values from `getTickValues` sit on round boundaries (whole hours, midnights, month starts),
 // while the tooltip shows a single bucket at the interval the backend aggregated at.
@@ -159,54 +132,6 @@ interface Properties {
     to: Temporal.Instant;
 }
 
-function isBucketPoint(value: unknown): value is BucketPoint {
-    return typeof value === "object" && value !== null && "bucket" in value;
-}
-
-// recharts' `DefaultTooltipContent` is declared without generics, so rendering the
-// content ourselves is the only way to keep the chart's narrowed types. Markup and
-// base styles mirror theirs.
-export const CustomTooltipContent: (
-    properties: TooltipContentProps<number, keyof BucketPoint>,
-) => null | React.JSX.Element = ({ contentStyle, itemStyle, label, labelFormatter, labelStyle, payload }) => {
-    const payload0 = payload[0];
-
-    if (payload0 === undefined || !isBucketPoint(payload0.payload)) {
-        return null;
-    }
-
-    const bucketPoint = payload0.payload;
-    const formattedLabel = labelFormatter === undefined ? label : labelFormatter(label, payload);
-
-    return (
-        <div
-            className="recharts-default-tooltip"
-            style={{ margin: 0, padding: 10, whiteSpace: "nowrap", ...contentStyle }}
-        >
-            <p className="recharts-tooltip-label" style={{ margin: 0, ...labelStyle }}>
-                {formattedLabel}
-            </p>
-            <ul className="recharts-tooltip-item-list" style={{ margin: 0, padding: 0 }}>
-                {METRICS.map((metric) => {
-                    return (
-                        <li
-                            className="recharts-tooltip-item"
-                            key={metric.value}
-                            style={{ display: "block", paddingBottom: 4, paddingTop: 4, ...itemStyle }}
-                        >
-                            <span className="recharts-tooltip-item-name">{metric.label}</span>
-                            <span className="recharts-tooltip-item-separator">{": "}</span>
-                            <span className="recharts-tooltip-item-value">
-                                {formatYLabel(metric.value, bucketPoint[metric.value])}
-                            </span>
-                        </li>
-                    );
-                })}
-            </ul>
-        </div>
-    );
-};
-
 type DevelopmentToolsState = {
     Component: () => React.JSX.Element;
     portalId: string;
@@ -300,13 +225,13 @@ export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) =
                             axisLine={false}
                             tick={{ fill: "#9ca3af", fontSize: 11 }}
                             tickFormatter={(value: number) => {
-                                return formatYLabel(selectedMetric, value);
+                                return formatMetricValue(selectedMetric, value);
                             }}
                             tickLine={false}
                             width="auto"
                         />
                         <Typed.Tooltip
-                            content={CustomTooltipContent}
+                            content={StatsTooltip}
                             contentStyle={{
                                 background: "#1f2937",
                                 border: "1px solid #374151",

@@ -1,6 +1,7 @@
 import type React from "react";
 
 import { formatBytes, formatDuration } from "../lib/formatting";
+import { Stat } from "./stat";
 
 interface Properties {
     activeConnectionsCount: number;
@@ -8,15 +9,6 @@ interface Properties {
     totalConnections: number;
     totalSecondsWasted: number;
 }
-
-const Stat: React.FC<{ label: string; value: string }> = ({ label, value }) => {
-    return (
-        <div className="flex flex-col items-center rounded-lg bg-gray-800 p-4">
-            <span className="text-2xl font-bold text-white">{value}</span>
-            <span className="mbs-1 text-sm text-gray-400">{label}</span>
-        </div>
-    );
-};
 
 export const StatsPanel: React.FC<Properties> = ({
     totalConnections,
