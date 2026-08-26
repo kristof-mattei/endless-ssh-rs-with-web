@@ -5,6 +5,9 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ../:/workspace/vscode/
+      # separate node_modules per environment, because sharing one across host and
+      # container yields ERR_PNPM_UNEXPECTED_STORE on every switch
+      - node-modules:/workspace/vscode/node_modules
     depends_on:
       - timescaledb
     network_mode: service:timescaledb
@@ -22,4 +25,5 @@ services:
       - ../init-db/:/docker-entrypoint-initdb.d/
 
 volumes:
+  node-modules:
   timescaledb-data:
