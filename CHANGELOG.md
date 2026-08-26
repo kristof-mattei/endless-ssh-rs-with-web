@@ -1,4 +1,13 @@
 <!-- header goes here -->
+## [0.23.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.22.0..v0.23.0) - 2026-08-26
+
+### 🚀 Features
+
+- Reload a tab whose bundle predates the server by [@kristof-mattei](https://github.com/kristof-mattei) ([`a7e0409`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a7e0409d2d9a629512e6428dc877ace064793041))
+
+### 🐛 Bug Fixes
+
+- Cache policy for the served front-end by [@kristof-mattei](https://github.com/kristof-mattei) ([`8675676`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8675676bf7aed6158d554cb0111be3aedc8d5be2))
 ## [0.22.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.21.0..v0.22.0) - 2026-08-26
 
 ### 🚀 Features
