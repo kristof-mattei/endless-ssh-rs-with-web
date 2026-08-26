@@ -67,6 +67,7 @@ tower-http = { version = "=0.7.0", features = [
     "cors",
     "fs",
     "on-early-drop",
+    "set-header",
     "trace",
 ] }
 tower-proxy = { version = "=0.10.0", features = ["axum"] }
@@ -83,6 +84,7 @@ uuid = { version = "=1.25.0", features = ["v7"] }
 [dev-dependencies]
 mockall = "=0.15.0"
 pretty_assertions = { version = "=1.4.1", features = ["unstable"] }
+tower = { version = "=0.5.3", features = ["util"] }
 ts-rs = { version = "=12.0.1", features = ["format"] }
 
 [lints]
