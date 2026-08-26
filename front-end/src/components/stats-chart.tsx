@@ -139,10 +139,7 @@ async function loadDevelopmentTools(setDevtools: Dispatch<SetStateAction<Develop
     });
 }
 
-function useRechartsDevtools(): {
-    Component: () => React.JSX.Element;
-    portalId: string;
-} | null {
+function useRechartsDevtools(): DevelopmentToolsState {
     const [devtools, setDevtools] = useState<DevelopmentToolsState>(null);
 
     useEffect(() => {
