@@ -1,12 +1,12 @@
 import type React from "react";
-import { Temporal } from "temporal-polyfill";
+import type { Temporal } from "temporal-polyfill";
 
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
 import { formatBytes, formatDuration, formatIp } from "../lib/formatting";
 import { CountryFlag } from "./country-flag";
 
-function secondsConnected(connectedAt: string, now: Temporal.Instant): number {
-    const milliseconds = now.epochMilliseconds - Temporal.Instant.from(connectedAt).epochMilliseconds;
+function secondsConnected(connectedAt: Temporal.Instant, now: Temporal.Instant): number {
+    const milliseconds = now.epochMilliseconds - connectedAt.epochMilliseconds;
 
     return Math.max(0, Math.floor(milliseconds / 1000));
 }

@@ -96,7 +96,7 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
                 type: "connected",
                 ip,
                 port,
-                connected_at: connectedAt.toString(),
+                connected_at: connectedAt,
                 ...geo,
             });
 
@@ -124,8 +124,8 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
                     sequence,
                     ip,
                     port,
-                    connected_at: connectedAt.toString(),
-                    disconnected_at: disconnectedAt.toString(),
+                    connected_at: connectedAt,
+                    disconnected_at: disconnectedAt,
                     time_spent: timeSpent,
                     bytes_sent: bytesSent,
                     ...geo,

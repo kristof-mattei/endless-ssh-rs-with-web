@@ -66,13 +66,12 @@ export function aggregate(rows: StatsRow[], { from, to }: InstantRange, interval
     const map = new Map<number, BucketPoint>();
 
     for (const row of rows) {
-        const bucket = Temporal.Instant.from(row.bucket);
-        const key = bucket.epochMilliseconds;
+        const key = row.bucket.epochMilliseconds;
         const existing = map.get(key);
 
         if (existing === undefined) {
             map.set(key, {
-                bucket,
+                bucket: row.bucket,
                 bytes_sent: row.bytes_sent,
                 connects: row.connects,
                 time_spent: row.time_spent,

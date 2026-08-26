@@ -6,19 +6,19 @@ import { aggregate, topCountries } from "./stats-buckets";
 
 const MINUTE_MS = 60_000;
 
+function instant(iso: string): Temporal.Instant {
+    return Temporal.Instant.from(iso);
+}
+
 function row(bucket: string, overrides?: Partial<Omit<StatsRow, "bucket">>): StatsRow {
     return {
-        bucket,
+        bucket: instant(bucket),
         country: { code: "US", name: "United States" },
         connects: 1,
         time_spent: 10,
         bytes_sent: 100,
         ...overrides,
     };
-}
-
-function instant(iso: string): Temporal.Instant {
-    return Temporal.Instant.from(iso);
 }
 
 describe("aggregate", () => {

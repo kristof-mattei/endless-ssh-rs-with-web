@@ -5,17 +5,13 @@ import type { DisconnectedEvent } from "../hooks/use-web-sockets";
 import { formatBytes, formatDuration, formatIp } from "../lib/formatting";
 import { CountryFlag } from "./country-flag";
 
-function disconnectedAtToHumanReadable(disconnectedAt: string): string {
-    const instant = Temporal.Instant.from(disconnectedAt);
+function disconnectedAtToHumanReadable(disconnectedAt: Temporal.Instant): string {
+    const localZonedDateTime = disconnectedAt.toZonedDateTimeISO(Temporal.Now.timeZoneId());
 
-    const localZonedDateTime = instant.toZonedDateTimeISO(Temporal.Now.timeZoneId());
-
-    const humanReadable = localZonedDateTime.toLocaleString([], {
+    return localZonedDateTime.toLocaleString([], {
         dateStyle: "full",
         timeStyle: "short",
     });
-
-    return humanReadable;
 }
 
 export const EventRow: React.FC<{ event: DisconnectedEvent }> = ({ event }) => {
