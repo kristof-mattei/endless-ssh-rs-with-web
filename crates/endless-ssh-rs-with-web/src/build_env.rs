@@ -1,3 +1,4 @@
+pub const COMPILE_TIME_BUILD_ID: &str = env!("COMPILE_TIME_BUILD_ID");
 pub const COMPILE_TIME_HOST: &str = env!("COMPILE_TIME_HOST");
 pub const COMPILE_TIME_TARGET: &str = env!("COMPILE_TIME_TARGET");
 pub const COMPILE_TIME_TARGET_CPU: Option<&str> = const {

@@ -26,6 +26,10 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
     const config: UserConfig = {
         appType: "spa",
         cacheDir: "../../node_modules/.cache/",
+        define: {
+            // The git sha in CI, "dev" locally. The server reports the same value in its `init` frame.
+            "import.meta.env.BUILD_ID": JSON.stringify(environment["BUILD_ID"] ?? "dev"),
+        },
         build: {
             minify: false,
             target: "esnext",

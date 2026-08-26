@@ -1,1 +1,4 @@
-/* oxlint-disable unicorn/no-empty-file -- Nothing here yet */
+// substituted at build time, see `vite.config.ts`
+interface ImportMetaEnv {
+    readonly BUILD_ID: string;
+}

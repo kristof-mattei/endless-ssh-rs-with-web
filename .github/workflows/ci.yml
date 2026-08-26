@@ -367,6 +367,7 @@ jobs:
         with:
           build-args: |
             APPLICATION_NAME=${{ needs.docker-prepare-variables.outputs.application_name }}
+            BUILD_ID=${{ github.sha }}
           context: .
           # this container is THE PR's artifact, and we will re-tag it
           # once the PR has been accepted

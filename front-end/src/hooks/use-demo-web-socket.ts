@@ -137,6 +137,7 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
 
         onEvent({
             type: "init",
+            build_id: import.meta.env.BUILD_ID,
             active_connections: [],
             total_connections: 0,
             total_bytes_sent: 0,

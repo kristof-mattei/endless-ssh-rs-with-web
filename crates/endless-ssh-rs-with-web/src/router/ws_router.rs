@@ -8,6 +8,7 @@ use serde::Deserialize;
 use tokio::sync::broadcast;
 use tracing::{Level, event};
 
+use crate::build_env::COMPILE_TIME_BUILD_ID;
 use crate::db;
 use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, Limit};
 use crate::events::{ActiveConnectionInfo, WsEvent};
@@ -40,6 +41,7 @@ async fn send_init_payload(
     totals: AllTimeTotals,
 ) -> Result<(), ()> {
     let init_payload = match serde_json::to_string(&WsEvent::Init {
+        build_id: COMPILE_TIME_BUILD_ID,
         active_connections,
         total_connections: totals.total_connections,
         total_bytes_sent: totals.total_bytes_sent,

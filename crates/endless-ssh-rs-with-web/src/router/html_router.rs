@@ -125,7 +125,7 @@ mod tests {
         std::fs::remove_dir_all(dist).unwrap();
     }
 
-    // `no-cache` keeps the copy and asks before reusing it; the ETag is what makes that ask a bodyless 304
+    // `no-cache` keeps the copy and asks before reusing it. The ETag turns that ask into a 304 without a body.
     #[tokio::test]
     async fn an_unchanged_index_html_revalidates_to_304() {
         let dist = dist();

@@ -17,10 +17,16 @@ fn main() {
         )
         .unwrap_or_default(),
     );
+    // The git sha in CI, "dev" locally. The front-end bundle is built with the same value.
+    export_var(
+        "COMPILE_TIME_BUILD_ID",
+        &env::var("BUILD_ID").unwrap_or_else(|_| "dev".to_owned()),
+    );
 
     println!("cargo:rerun-if-changed-env=HOST");
     println!("cargo:rerun-if-changed-env=TARGET");
     println!("cargo:rerun-if-changed-env=CARGO_ENCODED_RUSTFLAGS");
+    println!("cargo:rerun-if-changed-env=BUILD_ID");
     println!("cargo:rerun-if-changed=migrations");
 }
 

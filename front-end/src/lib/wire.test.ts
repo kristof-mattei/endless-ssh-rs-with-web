@@ -28,7 +28,7 @@ describe("parseWsEvent", () => {
 
     it("finds wrappers inside the init payload's array", () => {
         const event = parseWsEvent(
-            '{"type":"init","active_connections":[{"ip":"::1","port":1,"connected_at":{"$instant":"2026-01-01T00:00:00Z"},"bytes_sent":0,"coordinates":null,"country":null,"city":null}],"total_connections":0,"total_bytes_sent":0,"total_time_spent":0,"last_counted_id":0}',
+            '{"type":"init","build_id":"dev","active_connections":[{"ip":"::1","port":1,"connected_at":{"$instant":"2026-01-01T00:00:00Z"},"bytes_sent":0,"coordinates":null,"country":null,"city":null}],"total_connections":0,"total_bytes_sent":0,"total_time_spent":0,"last_counted_id":0}',
         );
 
         if (event.type !== "init") {

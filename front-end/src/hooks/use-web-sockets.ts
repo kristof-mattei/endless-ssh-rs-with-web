@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { Temporal } from "temporal-polyfill";
 
 import type { WsEvent } from "../generated/WsEvent";
+import { reload } from "../lib/reload";
 import { parseWsEvent } from "../lib/wire";
 
-export type ConnectionStatus = "connecting" | "live" | "reconnecting";
+export type ConnectionStatus = "connecting" | "live" | "outdated" | "reconnecting";
 
 export type ConnectedEvent = Extract<WsEvent, { type: "connected" }>;
 export type DisconnectedEvent = Extract<WsEvent, { type: "disconnected" }>;
@@ -25,6 +27,12 @@ const WATCHDOG_TIMEOUT_MS = 90_000;
 
 // RFC 6455 close code 1000, Normal Closure
 const NORMAL_CLOSURE_CODE = 1000;
+
+// A bundle and the server it talks to come from one build. A server reporting another build in `init` speaks a wire
+// this bundle may not read, so the page reloads to fetch its match. The time of that reload is kept, so a mismatch
+// soon after it (a rolling deploy answering with alternating builds) stops as outdated instead of looping.
+const RELOADED_AT_KEY = "reloaded-for-build-at";
+const RELOAD_COOLDOWN_MS = 60_000;
 
 // per spec, close() on a CONNECTING socket fails the connection without a close handshake, so defer until open
 function closeSocket(ws: WebSocket): void {
@@ -131,6 +139,24 @@ export function useWebSocket({ getSince, onEvent }: Options): { status: Connecti
                 })();
 
                 if (event === undefined) {
+                    return;
+                }
+
+                if (event.type === "init" && event.build_id !== import.meta.env.BUILD_ID) {
+                    const now = Temporal.Now.instant().epochMilliseconds;
+                    const reloadedAt = Number(sessionStorage.getItem(RELOADED_AT_KEY));
+
+                    if (now - reloadedAt < RELOAD_COOLDOWN_MS) {
+                        setStatus("outdated");
+                        isDisposed = true;
+                        closeSocket(ws);
+
+                        return;
+                    }
+
+                    sessionStorage.setItem(RELOADED_AT_KEY, now.toString());
+                    reload();
+
                     return;
                 }
 
