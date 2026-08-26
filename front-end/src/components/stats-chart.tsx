@@ -5,7 +5,7 @@ import { Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, createH
 import { Temporal } from "temporal-polyfill";
 
 import { DASHBOARD_PARAMS } from "../lib/dashboard-params";
-import { METRICS, formatMetricValue } from "../lib/metrics";
+import { METRICS, METRIC_KEYS, formatMetricValue } from "../lib/metrics";
 import type { BucketGrid, BucketPoint, StatsData } from "../lib/stats-buckets";
 import { aggregate, snapUpToBucket } from "../lib/stats-buckets";
 import { StatsTooltip } from "./stats-tooltip";
@@ -166,22 +166,22 @@ export const StatsChart: React.FC<StatsData> = ({ grid, rows }) => {
     return (
         <div className="rounded-lg bg-gray-800 p-4">
             <div className="mbe-3 flex items-center gap-2">
-                {METRICS.map((metric) => {
+                {METRIC_KEYS.map((metric) => {
                     return (
                         <button
-                            aria-pressed={selectedMetric === metric.value}
+                            aria-pressed={selectedMetric === metric}
                             className={`rounded-sm px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
-                                selectedMetric === metric.value
+                                selectedMetric === metric
                                     ? "bg-blue-600 text-white"
                                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                             }`}
-                            key={metric.value}
+                            key={metric}
                             onClick={() => {
-                                void setSelectedMetric(metric.value);
+                                void setSelectedMetric(metric);
                             }}
                             type="button"
                         >
-                            {metric.label}
+                            {METRICS[metric].label}
                         </button>
                     );
                 })}
@@ -241,16 +241,16 @@ export const StatsChart: React.FC<StatsData> = ({ grid, rows }) => {
                             }}
                             labelStyle={{ fontWeight: 600, color: "#e5e7eb", marginBottom: "4px" }}
                         />
-                        {METRICS.map((metric) => {
+                        {METRIC_KEYS.map((metric) => {
                             return (
                                 <Typed.Bar
                                     dataKey={(point: BucketPoint) => {
-                                        return point[metric.value];
+                                        return point[metric];
                                     }}
                                     fill="#2563eb"
-                                    hide={metric.value !== selectedMetric}
-                                    key={metric.value}
-                                    name={metric.label}
+                                    hide={metric !== selectedMetric}
+                                    key={metric}
+                                    name={METRICS[metric].label}
                                     radius={[2, 2, 0, 0]}
                                 />
                             );

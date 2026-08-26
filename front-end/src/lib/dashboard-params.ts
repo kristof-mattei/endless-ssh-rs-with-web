@@ -3,7 +3,7 @@ import { createParser, parseAsStringLiteral } from "nuqs";
 import type { Temporal } from "temporal-polyfill";
 
 import type { Metric } from "./metrics";
-import { METRICS } from "./metrics";
+import { METRIC_KEYS } from "./metrics";
 
 // The dashboard's URL contract. Every selectable value has a slug here, and the components read
 // state only through these parsers.
@@ -64,9 +64,9 @@ const REFRESH_PARSER = parseAsStringLiteral(REFRESH_SLUGS).withDefault("off").wi
 const METRIC_PARSER = createParser<Metric>({
     parse: (value) => {
         return (
-            METRICS.find((metric) => {
-                return METRIC_SLUGS[metric.value] === value;
-            })?.value ?? null
+            METRIC_KEYS.find((metric) => {
+                return METRIC_SLUGS[metric] === value;
+            }) ?? null
         );
     },
     serialize: (value) => {

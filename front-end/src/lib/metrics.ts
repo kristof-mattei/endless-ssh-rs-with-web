@@ -1,13 +1,15 @@
 import { formatBytes, formatDuration } from "./formatting";
-import type { BucketPointValues } from "./stats-buckets";
 
-export type Metric = keyof BucketPointValues;
+// the chart's metrics, in display order
+export const METRIC_KEYS = ["connects", "bytes_sent", "time_spent"] as const;
 
-export const METRICS: readonly { label: string; value: Metric }[] = [
-    { label: "Connections", value: "connects" },
-    { label: "Bytes wasted", value: "bytes_sent" },
-    { label: "Time wasted", value: "time_spent" },
-];
+export type Metric = (typeof METRIC_KEYS)[number];
+
+export const METRICS: Readonly<Record<Metric, { label: string }>> = {
+    connects: { label: "Connections" },
+    bytes_sent: { label: "Bytes wasted" },
+    time_spent: { label: "Time wasted" },
+};
 
 // Shared by the chart's y axis and its tooltip, so both render a metric the same way.
 export function formatMetricValue(metric: Metric, value: number): string {
