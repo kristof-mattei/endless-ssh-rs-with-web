@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import type { WsEvent } from "../generated/WsEvent";
+import { parseWsEvent } from "../lib/wire";
 
 export type ConnectionStatus = "connecting" | "live" | "reconnecting";
 
@@ -121,8 +122,7 @@ export function useWebSocket({ getSince, onEvent }: Options): { status: Connecti
 
                 const event = ((): undefined | WsEvent => {
                     try {
-                        // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- trusted source
-                        return JSON.parse(message.data) as WsEvent;
+                        return parseWsEvent(message.data);
                     } catch (error) {
                         console.error("Ignoring malformed WebSocket frame", error);
 

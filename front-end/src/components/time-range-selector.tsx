@@ -3,11 +3,11 @@ import type React from "react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Temporal } from "temporal-polyfill";
 
-import type { StatsResponse } from "../generated/StatsResponse";
 import type { StatsRow } from "../generated/StatsRow";
 import type { Range } from "../lib/dashboard-params";
 import { DASHBOARD_PARAMS, RANGES, RANGE_SLUGS, REFRESH_INTERVALS, REFRESH_SLUGS } from "../lib/dashboard-params";
 import type { InstantRange } from "../lib/stats-buckets";
+import { parseStatsResponse } from "../lib/wire";
 
 export interface StatsData {
     bucketMs: number;
@@ -24,9 +24,7 @@ function windowToRange(window: Temporal.DurationLike): InstantRange {
 
 // rows are ordered by bucket, so an open-ended range starts at the first row, or collapses to `to` without rows
 function openEndedFrom(rows: StatsRow[], to: Temporal.Instant): Temporal.Instant {
-    const first = rows.at(0);
-
-    return first === undefined ? to : Temporal.Instant.from(first.bucket);
+    return rows.at(0)?.bucket ?? to;
 }
 
 async function fetchStats(range: Range, onData: (data: StatsData) => void, signal: AbortSignal): Promise<void> {
@@ -44,8 +42,7 @@ async function fetchStats(range: Range, onData: (data: StatsData) => void, signa
         throw new Error(`stats fetch failed with ${String(response.status)}`);
     }
 
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- data from trusted backend
-    const data = (await response.json()) as StatsResponse;
+    const data = parseStatsResponse(await response.text());
 
     const to = requested?.to ?? Temporal.Now.instant();
     const from = requested?.from ?? openEndedFrom(data.rows, to);

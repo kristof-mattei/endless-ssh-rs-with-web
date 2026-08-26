@@ -1,3 +1,4 @@
+import { Temporal } from "temporal-polyfill";
 import { describe, expect, it } from "vitest";
 
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
@@ -5,6 +6,10 @@ import type { WsEvent } from "../generated/WsEvent";
 import type { ConnectedEvent, DisconnectedEvent, InitEvent, ReadyEvent } from "../hooks/use-web-sockets";
 import type { WsState } from "./ws-state";
 import { INITIAL_WS_STATE, wsReducer } from "./ws-state";
+
+function instant(iso: string): Temporal.Instant {
+    return Temporal.Instant.from(iso);
+}
 
 function init(overrides?: Partial<Omit<InitEvent, "type">>): InitEvent {
     return {
@@ -25,7 +30,7 @@ function connected(ip: string, port: number): ConnectedEvent {
         type: "connected",
         ip,
         port,
-        connected_at: "2026-07-27T10:00:00Z",
+        connected_at: instant("2026-07-27T10:00:00Z"),
         country: null,
         city: null,
         coordinates: { latitude: 51.2, longitude: 4.4 },
@@ -41,8 +46,8 @@ function disconnected(
         sequence,
         ip: `192.0.2.${sequence.toString()}`,
         port: 50_000,
-        connected_at: "2026-07-27T10:00:00Z",
-        disconnected_at: "2026-07-27T10:01:00Z",
+        connected_at: instant("2026-07-27T10:00:00Z"),
+        disconnected_at: instant("2026-07-27T10:01:00Z"),
         time_spent: 60,
         bytes_sent: 1000,
         country: null,
@@ -56,7 +61,7 @@ function activeConnection(ip: string, overrides?: Partial<Omit<ActiveConnectionI
     return {
         ip,
         port: 50_000,
-        connected_at: "2026-07-27T09:00:00Z",
+        connected_at: instant("2026-07-27T09:00:00Z"),
         bytes_sent: 0,
         coordinates: null,
         country: null,
@@ -208,13 +213,18 @@ describe("wsReducer", () => {
         });
 
         it("keeps a newer connection when a replayed disconnect matches a reused ip and port", () => {
+            const reused = activeConnection("198.51.100.7", {
+                port: 1111,
+                connected_at: instant("2026-07-27T11:00:00Z"),
+            });
+
             const state = applyEvents(INITIAL_WS_STATE, [
-                init({
-                    active_connections: [
-                        activeConnection("198.51.100.7", { port: 1111, connected_at: "2026-07-27T11:00:00Z" }),
-                    ],
+                init({ active_connections: [reused] }),
+                disconnected(1, {
+                    ip: "198.51.100.7",
+                    port: 1111,
+                    disconnected_at: instant("2026-07-27T10:30:00Z"),
                 }),
-                disconnected(1, { ip: "198.51.100.7", port: 1111, disconnected_at: "2026-07-27T10:30:00Z" }),
                 READY,
             ]);
 
