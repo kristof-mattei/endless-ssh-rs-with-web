@@ -221,11 +221,13 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                 className="rounded-sm bg-gray-700 px-2 py-1 text-sm text-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                 id={autoRefreshId}
                 onChange={(event) => {
-                    const chosen = REFRESH_SLUGS.find((slug) => {
-                        return slug === event.target.value;
-                    });
+                    const chosen = DASHBOARD_PARAMS.refresh.parse(event.target.value);
 
-                    void setRefreshLabel(chosen ?? "off");
+                    if (chosen === null) {
+                        return;
+                    }
+
+                    void setRefreshLabel(chosen);
                 }}
                 value={refreshLabel}
             >

@@ -1,4 +1,4 @@
-import type { UseQueryStateOptions } from "nuqs";
+import type { Options, SingleParser } from "nuqs";
 import { createParser, parseAsStringLiteral } from "nuqs";
 import type { Temporal } from "temporal-polyfill";
 
@@ -76,7 +76,7 @@ const METRIC_PARSER = createParser<Metric>({
     .withDefault("connects")
     .withOptions(PARSER_OPTIONS);
 
-type DashboardParser<Value> = { defaultValue: Value } & UseQueryStateOptions<Value>;
+type DashboardParser<Value> = { defaultValue: Value } & Options & SingleParser<Value>;
 
 // The whole contract in one object: `useCanonicalUrl` writes all of it, each component reads its own key.
 export const DASHBOARD_PARAMS: {
