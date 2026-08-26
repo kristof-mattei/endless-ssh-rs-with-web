@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, createHorizontalChart } from "recharts";
 import { Temporal } from "temporal-polyfill";
 
-import type { StatsRow } from "../generated/StatsRow";
 import { DASHBOARD_PARAMS } from "../lib/dashboard-params";
 import { METRICS, formatMetricValue } from "../lib/metrics";
-import type { BucketPoint } from "../lib/stats-buckets";
+import type { BucketGrid, BucketPoint, StatsData } from "../lib/stats-buckets";
 import { aggregate, snapUpToBucket } from "../lib/stats-buckets";
 import { StatsTooltip } from "./stats-tooltip";
 
@@ -22,7 +21,7 @@ const Typed = createHorizontalChart<BucketPoint, number>()({
 });
 
 // Axis ticks and tooltip headers need different precision. Tick values from `getTickValues` sit on round boundaries (whole hours, midnights, month starts),
-// while the tooltip shows a single bucket at the interval the backend aggregated at.
+// while the tooltip shows a single bucket at the width the back-end aggregated at.
 function formatDayTick(instant: Temporal.Instant): string {
     return instant.toLocaleString([], { day: "numeric", month: "short" });
 }
@@ -56,8 +55,8 @@ function getTickFormatter(spanHours: number): (instant: Temporal.Instant) => str
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-function getBucketLabelOptions(bucketMs: number): Intl.DateTimeFormatOptions {
-    if (bucketMs < DAY_MS) {
+function getBucketLabelOptions(bucketWidthMs: number): Intl.DateTimeFormatOptions {
+    if (bucketWidthMs < DAY_MS) {
         return { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" };
     }
 
@@ -105,18 +104,18 @@ function getFirstTickAndStep(
 
 // The x axis is categorical, one band per bucket, so recharts' default ticks land on arbitrary buckets.
 // Tick values are computed on local calendar boundaries instead, then snapped up to the bucket grid because
-// a boundary is only a bucket when the UTC offset divides the bucket interval.
-function getTickValues(from: Temporal.Instant, to: Temporal.Instant, intervalMs: number): number[] {
-    const spanHours = from.until(to).total("hours");
-    const start = from.toZonedDateTimeISO(Temporal.Now.timeZoneId());
+// a boundary is only a bucket when the UTC offset divides the bucket width.
+function getTickValues({ bucketWidthMs, range }: BucketGrid): number[] {
+    const spanHours = range.from.until(range.to).total("hours");
+    const start = range.from.toZonedDateTimeISO(Temporal.Now.timeZoneId());
     const { first, step } = getFirstTickAndStep(start, spanHours);
 
-    const endMs = to.epochMilliseconds;
+    const endMs = range.to.epochMilliseconds;
 
     const values: number[] = [];
 
     for (let cursor = first; cursor.epochMilliseconds < endMs; cursor = cursor.add(step)) {
-        const bucketMs = snapUpToBucket(cursor.epochMilliseconds, intervalMs);
+        const bucketMs = snapUpToBucket(cursor.epochMilliseconds, bucketWidthMs);
 
         if (bucketMs < endMs) {
             values.push(bucketMs);
@@ -124,13 +123,6 @@ function getTickValues(from: Temporal.Instant, to: Temporal.Instant, intervalMs:
     }
 
     return values;
-}
-
-interface Properties {
-    bucketMs: number;
-    from: Temporal.Instant;
-    rows: StatsRow[];
-    to: Temporal.Instant;
 }
 
 type DevelopmentToolsState = {
@@ -162,17 +154,17 @@ function useRechartsDevtools(): {
     return devtools;
 }
 
-export const StatsChart: React.FC<Properties> = ({ rows, bucketMs, from, to }) => {
+export const StatsChart: React.FC<StatsData> = ({ grid, rows }) => {
     const developmentTools = useRechartsDevtools();
 
     const [selectedMetric, setSelectedMetric] = useQueryState("metric", DASHBOARD_PARAMS.metric);
 
-    const points = aggregate(rows, { from, to }, bucketMs);
+    const points = aggregate(rows, grid);
 
-    const spanHours = from.until(to).total("hours");
+    const spanHours = grid.range.from.until(grid.range.to).total("hours");
     const formatTickLabel = getTickFormatter(spanHours);
-    const bucketLabelOptions = getBucketLabelOptions(bucketMs);
-    const tickValues = getTickValues(from, to, bucketMs);
+    const bucketLabelOptions = getBucketLabelOptions(grid.bucketWidthMs);
+    const tickValues = getTickValues(grid);
 
     return (
         <div className="rounded-lg bg-gray-800 p-4">

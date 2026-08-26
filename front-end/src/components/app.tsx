@@ -4,6 +4,7 @@ import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 
 import { useCanonicalUrl } from "../hooks/use-canonical-url";
 import { useEventSource } from "../hooks/use-event-source";
+import type { StatsData } from "../lib/stats-buckets";
 import { INITIAL_WS_STATE, wsReducer } from "../lib/ws-state";
 import { ActiveConnections } from "./active-connections";
 import { ConnectionBadge } from "./connection-badge";
@@ -11,7 +12,6 @@ import { EventFeed } from "./event-feed";
 import { StatsChart } from "./stats-chart";
 import { StatsPanel } from "./stats-panel";
 import { TimeRangeSelector } from "./time-range-selector";
-import type { StatsData } from "./time-range-selector";
 import { TopCountries } from "./top-countries";
 import { WorldMap } from "./world-map";
 
@@ -70,12 +70,7 @@ export const App: React.FC = () => {
                 {statsData !== null && (
                     <div className="grid gap-3 lg:grid-cols-4">
                         <div className="lg:col-span-3">
-                            <StatsChart
-                                bucketMs={statsData.bucketMs}
-                                from={statsData.from}
-                                rows={statsData.rows}
-                                to={statsData.to}
-                            />
+                            <StatsChart grid={statsData.grid} rows={statsData.rows} />
                         </div>
                         <TopCountries rows={statsData.rows} />
                     </div>

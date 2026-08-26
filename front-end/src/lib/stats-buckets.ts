@@ -16,8 +16,8 @@ export type BucketPoint = {
 // TimescaleDB's bucket origin, a Monday, so weekly buckets run Monday to Sunday. Every narrower width divides a day evenly, so only the weekly grid depends on the anchor.
 const BUCKET_ANCHOR_MS = Temporal.Instant.from("2000-01-03T00:00:00Z").epochMilliseconds;
 
-export function snapUpToBucket(ms: number, intervalMs: number): number {
-    return BUCKET_ANCHOR_MS + Math.ceil((ms - BUCKET_ANCHOR_MS) / intervalMs) * intervalMs;
+export function snapUpToBucket(ms: number, bucketWidthMs: number): number {
+    return BUCKET_ANCHOR_MS + Math.ceil((ms - BUCKET_ANCHOR_MS) / bucketWidthMs) * bucketWidthMs;
 }
 
 export interface CountryTotals {
@@ -62,7 +62,18 @@ export interface InstantRange {
     to: Temporal.Instant;
 }
 
-export function aggregate(rows: StatsRow[], { from, to }: InstantRange, intervalMs: number): BucketPoint[] {
+// the buckets rows sit on: [from, to) cut into buckets of the width the back-end aggregated at
+export interface BucketGrid {
+    bucketWidthMs: number;
+    range: InstantRange;
+}
+
+export interface StatsData {
+    grid: BucketGrid;
+    rows: StatsRow[];
+}
+
+export function aggregate(rows: StatsRow[], { bucketWidthMs, range }: BucketGrid): BucketPoint[] {
     const map = new Map<number, BucketPoint>();
 
     for (const row of rows) {
@@ -84,9 +95,9 @@ export function aggregate(rows: StatsRow[], { from, to }: InstantRange, interval
     }
 
     // Fill in zero-value entries for every bucket in [from, to) that has no data.
-    const startMs = snapUpToBucket(from.epochMilliseconds, intervalMs);
+    const startMs = snapUpToBucket(range.from.epochMilliseconds, bucketWidthMs);
 
-    for (let ms = startMs; ms < to.epochMilliseconds; ms += intervalMs) {
+    for (let ms = startMs; ms < range.to.epochMilliseconds; ms += bucketWidthMs) {
         if (!map.has(ms)) {
             map.set(ms, {
                 bucket: Temporal.Instant.fromEpochMilliseconds(ms),
