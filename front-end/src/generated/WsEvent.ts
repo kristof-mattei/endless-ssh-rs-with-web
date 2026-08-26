@@ -2,6 +2,8 @@
 import type { ActiveConnectionInfo } from "./ActiveConnectionInfo";
 import type { Coordinates } from "./Coordinates";
 import type { Country } from "./Country";
+import type { Seconds } from "./Seconds";
+import type { Timestamp } from "./Timestamp";
 
 /**
  * WebSocket broadcast.
@@ -12,7 +14,7 @@ export type WsEvent =
     active_connections: Array<ActiveConnectionInfo>;
     total_connections: number;
     total_bytes_sent: number;
-    total_time_spent: number;
+    total_time_spent: Seconds;
     /**
      * Totals cover exactly the connections with id at or below this.
      */
@@ -24,7 +26,7 @@ export type WsEvent =
     "type": "connected";
     ip: string;
     port: number;
-    connected_at: string;
+    connected_at: Timestamp;
     country: Country | null;
     city: string | null;
     coordinates: Coordinates | null;
@@ -35,9 +37,9 @@ export type WsEvent =
     sequence: number;
     ip: string;
     port: number;
-    connected_at: string;
-    disconnected_at: string;
-    time_spent: number;
+    connected_at: Timestamp;
+    disconnected_at: Timestamp;
+    time_spent: Seconds;
     bytes_sent: number;
     country: Country | null;
     city: string | null;

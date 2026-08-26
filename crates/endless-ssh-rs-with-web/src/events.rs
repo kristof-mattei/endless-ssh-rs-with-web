@@ -10,7 +10,7 @@ use tracing::{Level, event};
 
 use crate::db;
 use crate::geoip::{Coordinates, Country, GeoIpReader};
-use crate::utils::serde::as_seconds;
+use crate::utils::serde::{Seconds, Timestamp};
 
 /// Internal event bus.
 #[derive(Clone)]
@@ -41,9 +41,7 @@ pub enum WsEvent {
         active_connections: Vec<ActiveConnectionInfo>,
         total_connections: i64,
         total_bytes_sent: i64,
-        #[serde(serialize_with = "as_seconds")]
-        #[cfg_attr(test, ts(type = "number"))]
-        total_time_spent: SignedDuration,
+        total_time_spent: Seconds,
         /// Totals cover exactly the connections with id at or below this.
         last_counted_id: i64,
     },
@@ -52,9 +50,7 @@ pub enum WsEvent {
     Connected {
         ip: IpAddr,
         port: u16,
-        #[serde(with = "time::serde::rfc3339")]
-        #[cfg_attr(test, ts(type = "string"))]
-        connected_at: OffsetDateTime,
+        connected_at: Timestamp,
         country: Option<Country>,
         city: Option<String>,
         coordinates: Option<Coordinates>,
@@ -68,15 +64,9 @@ pub enum WsEvent {
         sequence: i64,
         ip: IpAddr,
         port: u16,
-        #[serde(with = "time::serde::rfc3339")]
-        #[cfg_attr(test, ts(type = "string"))]
-        connected_at: OffsetDateTime,
-        #[serde(with = "time::serde::rfc3339")]
-        #[cfg_attr(test, ts(type = "string"))]
-        disconnected_at: OffsetDateTime,
-        #[serde(serialize_with = "as_seconds")]
-        #[cfg_attr(test, ts(type = "number"))]
-        time_spent: SignedDuration,
+        connected_at: Timestamp,
+        disconnected_at: Timestamp,
+        time_spent: Seconds,
         bytes_sent: usize,
         country: Option<Country>,
         city: Option<String>,
@@ -92,9 +82,7 @@ pub enum WsEvent {
 pub struct ActiveConnectionInfo {
     pub ip: IpAddr,
     pub port: u16,
-    #[serde(with = "time::serde::rfc3339")]
-    #[cfg_attr(test, ts(type = "string"))]
-    pub connected_at: OffsetDateTime,
+    pub connected_at: Timestamp,
     pub bytes_sent: usize,
     pub coordinates: Option<Coordinates>,
     pub country: Option<Country>,
@@ -152,7 +140,7 @@ async fn handle_event(
             let info = ActiveConnectionInfo {
                 ip: addr.ip(),
                 port: addr.port(),
-                connected_at,
+                connected_at: Timestamp(connected_at),
                 bytes_sent: 0,
                 coordinates: geo.as_ref().and_then(|g| g.coordinates),
                 country: geo.as_ref().and_then(|g| g.country.clone()),
@@ -165,7 +153,7 @@ async fn handle_event(
             let ws_event = WsEvent::Connected {
                 ip: info.ip,
                 port: info.port,
-                connected_at,
+                connected_at: info.connected_at,
                 country,
                 city,
                 coordinates: info.coordinates,
@@ -221,9 +209,9 @@ async fn handle_event(
                         sequence,
                         ip: addr.ip(),
                         port: addr.port(),
-                        connected_at,
-                        disconnected_at,
-                        time_spent,
+                        connected_at: Timestamp(connected_at),
+                        disconnected_at: Timestamp(disconnected_at),
+                        time_spent: Seconds(time_spent),
                         bytes_sent,
                         country,
                         city,

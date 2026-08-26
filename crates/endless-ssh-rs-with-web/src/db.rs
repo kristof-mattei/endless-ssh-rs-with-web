@@ -15,7 +15,7 @@ use tracing::{Level, event};
 
 use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, DbPort, Limit};
 use crate::geoip::{Coordinates, Country, GeoInfo};
-use crate::utils::serde::as_seconds;
+use crate::utils::serde::{Seconds, Timestamp};
 
 pub async fn create_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
     PgPoolOptions::new()
@@ -226,14 +226,10 @@ where
 #[derive(Debug, Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
 pub struct StatsRow {
-    #[serde(serialize_with = "time::serde::rfc3339::serialize")]
-    #[cfg_attr(test, ts(type = "string"))]
-    pub bucket: OffsetDateTime,
+    pub bucket: Timestamp,
     pub country: Option<Country>,
     pub connects: i64,
-    #[serde(serialize_with = "as_seconds")]
-    #[cfg_attr(test, ts(type = "number"))]
-    pub time_spent: SignedDuration,
+    pub time_spent: Seconds,
     pub bytes_sent: i64,
 }
 
@@ -245,13 +241,13 @@ impl TryFrom<PgRow> for StatsRow {
         let name: Option<String> = row.try_get("country_name")?;
 
         Ok(Self {
-            bucket: row.try_get("bucket")?,
+            bucket: Timestamp(row.try_get("bucket")?),
             country: code.map(|code| Country {
                 name: name.unwrap_or_else(|| code.clone()),
                 code,
             }),
             connects: row.try_get("connects")?,
-            time_spent: row.try_get::<DbDuration, _>("time_spent")?.into(),
+            time_spent: Seconds(row.try_get::<DbDuration, _>("time_spent")?.into()),
             bytes_sent: row.try_get("bytes_sent")?,
         })
     }
