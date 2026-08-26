@@ -1,13 +1,36 @@
 import { act, renderHook } from "@testing-library/react";
+import { Temporal } from "temporal-polyfill";
 import type { Mock } from "vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { WsEvent } from "../generated/WsEvent";
+import { reload } from "../lib/reload";
 import type { ConnectionStatus } from "./use-web-sockets";
 import { useWebSocket } from "./use-web-sockets";
 
+vi.mock("../lib/reload", () => {
+    return { reload: vi.fn() };
+});
+
 // RFC 6455 close code 1000, Normal Closure, the code the hook sends
 const NORMAL_CLOSURE_CODE = 1000;
+
+// the fake timers do not reach the polyfill's clock, so cooldown fixtures are relative to it and leave margin
+function millisecondsAgo(milliseconds: number): string {
+    return (Temporal.Now.instant().epochMilliseconds - milliseconds).toString();
+}
+
+function init(buildId: string): WsEvent {
+    return {
+        type: "init",
+        build_id: buildId,
+        active_connections: [],
+        total_connections: 0,
+        total_bytes_sent: 0,
+        total_time_spent: 0,
+        last_counted_id: 0,
+    };
+}
 
 class FakeWebSocket extends EventTarget {
     /* oxlint-disable perfectionist/sort-classes -- prefer numeric sort here */
@@ -100,6 +123,8 @@ describe("useWebSocket", () => {
         vi.useFakeTimers();
         FakeWebSocket.instances = [];
         vi.stubGlobal("WebSocket", FakeWebSocket);
+        sessionStorage.clear();
+        vi.mocked(reload).mockClear();
     });
 
     afterEach(() => {
@@ -232,6 +257,78 @@ describe("useWebSocket", () => {
         });
 
         expect(onEvent).toHaveBeenCalledWith({ type: "ready" });
+    });
+
+    it("passes an init from its own build through", () => {
+        // without the `BUILD_ID` env var at build time, the identity is the local default
+        expect(import.meta.env.BUILD_ID).toBe("dev");
+
+        const { onEvent } = renderWebSocketHook();
+
+        openLatest();
+
+        act(() => {
+            latestSocket().serverMessage(JSON.stringify(init("dev")));
+        });
+
+        expect(onEvent).toHaveBeenCalledWith(init("dev"));
+        expect(reload).not.toHaveBeenCalled();
+    });
+
+    it("reloads when the server comes from another build", () => {
+        const before = Temporal.Now.instant().epochMilliseconds;
+        const { onEvent } = renderWebSocketHook();
+
+        openLatest();
+
+        act(() => {
+            latestSocket().serverMessage(JSON.stringify(init("other-build")));
+        });
+
+        expect(reload).toHaveBeenCalledTimes(1);
+        expect(onEvent).not.toHaveBeenCalled();
+
+        const reloadedAt = Number(sessionStorage.getItem("reloaded-for-build-at"));
+
+        expect(reloadedAt).toBeGreaterThanOrEqual(before);
+        expect(reloadedAt).toBeLessThanOrEqual(Temporal.Now.instant().epochMilliseconds);
+    });
+
+    it("reloads again for a mismatch after the cooldown", () => {
+        sessionStorage.setItem("reloaded-for-build-at", millisecondsAgo(90_000));
+
+        renderWebSocketHook();
+
+        openLatest();
+
+        act(() => {
+            latestSocket().serverMessage(JSON.stringify(init("other-build")));
+        });
+
+        expect(reload).toHaveBeenCalledTimes(1);
+    });
+
+    it("stops as outdated instead of reloading again within the cooldown", () => {
+        sessionStorage.setItem("reloaded-for-build-at", millisecondsAgo(30_000));
+
+        const { onEvent, result } = renderWebSocketHook();
+
+        openLatest();
+
+        act(() => {
+            latestSocket().serverMessage(JSON.stringify(init("other-build")));
+        });
+
+        expect(reload).not.toHaveBeenCalled();
+        expect(result.current.status).toBe("outdated");
+        expect(latestSocket().closeCalls).toEqual([NORMAL_CLOSURE_CODE]);
+        expect(onEvent).not.toHaveBeenCalled();
+
+        // and no reconnect follows the close
+        dropLatest();
+        advance(120_000);
+
+        expect(FakeWebSocket.instances).toHaveLength(1);
     });
 
     it("dials the reconnect with the sequence getSince reports", () => {

@@ -81,6 +81,9 @@ RUN /build-scripts/build.sh build --frozen --release
 # Rust full build
 FROM rust-cargo-build AS rust-build
 
+# the build identity the binary reports to the front-end, see `build.rs`
+ARG BUILD_ID
+
 WORKDIR /build
 
 # now we copy in the source which is more prone to changes and build it
@@ -124,6 +127,9 @@ RUN pnpm install --frozen-lockfile
 
 # now we copy in the rest
 COPY front-end ./front-end/
+
+# the build identity the bundle compares against the server's, see `vite.config.ts`
+ARG BUILD_ID
 
 RUN pnpm run build
 

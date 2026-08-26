@@ -11,6 +11,10 @@ import type { Timestamp } from "./Timestamp";
 export type WsEvent =
   | {
     "type": "init";
+    /**
+     * The build this server came from. A bundle from another build reloads to fetch its match.
+     */
+    build_id: string;
     active_connections: Array<ActiveConnectionInfo>;
     total_connections: number;
     total_bytes_sent: number;

@@ -38,6 +38,8 @@ pub enum ClientEvent {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum WsEvent {
     Init {
+        /// The build this server came from. A bundle from another build reloads to fetch its match.
+        build_id: &'static str,
         active_connections: Vec<ActiveConnectionInfo>,
         total_connections: i64,
         total_bytes_sent: i64,

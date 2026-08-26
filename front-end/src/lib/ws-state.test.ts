@@ -14,6 +14,7 @@ function instant(iso: string): Temporal.Instant {
 function init(overrides?: Partial<Omit<InitEvent, "type">>): InitEvent {
     return {
         type: "init",
+        build_id: import.meta.env.BUILD_ID,
         active_connections: [],
         total_connections: 0,
         total_bytes_sent: 0,
