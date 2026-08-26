@@ -6,15 +6,8 @@ import { Temporal } from "temporal-polyfill";
 import type { StatsRow } from "../generated/StatsRow";
 import type { Range } from "../lib/dashboard-params";
 import { DASHBOARD_PARAMS, RANGES, RANGE_SLUGS, REFRESH_INTERVALS, REFRESH_SLUGS } from "../lib/dashboard-params";
-import type { InstantRange } from "../lib/stats-buckets";
+import type { InstantRange, StatsData } from "../lib/stats-buckets";
 import { parseStatsResponse } from "../lib/wire";
-
-export interface StatsData {
-    bucketMs: number;
-    from: Temporal.Instant;
-    rows: StatsRow[];
-    to: Temporal.Instant;
-}
 
 function windowToRange(window: Temporal.DurationLike): InstantRange {
     const to = Temporal.Now.instant();
@@ -48,10 +41,8 @@ async function fetchStats(range: Range, onData: (data: StatsData) => void, signa
     const from = requested?.from ?? openEndedFrom(data.rows, to);
 
     onData({
+        grid: { bucketWidthMs: data.bucket_seconds * 1000, range: { from, to } },
         rows: data.rows,
-        bucketMs: data.bucket_seconds * 1000,
-        from,
-        to,
     });
 }
 

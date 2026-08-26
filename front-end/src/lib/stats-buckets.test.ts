@@ -38,8 +38,10 @@ describe("aggregate", () => {
                     bytes_sent: 50,
                 }),
             ],
-            { from: instant("2026-01-01T00:01:00Z"), to: instant("2026-01-01T00:02:00Z") },
-            MINUTE_MS,
+            {
+                bucketWidthMs: MINUTE_MS,
+                range: { from: instant("2026-01-01T00:01:00Z"), to: instant("2026-01-01T00:02:00Z") },
+            },
         );
 
         expect(points).toHaveLength(1);
@@ -47,11 +49,10 @@ describe("aggregate", () => {
     });
 
     it("zero-fills every empty bucket in [from, to)", () => {
-        const points = aggregate(
-            [row("2026-01-01T00:01:00Z")],
-            { from: instant("2026-01-01T00:00:00Z"), to: instant("2026-01-01T00:05:00Z") },
-            MINUTE_MS,
-        );
+        const points = aggregate([row("2026-01-01T00:01:00Z")], {
+            bucketWidthMs: MINUTE_MS,
+            range: { from: instant("2026-01-01T00:00:00Z"), to: instant("2026-01-01T00:05:00Z") },
+        });
 
         expect(
             points.map((point) => {
@@ -61,11 +62,10 @@ describe("aggregate", () => {
     });
 
     it("aligns the zero-fill to the bucket grid when from is unaligned", () => {
-        const points = aggregate(
-            [],
-            { from: instant("2026-01-01T00:00:30Z"), to: instant("2026-01-01T00:05:00Z") },
-            MINUTE_MS,
-        );
+        const points = aggregate([], {
+            bucketWidthMs: MINUTE_MS,
+            range: { from: instant("2026-01-01T00:00:30Z"), to: instant("2026-01-01T00:05:00Z") },
+        });
 
         expect(
             points.map((point) => {
@@ -77,11 +77,10 @@ describe("aggregate", () => {
     it("anchors weekly buckets on Mondays like TimescaleDB", () => {
         const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-        const points = aggregate(
-            [],
-            { from: instant("2026-01-01T00:00:00Z"), to: instant("2026-01-20T00:00:00Z") },
-            WEEK_MS,
-        );
+        const points = aggregate([], {
+            bucketWidthMs: WEEK_MS,
+            range: { from: instant("2026-01-01T00:00:00Z"), to: instant("2026-01-20T00:00:00Z") },
+        });
 
         expect(
             points.map((point) => {
@@ -91,11 +90,10 @@ describe("aggregate", () => {
     });
 
     it("sorts buckets ascending regardless of row order", () => {
-        const points = aggregate(
-            [row("2026-01-01T00:03:00Z"), row("2026-01-01T00:01:00Z")],
-            { from: instant("2026-01-01T00:01:00Z"), to: instant("2026-01-01T00:04:00Z") },
-            MINUTE_MS,
-        );
+        const points = aggregate([row("2026-01-01T00:03:00Z"), row("2026-01-01T00:01:00Z")], {
+            bucketWidthMs: MINUTE_MS,
+            range: { from: instant("2026-01-01T00:01:00Z"), to: instant("2026-01-01T00:04:00Z") },
+        });
 
         expect(
             points.map((point) => {
