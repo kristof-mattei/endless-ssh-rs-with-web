@@ -1,7 +1,7 @@
 import type React from "react";
 import type { TooltipContentProps } from "recharts";
 
-import { METRICS, formatMetricValue } from "../lib/metrics";
+import { METRICS, METRIC_KEYS, formatMetricValue } from "../lib/metrics";
 import type { BucketPoint } from "../lib/stats-buckets";
 
 function isBucketPoint(value: unknown): value is BucketPoint {
@@ -37,17 +37,17 @@ export const StatsTooltip: (properties: TooltipContentProps<number, keyof Bucket
                 {formattedLabel}
             </p>
             <ul className="recharts-tooltip-item-list" style={{ margin: 0, padding: 0 }}>
-                {METRICS.map((metric) => {
+                {METRIC_KEYS.map((metric) => {
                     return (
                         <li
                             className="recharts-tooltip-item"
-                            key={metric.value}
+                            key={metric}
                             style={{ display: "block", paddingBottom: 4, paddingTop: 4, ...itemStyle }}
                         >
-                            <span className="recharts-tooltip-item-name">{metric.label}</span>
+                            <span className="recharts-tooltip-item-name">{METRICS[metric].label}</span>
                             <span className="recharts-tooltip-item-separator">{": "}</span>
                             <span className="recharts-tooltip-item-value">
-                                {formatMetricValue(metric.value, bucketPoint[metric.value])}
+                                {formatMetricValue(metric, bucketPoint[metric])}
                             </span>
                         </li>
                     );

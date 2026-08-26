@@ -2,12 +2,9 @@ import { Temporal } from "temporal-polyfill";
 
 import type { Country } from "../generated/Country";
 import type { StatsRow } from "../generated/StatsRow";
+import type { Metric } from "./metrics";
 
-export interface BucketPointValues {
-    bytes_sent: number;
-    connects: number;
-    time_spent: number;
-}
+export type BucketPointValues = Record<Metric, number>;
 
 export type BucketPoint = {
     bucket: Temporal.Instant;
@@ -20,12 +17,9 @@ export function snapUpToBucket(ms: number, bucketWidthMs: number): number {
     return BUCKET_ANCHOR_MS + Math.ceil((ms - BUCKET_ANCHOR_MS) / bucketWidthMs) * bucketWidthMs;
 }
 
-export interface CountryTotals {
-    bytes_sent: number;
-    connects: number;
+export type CountryTotals = {
     country: Country | null;
-    time_spent: number;
-}
+} & BucketPointValues;
 
 export function topCountries(rows: StatsRow[], limit: number): CountryTotals[] {
     const map = new Map<null | string, CountryTotals>();
