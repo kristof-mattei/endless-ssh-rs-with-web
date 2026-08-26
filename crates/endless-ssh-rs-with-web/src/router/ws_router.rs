@@ -12,6 +12,7 @@ use crate::db;
 use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, Limit};
 use crate::events::{ActiveConnectionInfo, WsEvent};
 use crate::state::ApplicationState;
+use crate::utils::serde::{Seconds, Timestamp};
 
 /// The client's watchdog assumes a multiple of this before declaring the connection half-dead.
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
@@ -42,7 +43,7 @@ async fn send_init_payload(
         active_connections,
         total_connections: totals.total_connections,
         total_bytes_sent: totals.total_bytes_sent,
-        total_time_spent: totals.total_time_spent.into(),
+        total_time_spent: Seconds(totals.total_time_spent.into()),
         last_counted_id: totals.last_counted_id,
     }) {
         Ok(s) => s,
@@ -72,9 +73,9 @@ async fn send_connection_record(
         sequence: record.id,
         ip: record.ip_address.into(),
         port: record.port.into(),
-        connected_at: record.connected_at,
-        disconnected_at: record.disconnected_at,
-        time_spent: record.time_spent.into(),
+        connected_at: Timestamp(record.connected_at),
+        disconnected_at: Timestamp(record.disconnected_at),
+        time_spent: Seconds(record.time_spent.into()),
         bytes_sent: usize::try_from(record.bytes_sent).unwrap_or(0),
         country: record.country,
         city: record.city,
