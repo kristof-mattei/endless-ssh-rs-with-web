@@ -1,4 +1,27 @@
 <!-- header goes here -->
+## [0.22.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.21.0..v0.22.0) - 2026-08-26
+
+### 🚀 Features
+
+- Parse timestamps at the boundary by [@kristof-mattei](https://github.com/kristof-mattei) ([`147785c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/147785cb44782d01405c6074ac76615337a797af))
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update nuqs (npm) to v2.10.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`64f8785`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/64f8785931dd3c520c3e837d3cc5f3f8ff2403f0))
+- *(deps)* Update nuqs (npm) to v2.10.1 (#3336) by [@renovate[bot]](https://github.com/renovate[bot]) in #3336 ([`d98fabb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d98fabb171f754df2809030c5bb7c43ac56ce9d6))
+
+### 🚜 Refactor
+
+- *(front-end)* Derive duration parts with `Temporal.Duration` by [@kristof-mattei](https://github.com/kristof-mattei) ([`7f6e878`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7f6e8782b5efca897cc1c3d0b13963402458b220))
+- *(front-end)* One `StatsData` type by [@kristof-mattei](https://github.com/kristof-mattei) ([`31df195`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/31df195109a7a8bd2db8a25a37ea5e2abc042a7c))
+- *(front-end)* `useRechartsDevtools` returns `DevelopmentToolsState` instead of manually rebuilding the type by [@kristof-mattei](https://github.com/kristof-mattei) ([`2dc8d00`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2dc8d000ecdce459eab7a347a4fb06fa0c4859fd))
+- *(front-end)* The refresh select reads its value through the URL parser by [@kristof-mattei](https://github.com/kristof-mattei) ([`628c202`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/628c2025b2d9020061af5af337f150c63996530e))
+- *(front-end)* Derive `Metric` from one ordered list by [@kristof-mattei](https://github.com/kristof-mattei) ([`605ea26`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/605ea262a2260521a64a6fa8c8124ccd9d05167a))
+- `Timestamp` and `Seconds` newtypes for the wire by [@kristof-mattei](https://github.com/kristof-mattei) ([`6bc6462`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6bc64624d840663dc3ae9c8caa8d57f10e81cfe9))
+
+### ⚙️ Miscellaneous Tasks
+
+- Switching between dev container and host made pnpm exit with `ERR_PNPM_UNEXPECTED_STORE` by [@kristof-mattei](https://github.com/kristof-mattei) ([`204da9f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/204da9fe8a1cc20ec2ee957ee76ef25e96522c43))
 ## [0.21.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.20.0..v0.21.0) - 2026-08-25
 
 ### 🚀 Features
