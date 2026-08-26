@@ -4,6 +4,7 @@ appuser
 archi
 artipacked
 bkeepers
+bodyless
 bpchar
 buildcache
 cinstrument
@@ -59,16 +60,15 @@ mmap
 mmdb
 monomorphization
 multiplatform
-netsh
 nextest
 nsec
 nuqs
 oldact
+oneshot
 ossdata
 pathbuf
 pgadmin
 pgsql
-portproxy
 postprocessors
 prereleased
 profraw
