@@ -51,6 +51,7 @@ interface Properties {
     onData: (data: StatsData) => void;
 }
 
+// oxlint-disable-next-line max-lines-per-function -- the fetch, the refresh timer and selects share state
 export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
     const [selected, setSelected] = useQueryState("range", DASHBOARD_PARAMS.range);
     const [refreshLabel, setRefreshLabel] = useQueryState("refresh", DASHBOARD_PARAMS.refresh);

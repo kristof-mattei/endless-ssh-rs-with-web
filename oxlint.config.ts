@@ -70,9 +70,9 @@ const config: OxlintConfig = defineConfig({
         "func-style": ["error", "declaration", { allowArrowFunctions: true }],
         "id-length": ["error", { exceptions: ["x", "y"] }],
         "max-lines": "off",
-        "max-lines-per-function": "off",
+        "max-lines-per-function": ["error", { max: 100 }],
         "max-params": "error",
-        "max-statements": "off",
+        "max-statements": ["error", { max: 25 }],
         "no-alert": "error",
         "no-console": ["error", { allow: ["error", "warn"] }],
         "no-duplicate-imports": ["error", { allowSeparateTypeImports: true }],
@@ -132,7 +132,7 @@ const config: OxlintConfig = defineConfig({
         "import/group-exports": "off",
         "import/named": "error",
         "import/newline-after-import": "error",
-        "import/no-cycle": "off",
+        "import/no-cycle": "error",
         "import/no-default-export": "error",
         "import/no-named-export": "off",
         "import/no-relative-parent-imports": "off",
@@ -144,6 +144,7 @@ const config: OxlintConfig = defineConfig({
 
         "n/no-callback-literal": "error",
         "n/no-deprecated-api": "error",
+        "n/no-extraneous-import": "error",
 
         "node/no-process-env": "error",
         "node/no-top-level-await": ["error", { ignoreBin: true }],
@@ -263,6 +264,8 @@ const config: OxlintConfig = defineConfig({
         "better-tailwindcss/enforce-canonical-classes": "error",
         "better-tailwindcss/enforce-consistent-class-order": "error",
         "better-tailwindcss/enforce-consistent-important-position": "error",
+        // breaks oxfmt --check
+        "better-tailwindcss/enforce-consistent-line-wrapping": "off",
         "better-tailwindcss/enforce-consistent-variable-syntax": "error",
         "better-tailwindcss/enforce-consistent-variant-order": "error",
         "better-tailwindcss/enforce-logical-properties": "error",
@@ -321,6 +324,9 @@ const config: OxlintConfig = defineConfig({
             files: ["**/*.test.ts", "**/*.test.tsx"],
             plugins: [...plugins, "vitest"],
             rules: {
+                // the describe callback grows with the number of tests
+                "max-lines-per-function": "off",
+                "max-statements": "off",
                 "vitest/no-hooks": "off",
                 "vitest/no-importing-vitest-globals": "off",
                 "vitest/prefer-expect-assertions": [
