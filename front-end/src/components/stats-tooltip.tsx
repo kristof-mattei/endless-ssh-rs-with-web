@@ -1,7 +1,7 @@
 import type React from "react";
 import type { TooltipContentProps } from "recharts";
 
-import { METRICS, METRIC_KEYS, formatMetricValue } from "../lib/metrics";
+import { formatMetricValue, METRIC_KEYS, METRICS } from "../lib/metrics";
 import type { BucketPoint } from "../lib/stats-buckets";
 
 function isBucketPoint(value: unknown): value is BucketPoint {

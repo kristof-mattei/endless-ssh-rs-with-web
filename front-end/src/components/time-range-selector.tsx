@@ -5,7 +5,7 @@ import { Temporal } from "temporal-polyfill";
 
 import type { StatsRow } from "../generated/StatsRow";
 import type { Range } from "../lib/dashboard-params";
-import { DASHBOARD_PARAMS, RANGES, RANGE_SLUGS, REFRESH_INTERVALS, REFRESH_SLUGS } from "../lib/dashboard-params";
+import { DASHBOARD_PARAMS, RANGE_SLUGS, RANGES, REFRESH_INTERVALS, REFRESH_SLUGS } from "../lib/dashboard-params";
 import type { InstantRange, StatsData } from "../lib/stats-buckets";
 import { parseStatsResponse } from "../lib/wire";
 
