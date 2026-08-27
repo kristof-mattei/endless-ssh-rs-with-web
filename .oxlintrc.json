@@ -21,8 +21,7 @@
             "specifier": "eslint-plugin-n"
         },
         "eslint-plugin-perfectionist",
-        "eslint-plugin-react-hook-form",
-        "eslint-plugin-react-refresh"
+        "eslint-plugin-react-hook-form"
     ],
     "categories": {
         "correctness": "error",
@@ -225,6 +224,10 @@
         "react/memo-dependencies": "error",
         "react/no-deriving-state-in-effects": "error",
         "react/no-multi-comp": "error",
+        "react/only-export-components": [
+            "error",
+            { "allowConstantExport": true }
+        ],
         "react/rule-suppression": "error",
         "react/syntax": "error",
         "react/todo": "error",
@@ -274,12 +277,7 @@
         "react-hook-form/destructuring-formstate": "error",
         "react-hook-form/no-access-control": "error",
         "react-hook-form/no-nested-object-setvalue": "error",
-        "react-hook-form/no-use-watch": "error",
-
-        "react-refresh/only-export-components": [
-            "error",
-            { "allowConstantExport": true }
-        ]
+        "react-hook-form/no-use-watch": "error"
     },
     "overrides": [
         {
