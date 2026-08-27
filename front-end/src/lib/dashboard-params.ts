@@ -8,6 +8,18 @@ import { METRIC_KEYS } from "./metrics";
 // The dashboard's URL contract. Every selectable value has a slug here, and the components read
 // state only through these parsers.
 
+// `Metric` indexes `BucketPoint`, so the URL needs its own vocabulary rather than the column names.
+const METRIC_SLUGS = {
+    bytes_sent: "bytes-wasted",
+    connects: "connections",
+    time_spent: "time-wasted",
+} as const satisfies Record<Metric, string>;
+
+// Defaults stay in the URL, so changing one later cannot re-point links already shared.
+const PARSER_OPTIONS = { clearOnDefault: false, history: "push" } as const;
+
+type DashboardParser<Value> = { defaultValue: Value } & Options & SingleParser<Value>;
+
 export interface RangeDefinition {
     label: string;
     // `null` is the open-ended query
@@ -47,44 +59,26 @@ export const REFRESH_INTERVALS: Readonly<Record<RefreshLabel, RefreshDefinition>
     "5m": { interval: { minutes: 5 }, label: "5m" },
 };
 
-// `Metric` indexes `BucketPoint`, so the URL needs its own vocabulary rather than the column names.
-const METRIC_SLUGS = {
-    bytes_sent: "bytes-wasted",
-    connects: "connections",
-    time_spent: "time-wasted",
-} as const satisfies Record<Metric, string>;
-
-// Defaults stay in the URL, so changing one later cannot re-point links already shared.
-const PARSER_OPTIONS = { clearOnDefault: false, history: "push" } as const;
-
-const RANGE_PARSER = parseAsStringLiteral(RANGE_SLUGS).withDefault("24-hours").withOptions(PARSER_OPTIONS);
-
-const REFRESH_PARSER = parseAsStringLiteral(REFRESH_SLUGS).withDefault("off").withOptions(PARSER_OPTIONS);
-
-const METRIC_PARSER = createParser<Metric>({
-    parse: (value) => {
-        return (
-            METRIC_KEYS.find((metric) => {
-                return METRIC_SLUGS[metric] === value;
-            }) ?? null
-        );
-    },
-    serialize: (value) => {
-        return METRIC_SLUGS[value];
-    },
-})
-    .withDefault("connects")
-    .withOptions(PARSER_OPTIONS);
-
-type DashboardParser<Value> = { defaultValue: Value } & Options & SingleParser<Value>;
-
 // The whole contract in one object: `useCanonicalUrl` writes all of it, each component reads its own key.
 export const DASHBOARD_PARAMS: {
     metric: DashboardParser<Metric>;
     range: DashboardParser<Range>;
     refresh: DashboardParser<RefreshLabel>;
 } = {
-    metric: METRIC_PARSER,
-    range: RANGE_PARSER,
-    refresh: REFRESH_PARSER,
+    metric: createParser<Metric>({
+        parse: (value) => {
+            return (
+                METRIC_KEYS.find((metric) => {
+                    return METRIC_SLUGS[metric] === value;
+                }) ?? null
+            );
+        },
+        serialize: (value) => {
+            return METRIC_SLUGS[value];
+        },
+    })
+        .withDefault("connects")
+        .withOptions(PARSER_OPTIONS),
+    range: parseAsStringLiteral(RANGE_SLUGS).withDefault("24-hours").withOptions(PARSER_OPTIONS),
+    refresh: parseAsStringLiteral(REFRESH_SLUGS).withDefault("off").withOptions(PARSER_OPTIONS),
 };

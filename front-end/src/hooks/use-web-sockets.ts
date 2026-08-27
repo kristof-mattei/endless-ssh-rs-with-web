@@ -5,13 +5,6 @@ import type { WsEvent } from "../generated/WsEvent";
 import { reload } from "../lib/reload";
 import { parseWsEvent } from "../lib/wire";
 
-export type ConnectionStatus = "connecting" | "live" | "outdated" | "reconnecting";
-
-export type ConnectedEvent = Extract<WsEvent, { type: "connected" }>;
-export type DisconnectedEvent = Extract<WsEvent, { type: "disconnected" }>;
-export type InitEvent = Extract<WsEvent, { type: "init" }>;
-export type ReadyEvent = Extract<WsEvent, { type: "ready" }>;
-
 interface Options {
     /** The highest `disconnected` sequence already applied. A reconnect replays everything after it. */
     getSince: () => number;
@@ -52,6 +45,13 @@ function closeSocket(ws: WebSocket): void {
         ws.close(NORMAL_CLOSURE_CODE);
     }
 }
+
+export type ConnectionStatus = "connecting" | "live" | "outdated" | "reconnecting";
+
+export type ConnectedEvent = Extract<WsEvent, { type: "connected" }>;
+export type DisconnectedEvent = Extract<WsEvent, { type: "disconnected" }>;
+export type InitEvent = Extract<WsEvent, { type: "init" }>;
+export type ReadyEvent = Extract<WsEvent, { type: "ready" }>;
 
 export function useWebSocket({ getSince, onEvent }: Options): { status: ConnectionStatus } {
     const [status, setStatus] = useState<ConnectionStatus>("connecting");

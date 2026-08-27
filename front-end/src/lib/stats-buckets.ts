@@ -4,14 +4,14 @@ import type { Country } from "../generated/Country";
 import type { StatsRow } from "../generated/StatsRow";
 import type { Metric } from "./metrics";
 
+// TimescaleDB's bucket origin, a Monday, so weekly buckets run Monday to Sunday. Every narrower width divides a day evenly, so only the weekly grid depends on the anchor.
+const BUCKET_ANCHOR_MS = Temporal.Instant.from("2000-01-03T00:00:00Z").epochMilliseconds;
+
 export type BucketPointValues = Record<Metric, number>;
 
 export type BucketPoint = {
     bucket: Temporal.Instant;
 } & BucketPointValues;
-
-// TimescaleDB's bucket origin, a Monday, so weekly buckets run Monday to Sunday. Every narrower width divides a day evenly, so only the weekly grid depends on the anchor.
-const BUCKET_ANCHOR_MS = Temporal.Instant.from("2000-01-03T00:00:00Z").epochMilliseconds;
 
 export function snapUpToBucket(ms: number, bucketWidthMs: number): number {
     return BUCKET_ANCHOR_MS + Math.ceil((ms - BUCKET_ANCHOR_MS) / bucketWidthMs) * bucketWidthMs;
