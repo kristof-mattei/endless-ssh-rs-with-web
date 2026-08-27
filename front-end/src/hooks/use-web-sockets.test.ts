@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { Temporal } from "temporal-polyfill";
 import type { Mock } from "vitest";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { WsEvent } from "../generated/WsEvent";
 import { reload } from "../lib/reload";
@@ -82,12 +82,23 @@ function latestSocket(): FakeWebSocket {
     return socket;
 }
 
-function renderWebSocketHook(): {
+function renderWebSocketHook({ reloadedAt }: { reloadedAt?: string } = {}): {
     getSince: Mock<() => number>;
     onEvent: Mock<(event: WsEvent) => void>;
     result: { current: { status: ConnectionStatus } };
     unmount: () => void;
 } {
+    vi.useFakeTimers();
+    FakeWebSocket.instances = [];
+    vi.stubGlobal("WebSocket", FakeWebSocket);
+    vi.mocked(reload).mockClear();
+
+    sessionStorage.clear();
+
+    if (reloadedAt !== undefined) {
+        sessionStorage.setItem("reloaded-for-build-at", reloadedAt);
+    }
+
     const onEvent = vi.fn<(event: WsEvent) => void>();
     const getSince = vi.fn<() => number>(() => {
         return 0;
@@ -119,18 +130,6 @@ function dropLatest(): void {
 }
 
 describe("useWebSocket", () => {
-    beforeEach(() => {
-        vi.useFakeTimers();
-        FakeWebSocket.instances = [];
-        vi.stubGlobal("WebSocket", FakeWebSocket);
-        sessionStorage.clear();
-        vi.mocked(reload).mockClear();
-    });
-
-    afterEach(() => {
-        vi.useRealTimers();
-    });
-
     it("starts in connecting and dials with the replay cursor at 0", { timeout: 1000 }, () => {
         expect.assertions(4);
 
@@ -319,9 +318,7 @@ describe("useWebSocket", () => {
     it("reloads again for a mismatch after the cooldown", { timeout: 1000 }, () => {
         expect.assertions(1);
 
-        sessionStorage.setItem("reloaded-for-build-at", millisecondsAgo(90_000));
-
-        renderWebSocketHook();
+        renderWebSocketHook({ reloadedAt: millisecondsAgo(90_000) });
 
         openLatest();
 
@@ -335,9 +332,7 @@ describe("useWebSocket", () => {
     it("stops as outdated instead of reloading again within the cooldown", { timeout: 1000 }, () => {
         expect.assertions(5);
 
-        sessionStorage.setItem("reloaded-for-build-at", millisecondsAgo(30_000));
-
-        const { onEvent, result } = renderWebSocketHook();
+        const { onEvent, result } = renderWebSocketHook({ reloadedAt: millisecondsAgo(30_000) });
 
         openLatest();
 

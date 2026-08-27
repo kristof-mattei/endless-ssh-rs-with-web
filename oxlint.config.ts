@@ -321,7 +321,7 @@ const config: OxlintConfig = defineConfig({
             files: ["**/*.test.ts", "**/*.test.tsx"],
             plugins: [...plugins, "vitest"],
             rules: {
-                "vitest/no-hooks": "off",
+                "vitest/no-hooks": "error",
                 "vitest/no-importing-vitest-globals": "off",
                 "vitest/prefer-expect-assertions": "error",
                 "vitest/require-test-timeout": "error",
