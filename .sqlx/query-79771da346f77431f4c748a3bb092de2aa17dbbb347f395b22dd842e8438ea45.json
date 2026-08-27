@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO connection_log (\n            connected_at\n            , disconnected_at\n            , time_spent\n            , bytes_sent\n            , ip_address\n            , port\n            , country_code\n            , country_name\n            , city\n            , latitude\n            , longitude\n        ) VALUES (\n            $1\n            , $2\n            , $3\n            , $4\n            , $5\n            , $6\n            , $7\n            , $8\n            , $9\n            , $10\n            , $11\n        )\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "Timestamptz",
+        "Interval",
+        "Int8",
+        "Inet",
+        "Int4",
+        "Bpchar",
+        "Text",
+        "Text",
+        "Float8",
+        "Float8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "79771da346f77431f4c748a3bb092de2aa17dbbb347f395b22dd842e8438ea45"
+}
