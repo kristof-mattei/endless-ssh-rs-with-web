@@ -1,4 +1,18 @@
 <!-- header goes here -->
+## [0.24.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.23.0..v0.24.0) - 2026-08-27
+
+### 🚀 Features
+
+- Keep every connection by [@kristof-mattei](https://github.com/kristof-mattei) ([`cb9817b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/cb9817b58e5790060c05190d9ba47729b084558f))
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate uuid to v1.26.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`46f3d1a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/46f3d1a4f6c8b703a62343f2a2e5567290a70c34))
+- *(deps)* Update rust crate uuid to v1.26.0 (#3347) by [@renovate[bot]](https://github.com/renovate[bot]) in #3347 ([`ba59d4e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ba59d4ec2a5a9efc9400726f417faf50b134bbbf))
+
+### ⚙️ Miscellaneous Tasks
+
+- Replace `eslint-plugin-react-refresh` with oxlint's `react/only-export-components` by [@kristof-mattei](https://github.com/kristof-mattei) ([`1561c8c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1561c8cecede0f547c8d445f32f3e4655b4e764a))
 ## [0.23.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.22.0..v0.23.0) - 2026-08-26
 
 ### 🚀 Features
