@@ -2,9 +2,11 @@ import { render, waitFor } from "@testing-library/react";
 import type { UrlUpdateEvent } from "nuqs/adapters/testing";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import type React from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { useCanonicalUrl } from "./use-canonical-url";
+
+vi.setConfig({ testTimeout: 1000 });
 
 const Probe: React.FC = () => {
     useCanonicalUrl();
@@ -41,7 +43,7 @@ async function renderAndCaptureUpdate(searchParams: string): Promise<UrlUpdateEv
 }
 
 describe("useCanonicalUrl", () => {
-    it("writes every param on mount, defaults included", { timeout: 1000 }, async () => {
+    it("writes every param on mount, defaults included", async () => {
         expect.hasAssertions();
 
         const { searchParams } = await renderAndCaptureUpdate("");
@@ -51,19 +53,15 @@ describe("useCanonicalUrl", () => {
         expect(searchParams.get("refresh")).toBe("off");
     });
 
-    it(
-        "replaces rather than pushing, so arriving leaves no history entry to step back into",
-        { timeout: 1000 },
-        async () => {
-            expect.hasAssertions();
+    it("replaces rather than pushing, so arriving leaves no history entry to step back into", async () => {
+        expect.hasAssertions();
 
-            const { options } = await renderAndCaptureUpdate("");
+        const { options } = await renderAndCaptureUpdate("");
 
-            expect(options.history).toBe("replace");
-        },
-    );
+        expect(options.history).toBe("replace");
+    });
 
-    it("keeps values the URL already carries and fills in only the rest", { timeout: 1000 }, async () => {
+    it("keeps values the URL already carries and fills in only the rest", async () => {
         expect.hasAssertions();
 
         const { searchParams } = await renderAndCaptureUpdate("?range=7-days&refresh=10s");
@@ -73,7 +71,7 @@ describe("useCanonicalUrl", () => {
         expect(searchParams.get("metric")).toBe("connections");
     });
 
-    it("ignores a value it cannot parse and writes the default in its place", { timeout: 1000 }, async () => {
+    it("ignores a value it cannot parse and writes the default in its place", async () => {
         expect.hasAssertions();
 
         const { searchParams } = await renderAndCaptureUpdate("?metric=bogus");

@@ -8,6 +8,8 @@ import { reload } from "../lib/reload";
 import type { ConnectionStatus } from "./use-web-sockets";
 import { useWebSocket } from "./use-web-sockets";
 
+vi.setConfig({ testTimeout: 1000 });
+
 vi.mock("../lib/reload", () => {
     return { reload: vi.fn() };
 });
@@ -131,7 +133,7 @@ describe("useWebSocket", () => {
         vi.useRealTimers();
     });
 
-    it("starts in connecting and dials with the replay cursor at 0", { timeout: 1000 }, () => {
+    it("starts in connecting and dials with the replay cursor at 0", () => {
         const { result } = renderWebSocketHook();
 
         expect(result.current.status).toBe("connecting");
@@ -140,7 +142,7 @@ describe("useWebSocket", () => {
         expect(latestSocket().url).toContain("/api/ws?since=0");
     });
 
-    it("goes live on open", { timeout: 1000 }, () => {
+    it("goes live on open", () => {
         const { result } = renderWebSocketHook();
 
         openLatest();
@@ -148,7 +150,7 @@ describe("useWebSocket", () => {
         expect(result.current.status).toBe("live");
     });
 
-    it("stays in connecting when the socket drops before ever opening", { timeout: 1000 }, () => {
+    it("stays in connecting when the socket drops before ever opening", () => {
         const { result } = renderWebSocketHook();
 
         dropLatest();
@@ -156,7 +158,7 @@ describe("useWebSocket", () => {
         expect(result.current.status).toBe("connecting");
     });
 
-    it("flags reconnecting when a live connection drops, live again once it recovers", { timeout: 1000 }, () => {
+    it("flags reconnecting when a live connection drops, live again once it recovers", () => {
         const { result } = renderWebSocketHook();
 
         openLatest();
@@ -170,7 +172,7 @@ describe("useWebSocket", () => {
         expect(result.current.status).toBe("live");
     });
 
-    it("retries with exponential backoff", { timeout: 1000 }, () => {
+    it("retries with exponential backoff", () => {
         renderWebSocketHook();
 
         dropLatest();
@@ -195,7 +197,7 @@ describe("useWebSocket", () => {
         expect(FakeWebSocket.instances).toHaveLength(4);
     });
 
-    it("caps the backoff at 30 seconds", { timeout: 1000 }, () => {
+    it("caps the backoff at 30 seconds", () => {
         expect.assertions(16);
 
         renderWebSocketHook();
@@ -215,7 +217,7 @@ describe("useWebSocket", () => {
         }
     });
 
-    it("resets the backoff once a connection stays up for 5 seconds", { timeout: 1000 }, () => {
+    it("resets the backoff once a connection stays up for 5 seconds", () => {
         renderWebSocketHook();
 
         dropLatest();
@@ -232,7 +234,7 @@ describe("useWebSocket", () => {
         expect(FakeWebSocket.instances).toHaveLength(3);
     });
 
-    it("keeps growing the backoff for connections that drop before proving stable", { timeout: 1000 }, () => {
+    it("keeps growing the backoff for connections that drop before proving stable", () => {
         renderWebSocketHook();
 
         dropLatest();
@@ -249,7 +251,7 @@ describe("useWebSocket", () => {
         expect(FakeWebSocket.instances).toHaveLength(3);
     });
 
-    it("delivers parsed events to onEvent", { timeout: 1000 }, () => {
+    it("delivers parsed events to onEvent", () => {
         const { onEvent } = renderWebSocketHook();
 
         openLatest();
@@ -261,7 +263,7 @@ describe("useWebSocket", () => {
         expect(onEvent).toHaveBeenCalledWith({ type: "ready" });
     });
 
-    it("passes an init from its own build through", { timeout: 1000 }, () => {
+    it("passes an init from its own build through", () => {
         // without the `BUILD_ID` env var at build time, the identity is the local default
         expect(import.meta.env.BUILD_ID).toBe("dev");
 
@@ -277,7 +279,7 @@ describe("useWebSocket", () => {
         expect(reload).not.toHaveBeenCalled();
     });
 
-    it("reloads when the server comes from another build", { timeout: 1000 }, () => {
+    it("reloads when the server comes from another build", () => {
         const before = Temporal.Now.instant().epochMilliseconds;
         const { onEvent } = renderWebSocketHook();
 
@@ -296,7 +298,7 @@ describe("useWebSocket", () => {
         expect(reloadedAt).toBeLessThanOrEqual(Temporal.Now.instant().epochMilliseconds);
     });
 
-    it("reloads again for a mismatch after the cooldown", { timeout: 1000 }, () => {
+    it("reloads again for a mismatch after the cooldown", () => {
         sessionStorage.setItem("reloaded-for-build-at", millisecondsAgo(90_000));
 
         renderWebSocketHook();
@@ -310,7 +312,7 @@ describe("useWebSocket", () => {
         expect(reload).toHaveBeenCalledTimes(1);
     });
 
-    it("stops as outdated instead of reloading again within the cooldown", { timeout: 1000 }, () => {
+    it("stops as outdated instead of reloading again within the cooldown", () => {
         sessionStorage.setItem("reloaded-for-build-at", millisecondsAgo(30_000));
 
         const { onEvent, result } = renderWebSocketHook();
@@ -333,7 +335,7 @@ describe("useWebSocket", () => {
         expect(FakeWebSocket.instances).toHaveLength(1);
     });
 
-    it("dials the reconnect with the sequence getSince reports", { timeout: 1000 }, () => {
+    it("dials the reconnect with the sequence getSince reports", () => {
         const { getSince } = renderWebSocketHook();
 
         openLatest();
@@ -345,7 +347,7 @@ describe("useWebSocket", () => {
         expect(latestSocket().url).toContain("/api/ws?since=42");
     });
 
-    it("force-closes a half-dead connection when the watchdog expires", { timeout: 1000 }, () => {
+    it("force-closes a half-dead connection when the watchdog expires", () => {
         renderWebSocketHook();
 
         openLatest();
@@ -357,7 +359,7 @@ describe("useWebSocket", () => {
         expect(latestSocket().closeCalls).toEqual([NORMAL_CLOSURE_CODE]);
     });
 
-    it("re-arms the watchdog on any frame", { timeout: 1000 }, () => {
+    it("re-arms the watchdog on any frame", () => {
         renderWebSocketHook();
 
         openLatest();
@@ -375,7 +377,7 @@ describe("useWebSocket", () => {
         expect(latestSocket().closeCalls).toEqual([NORMAL_CLOSURE_CODE]);
     });
 
-    it("ignores malformed and non-text frames", { timeout: 1000 }, () => {
+    it("ignores malformed and non-text frames", () => {
         const consoleError = vi.spyOn(console, "error").mockImplementation(() => {
             // suppress the expected noise
         });
@@ -393,7 +395,7 @@ describe("useWebSocket", () => {
         expect(consoleError).toHaveBeenCalledTimes(2);
     });
 
-    it("defers close until open when unmounted while still connecting", { timeout: 1000 }, () => {
+    it("defers close until open when unmounted while still connecting", () => {
         const { unmount } = renderWebSocketHook();
 
         unmount();
@@ -405,7 +407,7 @@ describe("useWebSocket", () => {
         expect(latestSocket().closeCalls).toEqual([NORMAL_CLOSURE_CODE]);
     });
 
-    it("closes an open socket on unmount", { timeout: 1000 }, () => {
+    it("closes an open socket on unmount", () => {
         const { unmount } = renderWebSocketHook();
 
         openLatest();
@@ -414,7 +416,7 @@ describe("useWebSocket", () => {
         expect(latestSocket().closeCalls).toEqual([NORMAL_CLOSURE_CODE]);
     });
 
-    it("goes silent after unmount", { timeout: 1000 }, () => {
+    it("goes silent after unmount", () => {
         const { onEvent, unmount } = renderWebSocketHook();
 
         openLatest();
@@ -430,7 +432,7 @@ describe("useWebSocket", () => {
         expect(FakeWebSocket.instances).toHaveLength(1);
     });
 
-    it("cancels a pending reconnect on unmount", { timeout: 1000 }, () => {
+    it("cancels a pending reconnect on unmount", () => {
         const { unmount } = renderWebSocketHook();
 
         dropLatest();
@@ -440,7 +442,7 @@ describe("useWebSocket", () => {
         expect(FakeWebSocket.instances).toHaveLength(1);
     });
 
-    it("reconnects immediately when the browser comes back online", { timeout: 1000 }, () => {
+    it("reconnects immediately when the browser comes back online", () => {
         renderWebSocketHook();
 
         dropLatest();
@@ -456,7 +458,7 @@ describe("useWebSocket", () => {
         expect(FakeWebSocket.instances).toHaveLength(2);
     });
 
-    it("reconnects immediately when the tab becomes visible", { timeout: 1000 }, () => {
+    it("reconnects immediately when the tab becomes visible", () => {
         renderWebSocketHook();
 
         dropLatest();
@@ -468,7 +470,7 @@ describe("useWebSocket", () => {
         expect(FakeWebSocket.instances).toHaveLength(2);
     });
 
-    it("stays put when visibility changes while hidden", { timeout: 1000 }, () => {
+    it("stays put when visibility changes while hidden", () => {
         Object.defineProperty(document, "visibilityState", {
             configurable: true,
             get: () => {
@@ -489,7 +491,7 @@ describe("useWebSocket", () => {
         Reflect.deleteProperty(document, "visibilityState");
     });
 
-    it("ignores online events while connected", { timeout: 1000 }, () => {
+    it("ignores online events while connected", () => {
         renderWebSocketHook();
 
         openLatest();
