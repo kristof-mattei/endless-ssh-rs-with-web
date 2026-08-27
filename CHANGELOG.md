@@ -1,4 +1,10 @@
 <!-- header goes here -->
+## [0.24.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.24.0..v0.24.1) - 2026-08-27
+
+### ⚙️ Miscellaneous Tasks
+
+- Replace `.oxlintrc.json` and `.oxfmtrc.json` with `oxlint.config.ts` and `oxfmt.config.ts` by [@kristof-mattei](https://github.com/kristof-mattei) ([`2b68fc3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2b68fc34c1ce4363bf4a353368372bf9b2a2f600))
+- Tighten the lint config by [@kristof-mattei](https://github.com/kristof-mattei) ([`48ddb9f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/48ddb9fd8bb389ee254ae855bfcbe3b9658ba6c7))
 ## [0.24.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.23.0..v0.24.0) - 2026-08-27
 
 ### 🚀 Features
