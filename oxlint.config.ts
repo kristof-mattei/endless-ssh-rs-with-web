@@ -128,7 +128,7 @@ const config: OxlintConfig = defineConfig({
                 tsx: "never",
             },
         ],
-        "import/exports-last": "off",
+        "import/exports-last": "error",
         "import/group-exports": "off",
         "import/named": "error",
         "import/newline-after-import": "error",

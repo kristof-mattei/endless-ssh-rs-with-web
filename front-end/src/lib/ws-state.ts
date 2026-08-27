@@ -6,6 +6,15 @@ import type { DisconnectedEvent } from "../hooks/use-web-sockets";
 
 const MAX_EVENTS = 100;
 
+function isSameConnection(active: ActiveConnectionInfo, event: DisconnectedEvent): boolean {
+    if (active.ip !== event.ip || active.port !== event.port) {
+        return false;
+    }
+
+    // a disconnect dated before this entry connected belongs to an earlier connection on the same ip and port
+    return Temporal.Instant.compare(active.connected_at, event.disconnected_at) < 0;
+}
+
 export interface WsState {
     activeConnections: ActiveConnectionInfo[];
     events: DisconnectedEvent[];
@@ -25,15 +34,6 @@ export const INITIAL_WS_STATE: WsState = {
     totalConnections: 0,
     totalTimeSeconds: 0,
 };
-
-function isSameConnection(active: ActiveConnectionInfo, event: DisconnectedEvent): boolean {
-    if (active.ip !== event.ip || active.port !== event.port) {
-        return false;
-    }
-
-    // a disconnect dated before this entry connected belongs to an earlier connection on the same ip and port
-    return Temporal.Instant.compare(active.connected_at, event.disconnected_at) < 0;
-}
 
 export function wsReducer(state: WsState, event: WsEvent): WsState {
     switch (event.type) {
