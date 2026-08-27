@@ -4,7 +4,6 @@ appuser
 archi
 artipacked
 bkeepers
-bodyless
 bpchar
 buildcache
 cinstrument

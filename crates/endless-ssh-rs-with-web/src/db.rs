@@ -28,6 +28,21 @@ pub async fn run_migrations(pool: &PgPool) -> Result<(), MigrateError> {
     sqlx::migrate!().run(pool).await
 }
 
+/// A completed connection.
+struct NewConnection {
+    connected_at: OffsetDateTime,
+    disconnected_at: OffsetDateTime,
+    time_spent: SignedDuration,
+    bytes_sent: i64,
+    ip_address: IpAddr,
+    port: u16,
+    country_code: Option<String>,
+    country_name: Option<String>,
+    city: Option<String>,
+    latitude: Option<f64>,
+    longitude: Option<f64>,
+}
+
 #[expect(clippy::too_many_arguments, reason = "One argument per column")]
 pub async fn insert_connection(
     pool: &PgPool,
@@ -53,9 +68,36 @@ pub async fn insert_connection(
     let country = geo.and_then(|geo| geo.country.as_ref());
     let coordinates = geo.and_then(|geo| geo.coordinates);
 
+    let row = NewConnection {
+        connected_at,
+        disconnected_at,
+        time_spent,
+        bytes_sent,
+        ip_address,
+        port,
+        country_code: country.map(|country| country.code.clone()),
+        country_name: country.map(|country| country.name.clone()),
+        city: geo.and_then(|geo| geo.city.clone()),
+        latitude: coordinates.map(|coordinates| coordinates.latitude),
+        longitude: coordinates.map(|coordinates| coordinates.longitude),
+    };
+
     let mut tx = pool.begin().await?;
 
-    let id: i64 = sqlx::query_scalar!(
+    let id = insert_feed_row(&mut *tx, &row).await?;
+    insert_log_row(&mut *tx, &row).await?;
+    add_to_totals(&mut *tx, &row).await?;
+
+    tx.commit().await?;
+
+    Ok(id)
+}
+
+async fn insert_feed_row(
+    executor: impl PgExecutor<'_>,
+    row: &NewConnection,
+) -> Result<i64, sqlx::Error> {
+    sqlx::query_scalar!(
         r#"
         INSERT INTO connections (
             connected_at
@@ -83,21 +125,76 @@ pub async fn insert_connection(
             , $11
         ) RETURNING id
         "#,
-        connected_at,
-        disconnected_at,
-        DbDuration(time_spent) as _,
-        bytes_sent,
-        DbIpAddr(ip_address) as _,
-        i32::from(port),
-        country.map(|country| country.code.clone()),
-        country.map(|country| country.name.clone()),
-        geo.and_then(|g| g.city.clone()),
-        coordinates.map(|coordinates| coordinates.latitude),
-        coordinates.map(|coordinates| coordinates.longitude)
+        row.connected_at,
+        row.disconnected_at,
+        DbDuration(row.time_spent) as _,
+        row.bytes_sent,
+        DbIpAddr(row.ip_address) as _,
+        i32::from(row.port),
+        row.country_code.as_deref(),
+        row.country_name.as_deref(),
+        row.city.as_deref(),
+        row.latitude,
+        row.longitude
     )
-    .fetch_one(&mut *tx)
+    .fetch_one(executor)
+    .await
+}
+
+async fn insert_log_row(
+    executor: impl PgExecutor<'_>,
+    row: &NewConnection,
+) -> Result<(), sqlx::Error> {
+    sqlx::query!(
+        r#"
+        INSERT INTO connection_log (
+            connected_at
+            , disconnected_at
+            , time_spent
+            , bytes_sent
+            , ip_address
+            , port
+            , country_code
+            , country_name
+            , city
+            , latitude
+            , longitude
+        ) VALUES (
+            $1
+            , $2
+            , $3
+            , $4
+            , $5
+            , $6
+            , $7
+            , $8
+            , $9
+            , $10
+            , $11
+        )
+        "#,
+        row.connected_at,
+        row.disconnected_at,
+        DbDuration(row.time_spent) as _,
+        row.bytes_sent,
+        DbIpAddr(row.ip_address) as _,
+        i32::from(row.port),
+        row.country_code.as_deref(),
+        row.country_name.as_deref(),
+        row.city.as_deref(),
+        row.latitude,
+        row.longitude
+    )
+    .execute(executor)
     .await?;
 
+    Ok(())
+}
+
+async fn add_to_totals(
+    executor: impl PgExecutor<'_>,
+    row: &NewConnection,
+) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
         UPDATE totals
@@ -107,15 +204,13 @@ pub async fn insert_connection(
             , total_time_spent = total_time_spent + $2
         WHERE id = 1
         "#,
-        bytes_sent,
-        DbDuration(time_spent) as _,
+        row.bytes_sent,
+        DbDuration(row.time_spent) as _,
     )
-    .execute(&mut *tx)
+    .execute(executor)
     .await?;
 
-    tx.commit().await?;
-
-    Ok(id)
+    Ok(())
 }
 
 /// Return up to `limit` of the most recent connection records with id > `since_id`, ordered by ascending id.
