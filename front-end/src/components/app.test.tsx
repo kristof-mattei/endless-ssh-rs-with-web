@@ -33,7 +33,9 @@ class InertWebSocket {
 }
 
 describe("App", () => {
-    it("renders", () => {
+    it("renders", { timeout: 1000 }, () => {
+        expect.assertions(2);
+
         vi.stubGlobal("WebSocket", InertWebSocket);
         // a forever-pending stats fetch, the test only covers first paint
         vi.stubGlobal(
