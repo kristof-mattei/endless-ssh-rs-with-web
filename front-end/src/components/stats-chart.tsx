@@ -231,6 +231,7 @@ export const StatsChart: React.FC<StatsData> = ({ grid, rows }) => {
                             }}
                             cursor={{ fill: "rgba(255,255,255,0.04)" }}
                             itemStyle={{ color: "#9ca3af" }}
+                            // oxlint-disable-next-line typescript/promise-function-async -- ReactNode includes Promise
                             labelFormatter={(label: ReactNode) => {
                                 return typeof label === "number"
                                     ? Temporal.Instant.fromEpochMilliseconds(label).toLocaleString(

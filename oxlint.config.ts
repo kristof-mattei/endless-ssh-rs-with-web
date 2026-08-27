@@ -189,8 +189,7 @@ const config: OxlintConfig = defineConfig({
         "typescript/parameter-properties": "error",
         "typescript/prefer-optional-chain": "error",
         "typescript/prefer-readonly-parameter-types": "off",
-        // ReactNode includes Promise, so callbacks returning it would have to be async
-        "typescript/promise-function-async": "off",
+        "typescript/promise-function-async": "error",
         "typescript/restrict-template-expressions": [
             "error",
             {
