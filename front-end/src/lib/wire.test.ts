@@ -9,8 +9,6 @@ const DISCONNECTED =
 describe("parseWsEvent", () => {
     // the wrappers are what the back-end's `Timestamp` test asserts it writes, see `utils/serde.rs`
     it("turns the back-end's `$instant` wrappers into instants", { timeout: 1000 }, () => {
-        expect.assertions(3);
-
         const event = parseWsEvent(DISCONNECTED);
 
         if (event.type !== "disconnected") {
@@ -23,16 +21,12 @@ describe("parseWsEvent", () => {
     });
 
     it("leaves a bare string alone even when it looks like a timestamp", { timeout: 1000 }, () => {
-        expect.assertions(1);
-
         const event = parseWsEvent(DISCONNECTED);
 
         expect(event).toMatchObject({ city: "2026-01-01T00:00:00Z" });
     });
 
     it("finds wrappers inside the init payload's array", { timeout: 1000 }, () => {
-        expect.assertions(1);
-
         const event = parseWsEvent(
             '{"type":"init","build_id":"dev","active_connections":[{"ip":"::1","port":1,"connected_at":{"$instant":"2026-01-01T00:00:00Z"},"bytes_sent":0,"coordinates":null,"country":null,"city":null}],"total_connections":0,"total_bytes_sent":0,"total_time_spent":0,"last_counted_id":0}',
         );
@@ -45,8 +39,6 @@ describe("parseWsEvent", () => {
     });
 
     it("throws on a wrapper whose value is not a timestamp", { timeout: 1000 }, () => {
-        expect.assertions(1);
-
         expect(() => {
             return parseWsEvent(DISCONNECTED.replace('"2026-01-01T00:00:00Z"}', '"yesterday"}'));
         }).toThrow();
@@ -55,8 +47,6 @@ describe("parseWsEvent", () => {
 
 describe("parseStatsResponse", () => {
     it("turns every row's bucket into an instant", { timeout: 1000 }, () => {
-        expect.assertions(1);
-
         const stats = parseStatsResponse(
             '{"bucket_seconds":60,"rows":[{"bucket":{"$instant":"2026-01-01T00:00:00Z"},"country":null,"connects":1,"time_spent":1,"bytes_sent":1},{"bucket":{"$instant":"2026-01-01T00:01:00Z"},"country":{"code":"NL","name":"Netherlands"},"connects":2,"time_spent":2,"bytes_sent":2}]}',
         );

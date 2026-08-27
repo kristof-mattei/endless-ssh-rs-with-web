@@ -323,7 +323,14 @@ const config: OxlintConfig = defineConfig({
             rules: {
                 "vitest/no-hooks": "off",
                 "vitest/no-importing-vitest-globals": "off",
-                "vitest/prefer-expect-assertions": "error",
+                "vitest/prefer-expect-assertions": [
+                    "error",
+                    {
+                        onlyFunctionsWithAsyncKeyword: true,
+                        onlyFunctionsWithExpectInCallback: true,
+                        onlyFunctionsWithExpectInLoop: true,
+                    },
+                ],
                 "vitest/require-test-timeout": "error",
                 "vitest/require-top-level-describe": "error",
             },
