@@ -108,9 +108,6 @@ importers:
       eslint-plugin-react-hook-form:
         specifier: 0.3.1
         version: 0.3.1
-      eslint-plugin-react-refresh:
-        specifier: 0.5.5
-        version: 0.5.5(eslint@10.9.0(jiti@2.7.0)(supports-color@7.2.0))
       husky:
         specifier: 9.1.7
         version: 9.1.7
@@ -1904,11 +1901,6 @@ packages:
   eslint-plugin-react-hook-form@0.3.1:
     resolution: {integrity: sha512-+KHoQvjGa6gxxDaVTDPXmqOL+tJ2fWTBggBQTafoVTTe41xLnq94+ZXpb7oTDDRMP97UN908iIX3mNwQqnRxHw==}
     engines: {node: '>=0.10.0'}
-
-  eslint-plugin-react-refresh@0.5.5:
-    resolution: {integrity: sha512-vG7yLURXNvCHy0FBdbZRwIu0BLPJMlUUJS2Ep7ud9w1YCLftFZtuEjyjhym0Qq9yuZ6LJUitNlu/hMk0gakXAw==}
-    peerDependencies:
-      eslint: ^9 || ^10
 
   eslint-scope@9.1.2:
     resolution: {integrity: sha512-xS90H51cKw0jltxmvmHy2Iai1LIqrfbw57b79w/J7MfvDfkIkFZ+kj6zC3BjtUwh150HsSSdxXZcsuv72miDFQ==}
@@ -4826,10 +4818,6 @@ snapshots:
   eslint-plugin-react-hook-form@0.3.1:
     dependencies:
       requireindex: 1.1.0
-
-  eslint-plugin-react-refresh@0.5.5(eslint@10.9.0(jiti@2.7.0)(supports-color@7.2.0)):
-    dependencies:
-      eslint: 10.9.0(jiti@2.7.0)(supports-color@7.2.0)
 
   eslint-scope@9.1.2:
     dependencies:
