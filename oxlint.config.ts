@@ -71,41 +71,39 @@ const config: OxlintConfig = defineConfig({
         "id-length": ["error", { exceptions: ["x", "y"] }],
         "max-lines": "off",
         "max-lines-per-function": "off",
-        "max-params": ["error", { max: 4 }],
+        "max-params": "error",
         "max-statements": "off",
         "no-alert": "error",
-        "no-console": "off",
+        "no-console": ["error", { allow: ["error", "warn"] }],
         "no-duplicate-imports": ["error", { allowSeparateTypeImports: true }],
         "no-inline-comments": "off",
         // tsc reports redeclarations (ts2451); this rule also flags a type and a value sharing a name, which TypeScript allows
         "no-redeclare": "off",
         "no-ternary": "off",
         "no-undefined": "off",
-        "no-warning-comments": "off",
+        "no-unreachable-loop": "error",
+        "no-warning-comments": "error",
         "one-var": ["error", "never"],
         // destructuring a later array index needs a hole in the pattern (`const [, second] = ...`)
         "prefer-destructuring": ["error", { array: false, object: true }],
         "require-await": "off",
-        "sort-imports": ["error", { ignoreDeclarationSort: true }],
+        // perfectionist/sort-named-imports orders the members
+        "sort-imports": "off",
         "sort-keys": "off",
         "no-restricted-globals": [
             "error",
+            {
+                message: "Use Temporal from temporal-polyfill instead.",
+                name: "Date",
+            },
             {
                 message: "Import Temporal from temporal-polyfill instead.",
                 name: "Temporal",
             },
         ],
         "no-shadow": "error",
-        "no-use-before-define": [
-            "error",
-            {
-                classes: true,
-                enums: false,
-                functions: false,
-                typedefs: false,
-                variables: true,
-            },
-        ],
+        "no-use-before-define": "error",
+        "no-useless-assignment": "error",
         "no-useless-constructor": "error",
         "no-void": ["error", { allowAsStatement: true }],
         "object-shorthand": ["error", "always"],
@@ -115,10 +113,12 @@ const config: OxlintConfig = defineConfig({
         "oxc/no-optional-chaining": "off",
         "oxc/no-rest-spread-properties": "off",
 
-        "unicorn/no-array-sort": "off",
+        "unicorn/no-array-sort": "error",
         "unicorn/no-null": "off",
+        "unicorn/no-useless-iterator-to-array": "error",
         "unicorn/prefer-ternary": "off",
 
+        "import/export": "error",
         "import/extensions": [
             "error",
             "ignorePackages",
@@ -130,9 +130,10 @@ const config: OxlintConfig = defineConfig({
         ],
         "import/exports-last": "off",
         "import/group-exports": "off",
+        "import/named": "error",
         "import/newline-after-import": "error",
         "import/no-cycle": "off",
-        "import/no-default-export": "off",
+        "import/no-default-export": "error",
         "import/no-named-export": "off",
         "import/no-relative-parent-imports": "off",
         "import/no-unassigned-import": ["error", { allow: ["**/*.css"] }],
@@ -146,6 +147,8 @@ const config: OxlintConfig = defineConfig({
 
         "node/no-process-env": "error",
         "node/no-top-level-await": ["error", { ignoreBin: true }],
+
+        "promise/no-return-in-finally": "error",
 
         // tsc's noImplicitReturns covers this and understands exhaustive switches
         "typescript/consistent-return": "off",
@@ -163,6 +166,7 @@ const config: OxlintConfig = defineConfig({
         "typescript/no-explicit-any": ["error", { fixToUnknown: true, ignoreRestArgs: false }],
         "typescript/no-extraneous-class": "error",
         "typescript/no-magic-numbers": "off",
+        "typescript/no-unnecessary-condition": "error",
         "typescript/no-unused-expressions": [
             "error",
             {
@@ -183,9 +187,20 @@ const config: OxlintConfig = defineConfig({
             },
         ],
         "typescript/parameter-properties": "error",
-        "typescript/promise-function-async": "off",
+        "typescript/prefer-optional-chain": "error",
         "typescript/prefer-readonly-parameter-types": "off",
-        "typescript/restrict-template-expressions": ["error", { allowNumber: true }],
+        // ReactNode includes Promise, so callbacks returning it would have to be async
+        "typescript/promise-function-async": "off",
+        "typescript/restrict-template-expressions": [
+            "error",
+            {
+                allowAny: false,
+                allowBoolean: false,
+                allowNullish: false,
+                allowNumber: false,
+                allowRegExp: false,
+            },
+        ],
         "typescript/return-await": ["error", "in-try-catch"],
         "typescript/require-await": "error",
         "typescript/switch-exhaustiveness-check": [
@@ -223,6 +238,7 @@ const config: OxlintConfig = defineConfig({
         "react/no-deriving-state-in-effects": "error",
         "react/no-multi-comp": "error",
         "react/only-export-components": ["error", { allowConstantExport: true }],
+        "react/require-render-return": "error",
         "react/rule-suppression": "error",
         "react/syntax": "error",
         "react/todo": "error",
@@ -254,6 +270,7 @@ const config: OxlintConfig = defineConfig({
         "better-tailwindcss/no-concatenated-classes": "error",
         "better-tailwindcss/no-conflicting-classes": "error",
         "better-tailwindcss/no-deprecated-classes": "error",
+        "better-tailwindcss/no-duplicate-classes": "error",
         "better-tailwindcss/no-unknown-classes": [
             "error",
             {
@@ -261,13 +278,23 @@ const config: OxlintConfig = defineConfig({
                 ignore: ["recharts-.*"],
             },
         ],
+        "better-tailwindcss/no-unnecessary-whitespace": "error",
 
+        "perfectionist/sort-array-includes": "error",
         "perfectionist/sort-classes": "error",
+        "perfectionist/sort-enums": "error",
+        "perfectionist/sort-exports": "error",
+        "perfectionist/sort-heritage-clauses": "error",
         "perfectionist/sort-interfaces": "error",
         "perfectionist/sort-intersection-types": "error",
         "perfectionist/sort-jsx-props": "error",
+        "perfectionist/sort-maps": "error",
+        "perfectionist/sort-named-exports": "error",
+        "perfectionist/sort-named-imports": "error",
         "perfectionist/sort-object-types": "error",
+        "perfectionist/sort-sets": "error",
         "perfectionist/sort-union-types": "error",
+        "perfectionist/sort-variable-declarations": "error",
 
         "react-hook-form/destructuring-formstate": "error",
         "react-hook-form/no-access-control": "error",
@@ -282,6 +309,12 @@ const config: OxlintConfig = defineConfig({
             },
             rules: {
                 "import/no-nodejs-modules": "off",
+            },
+        },
+        {
+            files: ["*.config.ts", "oxlint.plugin.ts"],
+            rules: {
+                "import/no-default-export": "off",
             },
         },
         {

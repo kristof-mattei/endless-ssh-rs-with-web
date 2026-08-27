@@ -45,7 +45,7 @@ export function topCountries(rows: StatsRow[], limit: number): CountryTotals[] {
     return map
         .values()
         .toArray()
-        .sort((left, right) => {
+        .toSorted((left, right) => {
             return right.connects - left.connects;
         })
         .slice(0, limit);
@@ -105,7 +105,7 @@ export function aggregate(rows: StatsRow[], { bucketWidthMs, range }: BucketGrid
     return map
         .values()
         .toArray()
-        .sort((left, right) => {
+        .toSorted((left, right) => {
             return Temporal.Instant.compare(left.bucket, right.bucket);
         });
 }

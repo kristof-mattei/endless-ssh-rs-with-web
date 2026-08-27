@@ -1,11 +1,11 @@
 import { useQueryState } from "nuqs";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useEffect, useState } from "react";
-import { Bar, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, createHorizontalChart } from "recharts";
+import { Bar, CartesianGrid, createHorizontalChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Temporal } from "temporal-polyfill";
 
 import { DASHBOARD_PARAMS } from "../lib/dashboard-params";
-import { METRICS, METRIC_KEYS, formatMetricValue } from "../lib/metrics";
+import { formatMetricValue, METRIC_KEYS, METRICS } from "../lib/metrics";
 import type { BucketGrid, BucketPoint, StatsData } from "../lib/stats-buckets";
 import { aggregate, snapUpToBucket } from "../lib/stats-buckets";
 import { StatsTooltip } from "./stats-tooltip";
