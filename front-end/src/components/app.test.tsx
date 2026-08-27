@@ -5,6 +5,8 @@ import { describe, expect, it, vi } from "vitest";
 
 import { App } from "./app";
 
+vi.setConfig({ testTimeout: 1000 });
+
 // maplibre requires WebGL, absent in jsdom
 vi.mock("react-map-gl/maplibre", () => {
     // oxlint-disable-next-line unicorn/consistent-function-scoping -- the factory is hoisted, outer scope is not initialized when it runs
@@ -33,7 +35,7 @@ class InertWebSocket {
 }
 
 describe("App", () => {
-    it("renders", { timeout: 1000 }, () => {
+    it("renders", () => {
         vi.stubGlobal("WebSocket", InertWebSocket);
         // a forever-pending stats fetch, the test only covers first paint
         vi.stubGlobal(

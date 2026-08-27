@@ -1,11 +1,13 @@
 import { Temporal } from "temporal-polyfill";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
 import type { WsEvent } from "../generated/WsEvent";
 import type { ConnectedEvent, DisconnectedEvent, InitEvent, ReadyEvent } from "../hooks/use-web-sockets";
 import type { WsState } from "./ws-state";
 import { INITIAL_WS_STATE, wsReducer } from "./ws-state";
+
+vi.setConfig({ testTimeout: 1000 });
 
 function instant(iso: string): Temporal.Instant {
     return Temporal.Instant.from(iso);
@@ -83,7 +85,7 @@ function applyEvents(state: WsState, events: WsEvent[]): WsState {
 
 describe("wsReducer", () => {
     describe("init", () => {
-        it("adopts the server's totals and active connections", { timeout: 1000 }, () => {
+        it("adopts the server's totals and active connections", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
                 init({
                     active_connections: [activeConnection("198.51.100.7")],
@@ -101,7 +103,7 @@ describe("wsReducer", () => {
     });
 
     describe("ready", () => {
-        it("leaves the state untouched", { timeout: 1000 }, () => {
+        it("leaves the state untouched", () => {
             const before = applyEvents(INITIAL_WS_STATE, [init()]);
 
             expect(wsReducer(before, READY)).toBe(before);
@@ -109,7 +111,7 @@ describe("wsReducer", () => {
     });
 
     describe("heartbeat", () => {
-        it("leaves the state untouched", { timeout: 1000 }, () => {
+        it("leaves the state untouched", () => {
             const before = applyEvents(INITIAL_WS_STATE, [init()]);
 
             expect(wsReducer(before, { type: "heartbeat" })).toBe(before);
@@ -117,7 +119,7 @@ describe("wsReducer", () => {
     });
 
     describe("connected", () => {
-        it("adds a new connection", { timeout: 1000 }, () => {
+        it("adds a new connection", () => {
             const state = applyEvents(INITIAL_WS_STATE, [init(), READY, connected("198.51.100.7", 50_000)]);
 
             expect(
@@ -127,14 +129,14 @@ describe("wsReducer", () => {
             ).toEqual(["198.51.100.7"]);
         });
 
-        it("ignores a duplicate ip and port", { timeout: 1000 }, () => {
+        it("ignores a duplicate ip and port", () => {
             const before = applyEvents(INITIAL_WS_STATE, [init(), READY, connected("198.51.100.7", 50_000)]);
             const after = wsReducer(before, connected("198.51.100.7", 50_000));
 
             expect(after).toBe(before);
         });
 
-        it("tracks simultaneous connections from the same ip on different ports", { timeout: 1000 }, () => {
+        it("tracks simultaneous connections from the same ip on different ports", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
                 init(),
                 READY,
@@ -151,7 +153,7 @@ describe("wsReducer", () => {
     });
 
     describe("bytes_sent", () => {
-        it("updates only the matching connection", { timeout: 1000 }, () => {
+        it("updates only the matching connection", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
                 init(),
                 READY,
@@ -167,7 +169,7 @@ describe("wsReducer", () => {
             ).toEqual([0, 96]);
         });
 
-        it("ignores an update for an unknown connection", { timeout: 1000 }, () => {
+        it("ignores an update for an unknown connection", () => {
             const before = applyEvents(INITIAL_WS_STATE, [init(), READY, connected("198.51.100.7", 1111)]);
             const after = wsReducer(before, { type: "bytes_sent", ip: "198.51.100.8", port: 1111, bytes_sent: 96 });
 
@@ -176,7 +178,7 @@ describe("wsReducer", () => {
     });
 
     describe("disconnected", () => {
-        it("moves the connection from the map to the feed", { timeout: 1000 }, () => {
+        it("moves the connection from the map to the feed", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
                 init(),
                 READY,
@@ -197,7 +199,7 @@ describe("wsReducer", () => {
             ).toEqual([1]);
         });
 
-        it("removes only the connection on the matching port", { timeout: 1000 }, () => {
+        it("removes only the connection on the matching port", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
                 init(),
                 READY,
@@ -213,35 +215,31 @@ describe("wsReducer", () => {
             ).toEqual([2222]);
         });
 
-        it(
-            "keeps a newer connection when a replayed disconnect matches a reused ip and port",
-            { timeout: 1000 },
-            () => {
-                const reused = activeConnection("198.51.100.7", {
+        it("keeps a newer connection when a replayed disconnect matches a reused ip and port", () => {
+            const reused = activeConnection("198.51.100.7", {
+                port: 1111,
+                connected_at: instant("2026-07-27T11:00:00Z"),
+            });
+
+            const state = applyEvents(INITIAL_WS_STATE, [
+                init({ active_connections: [reused] }),
+                disconnected(1, {
+                    ip: "198.51.100.7",
                     port: 1111,
-                    connected_at: instant("2026-07-27T11:00:00Z"),
-                });
+                    disconnected_at: instant("2026-07-27T10:30:00Z"),
+                }),
+                READY,
+            ]);
 
-                const state = applyEvents(INITIAL_WS_STATE, [
-                    init({ active_connections: [reused] }),
-                    disconnected(1, {
-                        ip: "198.51.100.7",
-                        port: 1111,
-                        disconnected_at: instant("2026-07-27T10:30:00Z"),
-                    }),
-                    READY,
-                ]);
+            expect(state.activeConnections).toHaveLength(1);
+            expect(
+                state.events.map((event) => {
+                    return event.sequence;
+                }),
+            ).toEqual([1]);
+        });
 
-                expect(state.activeConnections).toHaveLength(1);
-                expect(
-                    state.events.map((event) => {
-                        return event.sequence;
-                    }),
-                ).toEqual([1]);
-            },
-        );
-
-        it("matches IPv6 connections by exact string", { timeout: 1000 }, () => {
+        it("matches IPv6 connections by exact string", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
                 init(),
                 READY,
@@ -257,7 +255,7 @@ describe("wsReducer", () => {
             ).toEqual(["2001:db8::2"]);
         });
 
-        it("counts events above init's watermark towards the totals", { timeout: 1000 }, () => {
+        it("counts events above init's watermark towards the totals", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
                 init({ total_connections: 10, total_bytes_sent: 500, total_time_spent: 100, last_counted_id: 0 }),
                 READY,
@@ -269,36 +267,32 @@ describe("wsReducer", () => {
             expect(state.totalTimeSeconds).toBe(105);
         });
 
-        it(
-            "fills the feed with events at or below the watermark without touching init's totals",
-            { timeout: 1000 },
-            () => {
-                const state = applyEvents(INITIAL_WS_STATE, [
-                    init({ total_connections: 10, total_bytes_sent: 500, total_time_spent: 100, last_counted_id: 2 }),
-                    disconnected(1, { bytes_sent: 25, time_spent: 5 }),
-                    disconnected(2, { bytes_sent: 25, time_spent: 5 }),
-                    READY,
-                ]);
+        it("fills the feed with events at or below the watermark without touching init's totals", () => {
+            const state = applyEvents(INITIAL_WS_STATE, [
+                init({ total_connections: 10, total_bytes_sent: 500, total_time_spent: 100, last_counted_id: 2 }),
+                disconnected(1, { bytes_sent: 25, time_spent: 5 }),
+                disconnected(2, { bytes_sent: 25, time_spent: 5 }),
+                READY,
+            ]);
 
-                expect(
-                    state.events.map((event) => {
-                        return event.sequence;
-                    }),
-                ).toEqual([1, 2]);
-                expect(state.totalConnections).toBe(10);
-                expect(state.totalBytes).toBe(500);
-                expect(state.totalTimeSeconds).toBe(100);
-            },
-        );
+            expect(
+                state.events.map((event) => {
+                    return event.sequence;
+                }),
+            ).toEqual([1, 2]);
+            expect(state.totalConnections).toBe(10);
+            expect(state.totalBytes).toBe(500);
+            expect(state.totalTimeSeconds).toBe(100);
+        });
 
-        it("drops anything at or below the high-water mark", { timeout: 1000 }, () => {
+        it("drops anything at or below the high-water mark", () => {
             const before = applyEvents(INITIAL_WS_STATE, [init(), READY, disconnected(5)]);
             const after = wsReducer(before, disconnected(5));
 
             expect(after).toBe(before);
         });
 
-        it("caps the feed at 100 events", { timeout: 1000 }, () => {
+        it("caps the feed at 100 events", () => {
             const sequences = Array.from({ length: 105 }, (_element, index) => {
                 return index + 1;
             });
@@ -319,7 +313,7 @@ describe("wsReducer", () => {
     });
 
     describe("reconnect", () => {
-        it("survives an overlapping replay without double-counting", { timeout: 1000 }, () => {
+        it("survives an overlapping replay without double-counting", () => {
             const beforeDrop = applyEvents(INITIAL_WS_STATE, [
                 init({ total_connections: 2, total_bytes_sent: 200, total_time_spent: 20, last_counted_id: 2 }),
                 READY,
@@ -344,7 +338,7 @@ describe("wsReducer", () => {
             expect(afterReconnect.totalConnections).toBe(5);
         });
 
-        it("counts a replayed event the totals don't cover yet", { timeout: 1000 }, () => {
+        it("counts a replayed event the totals don't cover yet", () => {
             const state = applyEvents(INITIAL_WS_STATE, [
                 init({ total_connections: 2, total_bytes_sent: 200, total_time_spent: 20, last_counted_id: 2 }),
                 disconnected(2, { bytes_sent: 100, time_spent: 10 }),
