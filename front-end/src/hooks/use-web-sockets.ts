@@ -53,6 +53,7 @@ export type DisconnectedEvent = Extract<WsEvent, { type: "disconnected" }>;
 export type InitEvent = Extract<WsEvent, { type: "init" }>;
 export type ReadyEvent = Extract<WsEvent, { type: "ready" }>;
 
+/* oxlint-disable max-lines-per-function -- one effect owns the socket, its timers and the retries */
 export function useWebSocket({ getSince, onEvent }: Options): { status: ConnectionStatus } {
     const [status, setStatus] = useState<ConnectionStatus>("connecting");
 

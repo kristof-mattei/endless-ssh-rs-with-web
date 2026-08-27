@@ -151,6 +151,7 @@ function useRechartsDevtools(): DevelopmentToolsState {
     return devtools;
 }
 
+// oxlint-disable-next-line max-lines-per-function -- the chart is built inline
 export const StatsChart: React.FC<StatsData> = ({ grid, rows }) => {
     const developmentTools = useRechartsDevtools();
 
