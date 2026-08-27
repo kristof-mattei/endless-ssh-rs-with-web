@@ -261,6 +261,7 @@ const config: OxlintConfig = defineConfig({
         "react-perf/jsx-no-new-object-as-prop": "off",
 
         "better-tailwindcss/enforce-canonical-classes": "error",
+        "better-tailwindcss/enforce-consistent-class-order": "error",
         "better-tailwindcss/enforce-consistent-important-position": "error",
         "better-tailwindcss/enforce-consistent-variable-syntax": "error",
         "better-tailwindcss/enforce-consistent-variant-order": "error",
