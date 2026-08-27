@@ -40,8 +40,8 @@ describe("App", () => {
         // a forever-pending stats fetch, the test only covers first paint
         vi.stubGlobal(
             "fetch",
-            vi.fn(() => {
-                return Promise.race([]);
+            vi.fn(async () => {
+                await Promise.race([]);
             }),
         );
 
