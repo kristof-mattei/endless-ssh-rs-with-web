@@ -23,8 +23,6 @@ function row(bucket: string, overrides?: Partial<Omit<StatsRow, "bucket">>): Sta
 
 describe("aggregate", () => {
     it("sums the per-country rows of one bucket", { timeout: 1000 }, () => {
-        expect.assertions(2);
-
         const points = aggregate(
             [
                 row("2026-01-01T00:01:00Z", {
@@ -51,8 +49,6 @@ describe("aggregate", () => {
     });
 
     it("zero-fills every empty bucket in [from, to)", { timeout: 1000 }, () => {
-        expect.assertions(1);
-
         const points = aggregate([row("2026-01-01T00:01:00Z")], {
             bucketWidthMs: MINUTE_MS,
             range: { from: instant("2026-01-01T00:00:00Z"), to: instant("2026-01-01T00:05:00Z") },
@@ -66,8 +62,6 @@ describe("aggregate", () => {
     });
 
     it("aligns the zero-fill to the bucket grid when from is unaligned", { timeout: 1000 }, () => {
-        expect.assertions(1);
-
         const points = aggregate([], {
             bucketWidthMs: MINUTE_MS,
             range: { from: instant("2026-01-01T00:00:30Z"), to: instant("2026-01-01T00:05:00Z") },
@@ -81,8 +75,6 @@ describe("aggregate", () => {
     });
 
     it("anchors weekly buckets on Mondays like TimescaleDB", { timeout: 1000 }, () => {
-        expect.assertions(1);
-
         const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
         const points = aggregate([], {
@@ -98,8 +90,6 @@ describe("aggregate", () => {
     });
 
     it("sorts buckets ascending regardless of row order", { timeout: 1000 }, () => {
-        expect.assertions(1);
-
         const points = aggregate([row("2026-01-01T00:03:00Z"), row("2026-01-01T00:01:00Z")], {
             bucketWidthMs: MINUTE_MS,
             range: { from: instant("2026-01-01T00:01:00Z"), to: instant("2026-01-01T00:04:00Z") },
@@ -115,8 +105,6 @@ describe("aggregate", () => {
 
 describe("topCountries", () => {
     it("sums a country across buckets", { timeout: 1000 }, () => {
-        expect.assertions(1);
-
         const totals = topCountries(
             [
                 row("2026-01-01T00:01:00Z", { connects: 2, bytes_sent: 100 }),
@@ -131,8 +119,6 @@ describe("topCountries", () => {
     });
 
     it("sorts by connects descending and truncates to the limit", { timeout: 1000 }, () => {
-        expect.assertions(1);
-
         const totals = topCountries(
             [
                 row("2026-01-01T00:01:00Z", { country: { code: "US", name: "United States" }, connects: 1 }),
@@ -150,8 +136,6 @@ describe("topCountries", () => {
     });
 
     it("groups rows without a country under one entry", { timeout: 1000 }, () => {
-        expect.assertions(2);
-
         const totals = topCountries(
             [
                 row("2026-01-01T00:01:00Z", { country: null, connects: 1 }),
