@@ -102,7 +102,16 @@ const config: OxlintConfig = defineConfig({
             },
         ],
         "no-shadow": "error",
-        "no-use-before-define": "error",
+        "no-use-before-define": [
+            "error",
+            {
+                classes: true,
+                enums: false,
+                functions: false,
+                typedefs: false,
+                variables: true,
+            },
+        ],
         "no-useless-assignment": "error",
         "no-useless-constructor": "error",
         "no-void": ["error", { allowAsStatement: true }],
