@@ -1,4 +1,20 @@
 <!-- header goes here -->
+## [0.24.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.24.1..v0.24.2) - 2026-08-28
+
+### ⚙️ Miscellaneous Tasks
+
+- Enable more vitest lints by [@kristof-mattei](https://github.com/kristof-mattei) ([`fe4dbaa`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fe4dbaaacae3c9c8f998cb2915013245cda1c7a9))
+- Enable `typescript/promise-function-async` by [@kristof-mattei](https://github.com/kristof-mattei) ([`61d5a50`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/61d5a50ae1290e953abb4186add8edb456762aec))
+- Enable `better-tailwindcss/enforce-consistent-class-order` by [@kristof-mattei](https://github.com/kristof-mattei) ([`914dc5a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/914dc5a3d19117fe889b46211df92e8eb97a61ec))
+- Enable `import/exports-last` by [@kristof-mattei](https://github.com/kristof-mattei) ([`3cb8294`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3cb8294c9c918c343a4ff3cbb4908b73f29fc03c))
+- Scope `vitest/prefer-expect-assertions` to async, callback, and loop tests by [@kristof-mattei](https://github.com/kristof-mattei) ([`701427a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/701427af49359d38c5943247e345181524fd6a4f))
+- Set the vitest timeout per file with `vi.setConfig` by [@kristof-mattei](https://github.com/kristof-mattei) ([`8490ad0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8490ad013d6a700de1338f79bdf486a26b3370ee))
+- Tighten the lint config, second pass by [@kristof-mattei](https://github.com/kristof-mattei) ([`2493a4b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2493a4b5a3ffc4b694c073a70fd58157592340bd))
+- Restrict `no-use-before-define` to classes and variables by [@kristof-mattei](https://github.com/kristof-mattei) ([`6acf5f1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6acf5f13942b044373efc8a86f044f2ad814fe8e))
+- Allow numbers in template literals by [@kristof-mattei](https://github.com/kristof-mattei) ([`bcc64dc`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bcc64dcc4fc4bcc3a9bf5d70e330fd13886dcf73))
+- Relax `max-params`, `no-warning-comments`, and `typescript/require-await` by [@kristof-mattei](https://github.com/kristof-mattei) ([`aae3d1f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/aae3d1f2653c6390d21f7821ff63db6ca6b37b2a))
+- Gate release PRs on the base commit's container being retagged onto main by [@kristof-mattei](https://github.com/kristof-mattei) ([`60e92af`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/60e92af9995c0b8dbe70a996c8e7d72574e07ade))
+- Set `GH_REPO` and retry transient errors in the release base container gate by [@kristof-mattei](https://github.com/kristof-mattei) ([`ddd7912`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ddd7912c6629eef022288a16b6a10d563f9b7a39))
 ## [0.24.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.24.0..v0.24.1) - 2026-08-27
 
 ### ⚙️ Miscellaneous Tasks
