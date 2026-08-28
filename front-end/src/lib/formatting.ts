@@ -15,18 +15,18 @@ export function formatDuration(totalSeconds: number): string {
     const parts: string[] = [];
 
     if (days > 0) {
-        parts.push(`${days.toString()}d`);
+        parts.push(`${days}d`);
     }
 
     if (parts.length > 0 || hours > 0) {
-        parts.push(`${hours.toString()}h`);
+        parts.push(`${hours}h`);
     }
 
     if (parts.length > 0 || minutes > 0) {
-        parts.push(`${minutes.toString()}m`);
+        parts.push(`${minutes}m`);
     }
 
-    parts.push(`${seconds.toString()}s`);
+    parts.push(`${seconds}s`);
 
     return parts.join(" ");
 }

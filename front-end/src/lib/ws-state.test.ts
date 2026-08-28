@@ -47,7 +47,7 @@ function disconnected(
     return {
         type: "disconnected",
         sequence,
-        ip: `192.0.2.${sequence.toString()}`,
+        ip: `192.0.2.${sequence}`,
         port: 50_000,
         connected_at: instant("2026-07-27T10:00:00Z"),
         disconnected_at: instant("2026-07-27T10:01:00Z"),

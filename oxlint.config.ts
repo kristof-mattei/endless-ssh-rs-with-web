@@ -197,7 +197,7 @@ const config: OxlintConfig = defineConfig({
                 allowAny: false,
                 allowBoolean: false,
                 allowNullish: false,
-                allowNumber: false,
+                allowNumber: true,
                 allowRegExp: false,
             },
         ],

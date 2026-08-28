@@ -30,7 +30,7 @@ export const WorldMap: React.FC<Properties> = ({ activeConnections }) => {
                 {dots.map((dot) => {
                     return (
                         <Marker
-                            key={`${dot.ip}:${dot.port.toString()}`}
+                            key={`${dot.ip}:${dot.port}`}
                             latitude={dot.coordinates.latitude}
                             longitude={dot.coordinates.longitude}
                         >

@@ -52,7 +52,7 @@ function randomIp(): string {
         return groups.join(":");
     }
 
-    return `${randomInt(1, 223).toString()}.${randomInt(0, 255).toString()}.${randomInt(0, 255).toString()}.${randomInt(1, 254).toString()}`;
+    return `${randomInt(1, 223)}.${randomInt(0, 255)}.${randomInt(0, 255)}.${randomInt(1, 254)}`;
 }
 
 // spread markers from the same city so they don't stack on one pixel

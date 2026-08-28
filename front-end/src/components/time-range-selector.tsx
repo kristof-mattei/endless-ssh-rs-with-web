@@ -32,7 +32,7 @@ async function fetchStats(range: Range, onData: (data: StatsData) => void, signa
     const response = await fetch(url, { signal });
 
     if (!response.ok) {
-        throw new Error(`stats fetch failed with ${String(response.status)}`);
+        throw new Error(`stats fetch failed with ${response.status}`);
     }
 
     const data = parseStatsResponse(await response.text());
