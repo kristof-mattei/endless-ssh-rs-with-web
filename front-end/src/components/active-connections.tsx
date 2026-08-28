@@ -40,11 +40,7 @@ export const ActiveConnections: React.FC<Properties> = ({ activeConnections }) =
                 )}
                 {activeConnections.map((connection) => {
                     return (
-                        <ConnectionRow
-                            connection={connection}
-                            key={`${connection.ip}:${connection.port.toString()}`}
-                            now={now}
-                        />
+                        <ConnectionRow connection={connection} key={`${connection.ip}:${connection.port}`} now={now} />
                     );
                 })}
             </div>

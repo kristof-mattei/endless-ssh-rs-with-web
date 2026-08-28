@@ -86,7 +86,7 @@ export function useWebSocket({ getSince, onEvent }: Options): { status: Connecti
         function connect(): void {
             const since = sinceGetterReference.current();
 
-            const url = `${globalThis.location.protocol === "https:" ? "wss" : "ws"}://${globalThis.location.host}/api/ws?since=${since.toString()}`;
+            const url = `${globalThis.location.protocol === "https:" ? "wss" : "ws"}://${globalThis.location.host}/api/ws?since=${since}`;
 
             const ws = new WebSocket(url);
             socket = ws;
