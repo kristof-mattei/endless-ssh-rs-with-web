@@ -44,7 +44,7 @@
         "@vitest/coverage-v8": "4.1.11",
         "@vitest/ui": "4.1.11",
         "babel-plugin-react-compiler": "1.0.0",
-        "cspell": "10.1.1",
+        "cspell": "10.2.0",
         "dependency-cruiser": "18.2.0",
         "eslint-plugin-better-tailwindcss": "4.7.0",
         "eslint-plugin-n": "18.3.0",
