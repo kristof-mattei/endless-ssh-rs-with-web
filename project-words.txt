@@ -6,6 +6,7 @@ bkeepers
 bpchar
 buildcache
 cinstrument
+cliffignore
 cloexec
 ctarget
 cttc
@@ -73,6 +74,7 @@ profraw
 psql
 pyflakes
 randline
+rawfile
 rcvbuf
 retag
 retagging
@@ -93,6 +95,7 @@ signum
 sigset
 skopeo
 skopeo's
+slurpfile
 socketioxide
 socklen
 startswith
