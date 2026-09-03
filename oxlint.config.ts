@@ -232,7 +232,7 @@ const config: OxlintConfig = defineConfig({
                         propName: "className",
                         allowedFor: ["Typed.BarChart"],
                     },
-                    { propName: "style", allowedFor: ["Map"] },
+                    { propName: "style", allowedFor: ["Map", "VisXYContainer"] },
                 ],
             },
         ],

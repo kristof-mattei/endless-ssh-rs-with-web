@@ -1,3 +1,5 @@
+allowBuilds:
+  maplibre-gl: false
 catalogs:
   default:
     vite: "8.2.2"

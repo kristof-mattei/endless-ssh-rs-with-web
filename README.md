@@ -90,7 +90,7 @@ pnpm run build     # Production build
 
 **Backend**: Rust, Axum, Tokio, SQLx, PostgreSQL, TimescaleDB, MaxMind GeoLite2
 
-**Frontend**: React 19, TypeScript, Vite, Tailwind CSS, MapLibre GL, Recharts
+**Frontend**: React 19, TypeScript, Vite, Tailwind CSS, MapLibre GL, Recharts, Unovis
 
 ## License
 
