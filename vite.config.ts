@@ -1,7 +1,6 @@
 import { codecovVitePlugin } from "@codecov/vite-plugin";
-import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
-import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react";
 import type { UserConfig } from "vite";
 import { loadEnv } from "vite";
 import { checker } from "vite-plugin-checker";
@@ -47,10 +46,7 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
         },
         plugins: [
             svgr(),
-            react(),
-            babel({
-                presets: [reactCompilerPreset({ panicThreshold: "all_errors" })],
-            }),
+            react({ compiler: { panicThreshold: "all_errors" } }),
             checker({ typescript: true }),
             tailwindcss(),
             codecovVitePlugin({
