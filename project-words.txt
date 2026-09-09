@@ -64,6 +64,7 @@ nsec
 nuqs
 oldact
 oneshot
+oras
 ossdata
 pathbuf
 pgadmin
@@ -121,6 +122,7 @@ uninit
 uninlined
 uninspectable
 unovis
+unovis's
 unseparated
 unstub
 uppercases
