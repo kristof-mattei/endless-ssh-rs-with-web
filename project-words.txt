@@ -47,6 +47,7 @@ idents
 jsons
 kristof
 lcovonly
+lintian
 maplibre
 maplibregl
 mattei
