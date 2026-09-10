@@ -1,3 +1,4 @@
+allgreen
 appgroup
 appuser
 archi
@@ -40,8 +41,8 @@ formstate
 geoip
 geolocation
 grcov
+headgreen
 healthz
-hubot
 hypertable
 idents
 jsons
