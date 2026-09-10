@@ -14,7 +14,7 @@ services:
     command: sleep infinity
 
   timescaledb:
-    image: timescale/timescaledb:2.30.0-pg18@sha256:ffa7746b81fb0e1fdbd8fdf0fef2341d789718534e28b2e3fdc9d62aab1e2984
+    image: timescale/timescaledb:2.30.0-pg18@sha256:69114a6774869b115bd2eb594f749416c8e34be07ceaaf327ed152426485390a
     restart: unless-stopped
     ports:
       - 127.0.0.1:5432:5432
