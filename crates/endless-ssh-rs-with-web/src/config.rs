@@ -1,10 +1,10 @@
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
-use std::num::{NonZeroU8, NonZeroU32};
+use std::num::NonZeroU8;
 use std::time::Duration;
 
 use tracing::{Level, event};
 
-pub const DEFAULT_DELAY_MS: NonZeroU32 = NonZeroU32::new(10000).unwrap();
+pub const DEFAULT_DELAY: Duration = Duration::from_secs(10);
 pub const DEFAULT_MAX_LINE_LENGTH: NonZeroU8 = NonZeroU8::new(32).unwrap();
 pub const DEFAULT_MAX_CLIENTS: NonZeroU8 = NonZeroU8::new(64).unwrap();
 pub const DEFAULT_SSH_LISTEN_ADDRESS: SocketAddr =
@@ -30,7 +30,7 @@ impl Default for Config {
 impl Config {
     pub fn new() -> Self {
         Self {
-            delay: Duration::from_millis(DEFAULT_DELAY_MS.get().into()),
+            delay: DEFAULT_DELAY,
             max_line_length: DEFAULT_MAX_LINE_LENGTH,
             max_clients: DEFAULT_MAX_CLIENTS,
             http_listen_address: DEFAULT_HTTP_LISTEN_ADDRESS,
@@ -39,7 +39,11 @@ impl Config {
     }
 
     pub fn log(&self) {
-        event!(Level::INFO, "Delay: {}ms", self.delay.as_millis());
+        event!(
+            Level::INFO,
+            "Delay: {}",
+            humantime::format_duration(self.delay)
+        );
         event!(Level::INFO, "MaxLineLength: {}", self.max_line_length);
         event!(Level::INFO, "MaxClients: {}", self.max_clients);
         event!(

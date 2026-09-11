@@ -55,7 +55,7 @@ The web dashboard is served on `127.0.0.1:3000` by default. The SSH honeypot lis
 
 | Flag                      | Default          | Description                             |
 | ------------------------- | ---------------- | --------------------------------------- |
-| `-d`, `--delay`           | `10000`          | Delay between messages (ms)             |
+| `-d`, `--delay`           | `10s`            | Delay between messages (`10s`, `500ms`) |
 | `-l`, `--max-line-length` | `32`             | Max banner line length (3–255 bytes)    |
 | `-m`, `--max-clients`     | `64`             | Max concurrent connections              |
 | `--ssh-listen-address`    | `[::]:2223`      | SSH honeypot listen address             |

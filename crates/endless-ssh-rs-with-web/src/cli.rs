@@ -5,22 +5,13 @@ use std::num::NonZeroU8;
 use std::time::Duration;
 
 use clap::builder::TypedValueParser as _;
-use clap::error::ErrorKind;
 use clap::{ArgAction, Parser, value_parser};
 use color_eyre::eyre;
 
 use crate::config::{
-    Config, DEFAULT_DELAY_MS, DEFAULT_HTTP_LISTEN_ADDRESS, DEFAULT_MAX_CLIENTS,
+    Config, DEFAULT_DELAY, DEFAULT_HTTP_LISTEN_ADDRESS, DEFAULT_MAX_CLIENTS,
     DEFAULT_MAX_LINE_LENGTH, DEFAULT_SSH_LISTEN_ADDRESS,
 };
-
-fn delay_parser(value: &str) -> Result<Duration, clap::Error> {
-    let timeout_ms = value
-        .parse()
-        .map_err(|_| clap::Error::new(ErrorKind::ValueValidation))?;
-
-    Ok(Duration::from_millis(timeout_ms))
-}
 
 #[derive(Debug, Parser)]
 #[command(disable_help_flag = true)]
@@ -28,9 +19,9 @@ pub struct Cli {
     #[clap(
         short = 'd',
         long = "delay",
-        default_value = DEFAULT_DELAY_MS.to_string(),
-        help = "Message millisecond delay",
-        value_parser = delay_parser
+        default_value = humantime::format_duration(DEFAULT_DELAY).to_string(),
+        help = "Delay between messages, for example 10s or 500ms",
+        value_parser = humantime::parse_duration
     )]
     delay: Duration,
 
@@ -136,7 +127,7 @@ mod tests {
 
     #[test]
     fn parses_delay() {
-        let result = parse_factory("endless-ssh-rs --delay 100");
+        let result = parse_factory("endless-ssh-rs --delay 100ms");
 
         let expected_config = Config {
             delay: std::time::Duration::from_millis(100),
@@ -145,6 +136,20 @@ mod tests {
 
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), expected_config);
+    }
+
+    #[test]
+    fn defaults_delay_to_ten_seconds() {
+        let result = parse_factory("endless-ssh-rs");
+
+        assert_matches!(result, Ok(config) if config.delay == std::time::Duration::from_secs(10));
+    }
+
+    #[test]
+    fn rejects_delay_without_unit() {
+        let result = parse_factory("endless-ssh-rs --delay 100");
+
+        assert_matches!(result, Err(_));
     }
 
     #[test]
