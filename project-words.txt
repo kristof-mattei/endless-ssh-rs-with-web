@@ -71,6 +71,7 @@ ossdata
 pathbuf
 pgadmin
 pgsql
+pkgs
 postprocessors
 prereleased
 profraw
@@ -115,6 +116,7 @@ timescaledb
 timespec
 timestamptz
 topo
+tostring
 trixie
 trunc
 tsgolint
