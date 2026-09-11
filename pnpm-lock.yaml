@@ -176,8 +176,8 @@ importers:
   .:
     dependencies:
       '@unovis/react':
-        specifier: 1.6.7
-        version: 1.6.7(@unovis/ts@1.6.7(supports-color@7.2.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: 1.7.0
+        version: 1.7.0(@unovis/ts@1.6.7(supports-color@7.2.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@unovis/ts':
         specifier: 1.6.7
         version: 1.6.7(supports-color@7.2.0)
@@ -1865,10 +1865,10 @@ packages:
   '@unovis/graphlibrary@2.2.0-2':
     resolution: {integrity: sha512-HeEzpd/vDyWiIJt0rnh+2ICXUIuF2N0+Z9OJJiKg0DB+eFUcD+bk+9QPhYHwkFwfxdjDA9fHi1DZ/O/bbV58Nw==}
 
-  '@unovis/react@1.6.7':
-    resolution: {integrity: sha512-kEvrUVtyS52CKa9+3kj5MYKE4vsByVUovCXihpdoONw6chTA6+Bjgt/kC0d92NSK+q7aOyu13m/h//U44ZqUMw==}
+  '@unovis/react@1.7.0':
+    resolution: {integrity: sha512-t3NUPffPZkCxz9raSXSmdDtk+RbrgHMdL+c4doWjoP7m0Hn0hAjvmQsON9ukIq4X0dRc1XH9gcUSAO7cE1t1GA==}
     peerDependencies:
-      '@unovis/ts': 1.6.7
+      '@unovis/ts': 1.7.0
       react: '>=16.8.0 || ^17 || ^18 || ^19'
       react-dom: '>=16.8.0 || ^17 || ^18 || ^19'
 
@@ -5287,7 +5287,7 @@ snapshots:
     dependencies:
       lodash-es: 4.18.1
 
-  '@unovis/react@1.6.7(@unovis/ts@1.6.7(supports-color@7.2.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@unovis/react@1.7.0(@unovis/ts@1.6.7(supports-color@7.2.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@unovis/ts': 1.6.7(supports-color@7.2.0)
       react: 19.3.0
