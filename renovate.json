@@ -6,6 +6,7 @@
         "github>kristof-mattei/renovate-config//github-actions/nonSemver",
         "github>kristof-mattei/renovate-config//node/groupNodeDockerImage",
         "github>kristof-mattei/renovate-config//node/groupOxcPackages",
+        "github>kristof-mattei/renovate-config//node/groupUnovisPackages",
         "github>kristof-mattei/renovate-config//node/updateEnginesNodeInPackageJson",
         "github>kristof-mattei/renovate-config//rust/updateRustVersionInCargoToml",
         "github>kristof-mattei/renovate-config//rust/updateChannelInRustToolchainToml",
