@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
+import type React from "react";
 import { Temporal } from "temporal-polyfill";
 import { describe, expect, it, vi } from "vitest";
 
@@ -8,6 +9,28 @@ import type { BucketGrid } from "../lib/stats-buckets";
 import { StatsChart } from "./stats-chart";
 
 vi.setConfig({ testTimeout: 1000 });
+
+// unovis does not render under jsdom
+vi.mock("@unovis/react", () => {
+    // oxlint-disable-next-line unicorn/consistent-function-scoping -- the factory is hoisted, outer scope is not initialized when it runs
+    const Passthrough = ({
+        ariaLabel,
+        children,
+    }: {
+        ariaLabel?: string;
+        children?: React.ReactNode;
+    }): React.JSX.Element => {
+        return <div aria-label={ariaLabel}>{children}</div>;
+    };
+
+    return {
+        VisAxis: Passthrough,
+        VisCrosshair: Passthrough,
+        VisStackedBar: Passthrough,
+        VisTooltip: Passthrough,
+        VisXYContainer: Passthrough,
+    };
+});
 
 const FROM = Temporal.Instant.from("2026-08-01T00:00:00Z");
 const TO = Temporal.Instant.from("2026-08-01T01:00:00Z");
@@ -36,15 +59,12 @@ describe("StatsChart", () => {
         expect(screen.queryByLabelText(UNOVIS_LABEL)).toBeNull();
     });
 
-    // the unovis chart labels its container one animation frame after mount, so the query has to wait for it
-    it("switches to unovis", async () => {
-        expect.hasAssertions();
-
+    it("switches to unovis", () => {
         render(<StatsChart grid={GRID} rows={ROWS} />, { wrapper: NuqsTestingAdapter });
 
         fireEvent.click(screen.getByRole("radio", { name: "unovis" }));
 
-        expect(await screen.findByLabelText(UNOVIS_LABEL)).toBeDefined();
+        expect(screen.getByLabelText(UNOVIS_LABEL)).toBeDefined();
         expect(screen.getByRole("radio", { name: "recharts" })).toHaveProperty("checked", false);
     });
 
