@@ -316,10 +316,11 @@ async fn start_tasks() -> Shutdown {
     client_tasks.close();
 
     // drain clients
-    if timeout(Duration::from_secs(10), client_tasks.wait())
+    let clients_drained = timeout(Duration::from_secs(10), client_tasks.wait())
         .await
-        .is_err()
-    {
+        .is_ok();
+
+    if !clients_drained {
         event!(
             Level::ERROR,
             "Client tasks didn't stop within allotted time!"
@@ -330,11 +331,20 @@ async fn start_tasks() -> Shutdown {
     cancellation_token.cancel();
 
     // wait for the other tasks to shut down gracefully
-    if timeout(Duration::from_secs(10), tasks.wait())
-        .await
-        .is_err()
-    {
+    let tasks_drained = timeout(Duration::from_secs(10), tasks.wait()).await.is_ok();
+
+    if !tasks_drained {
         event!(Level::ERROR, "Tasks didn't stop within allotted time!");
+    }
+
+    // a shutdown that already reports a failure is returned unchanged
+    let drained = clients_drained && tasks_drained;
+
+    if !drained && matches!(shutdown_reason, Shutdown::Success | Shutdown::Signal(_)) {
+        return Shutdown::OperationalFailure {
+            code: ExitCode::FAILURE,
+            message: "Tasks didn't stop within the allotted time",
+        };
     }
 
     event!(Level::INFO, "Shutdown completed");
