@@ -76,7 +76,7 @@ pub async fn wait_for_sigint() -> Shutdown {
     }
 }
 
-/// Raises `signal` with the default disposition restored, so the process dies by it.
+/// Sets signal back to its default action and raises it, killing this process.
 /// Returns when the raise did not terminate the process: PID 1 of a PID namespace only receives signals it has a handler for, and the reset removes it.
 pub fn terminate_by_signal(signal: u8) {
     let signum = c_int::from(signal);
