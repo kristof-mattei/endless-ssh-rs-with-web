@@ -196,16 +196,19 @@ async fn start_tasks() -> Shutdown {
 
     event!(Level::INFO, "Database ready");
 
-    let geo_ip = match std::env::var("MAXMIND_LICENSE_KEY") {
-        Ok(key) if !key.is_empty() => Arc::new(GeoIpReader::try_init(&key).await),
-        _ => {
-            event!(
-                Level::INFO,
-                "`MAXMIND_LICENSE_KEY` not set, GeoIP lookup will be disabled"
-            );
+    let maxmind_license_key = std::env::var("MAXMIND_LICENSE_KEY")
+        .ok()
+        .filter(|key| !key.is_empty());
 
-            Arc::new(GeoIpReader::empty())
-        },
+    let geo_ip = if let Some(ref key) = maxmind_license_key {
+        Arc::new(GeoIpReader::try_init(key).await)
+    } else {
+        event!(
+            Level::INFO,
+            "`MAXMIND_LICENSE_KEY` not set, GeoIP lookup will be disabled"
+        );
+
+        Arc::new(GeoIpReader::empty())
     };
 
     let (internal_events_tx, internal_events_rx) = tokio::sync::mpsc::channel::<ClientEvent>(1000);
@@ -282,6 +285,17 @@ async fn start_tasks() -> Shutdown {
                 active_connections,
             )
             .await;
+        });
+    }
+
+    if let Some(license_key) = maxmind_license_key {
+        let cancellation_token = cancellation_token.clone();
+        let geo_ip = Arc::clone(&geo_ip);
+
+        tasks.spawn_with_name("geoip refresh", async move {
+            let _guard = cancellation_token.clone().drop_guard();
+
+            geoip::refresh_forever(cancellation_token, geo_ip, license_key).await;
         });
     }
 

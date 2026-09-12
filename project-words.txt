@@ -72,6 +72,7 @@ pathbuf
 pgadmin
 pgsql
 pkgs
+pointee
 postprocessors
 prereleased
 profraw

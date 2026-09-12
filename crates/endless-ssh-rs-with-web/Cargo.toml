@@ -17,6 +17,7 @@ default = []
 tokio-console = ["dep:console-subscriber"]
 
 [dependencies]
+arc-swap = "=1.9.2"
 axum = { version = "=0.8.9", features = ["macros", "ws"] }
 clap = { version = "=4.6.6", features = ["cargo", "derive", "env", "string"] }
 color-eyre = "=0.6.5"

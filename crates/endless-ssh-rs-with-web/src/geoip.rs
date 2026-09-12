@@ -1,12 +1,17 @@
 use std::net::IpAddr;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
+use std::time::Duration;
 
+use arc_swap::ArcSwapOption;
 use http::HeaderMap;
 use http::header::ETAG;
 use maxminddb::{Mmap, geoip2};
 use memmap2::MmapOptions;
 use serde::Serialize;
 use thiserror::Error;
+use tokio::time::{Instant, interval_at};
+use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
 #[derive(Error, Debug)]
@@ -48,7 +53,7 @@ pub struct GeoInfo {
 }
 
 pub struct GeoIpReader {
-    reader: Option<GeoIpDbWrapper>,
+    reader: ArcSwapOption<GeoIpDbWrapper>,
 }
 
 impl GeoIpReader {
@@ -58,10 +63,11 @@ impl GeoIpReader {
             // TODO print try number
             if let Some(geo_ip_reader) = GeoIpDbWrapper::init(license_key).await {
                 return Self {
-                    reader: Some(geo_ip_reader),
+                    reader: ArcSwapOption::from_pointee(geo_ip_reader),
                 };
             } else {
-                let geo_ip_path = Path::new(GEO_IP_PATH);
+                let geo_ip_path = database_path();
+                let geo_ip_path = geo_ip_path.as_path();
 
                 // remove files so that the download will trigger again
                 if let Err(db_removal) = std::fs::remove_file(geo_ip_path) {
@@ -85,12 +91,16 @@ impl GeoIpReader {
             }
         }
 
-        Self { reader: None }
+        Self {
+            reader: ArcSwapOption::empty(),
+        }
     }
 
     pub fn lookup(&self, ip: IpAddr) -> Option<GeoInfo> {
-        let city: geoip2::City<'_> = self
-            .reader
+        // this guard lives for the whole lookup, so a refresh cannot swap the database out from under it
+        let reader = self.reader.load();
+
+        let city: geoip2::City<'_> = reader
             .as_ref()?
             .db
             .lookup(ip)
@@ -122,13 +132,76 @@ impl GeoIpReader {
     }
 
     pub fn empty() -> Self {
-        Self { reader: None }
+        Self {
+            reader: ArcSwapOption::empty(),
+        }
     }
 
-    // TODO create replacer task
+    /// A failed refresh leaves the current database in place.
+    async fn refresh(&self, license_key: &str) {
+        let geo_ip_path = database_path();
+
+        if !should_download_database(license_key, &geo_ip_path).await {
+            event!(Level::DEBUG, "GeoLite2 database up to date");
+
+            return;
+        }
+
+        if let Err(error) = download_database(license_key, geo_ip_path.clone()).await {
+            event!(
+                Level::ERROR,
+                ?error,
+                "Failed to download the GeoLite2 database, keeping the current one"
+            );
+
+            return;
+        }
+
+        match GeoIpDbWrapper::load(&geo_ip_path) {
+            Some(wrapper) => {
+                self.reader.store(Some(Arc::new(wrapper)));
+
+                event!(Level::INFO, "Refreshed the GeoLite2 database");
+            },
+            None => {
+                event!(
+                    Level::ERROR,
+                    "Failed to load the downloaded GeoLite2 database, keeping the current one"
+                );
+            },
+        }
+    }
+}
+
+pub async fn refresh_forever(
+    cancellation_token: CancellationToken,
+    reader: Arc<GeoIpReader>,
+    license_key: String,
+) {
+    let mut interval = interval_at(Instant::now() + REFRESH_INTERVAL, REFRESH_INTERVAL);
+
+    loop {
+        tokio::select! {
+            () = cancellation_token.cancelled() => {
+                break;
+            },
+            _instant = interval.tick() => {
+                reader.refresh(&license_key).await;
+            },
+        }
+    }
 }
 
 const GEO_IP_PATH: &str = "./.local/ip-database/GeoLite2-City.mmdb";
+
+/// `MaxMind` advises checking throughout the day rather than trusting a release schedule.
+const REFRESH_INTERVAL: Duration = Duration::from_mins(60);
+
+fn database_path() -> PathBuf {
+    let geo_ip_path = Path::new(GEO_IP_PATH);
+
+    std::path::absolute(geo_ip_path).unwrap_or_else(|_error| geo_ip_path.to_path_buf())
+}
 
 struct GeoIpDbWrapper {
     db: maxminddb::Reader<Mmap>,
@@ -136,9 +209,7 @@ struct GeoIpDbWrapper {
 
 impl GeoIpDbWrapper {
     async fn init(license_key: &str) -> Option<GeoIpDbWrapper> {
-        let geo_ip_path = Path::new(GEO_IP_PATH);
-        let geo_ip_path =
-            std::path::absolute(geo_ip_path).unwrap_or_else(|_err| geo_ip_path.to_path_buf());
+        let geo_ip_path = database_path();
 
         // create directory structure to where we'll write the file, this doesn't fail if they already exist
         if let Some(parent) = geo_ip_path.parent() {
@@ -162,8 +233,12 @@ impl GeoIpDbWrapper {
             event!(Level::INFO, "GeoLite2 database up to date");
         }
 
+        GeoIpDbWrapper::load(&geo_ip_path)
+    }
+
+    fn load(geo_ip_path: &Path) -> Option<GeoIpDbWrapper> {
         // we now have file, let's try and memory map it
-        let mmap = match try_mmap_file(&geo_ip_path) {
+        let mmap = match try_mmap_file(geo_ip_path) {
             Ok(mapped_file) => mapped_file,
             Err(error) => {
                 event!(Level::ERROR, ?error, database_path = ?geo_ip_path.display(), "Failed to open database as mmap");
@@ -206,13 +281,14 @@ async fn should_download_database(license_key: &str, geo_ip_path: &Path) -> bool
         Ok(contents) => contents,
         Err(error) => {
             event!(
-                Level::ERROR,
+                Level::WARN,
                 ?error,
                 path = %etag_file.display(),
-                "Failed to check etag file"
+                "No readable ETag file, downloading the database"
             );
 
-            return false;
+            // there is nothing to compare the upstream ETag against
+            return true;
         },
     };
 
@@ -292,6 +368,7 @@ async fn download_database(
 
     let etag = get_etag(response.headers())?;
     let etag_path = output.with_extension("etag");
+    let download_path = output.with_extension("mmdb.part");
 
     let bytes = response.bytes().await?;
 
@@ -306,7 +383,10 @@ async fn download_database(
             let mut entry = entry?;
             let path = entry.path()?.into_owned();
             if path.extension().is_some_and(|ext| ext == "mmdb") {
-                let _r = entry.unpack(output)?;
+                let _r = entry.unpack(&download_path)?;
+
+                // the rename leaves the old mapping on its own inode, because a reader may still be using it
+                std::fs::rename(&download_path, &output)?;
 
                 return Result::<(), Box<dyn std::error::Error + Send + Sync>>::Ok(());
             }
