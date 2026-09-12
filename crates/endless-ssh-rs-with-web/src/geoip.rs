@@ -290,9 +290,8 @@ async fn download_database(
         return Err(format!("HTTP {}", response.status()).into());
     }
 
-    // write the ETAG
     let etag = get_etag(response.headers())?;
-    std::fs::write(output.with_extension("etag"), etag)?;
+    let etag_path = output.with_extension("etag");
 
     let bytes = response.bytes().await?;
 
@@ -316,6 +315,9 @@ async fn download_database(
         Err("GeoLite2-City.mmdb not found in downloaded archive".into())
     })
     .await??;
+
+    // the ETag must only exist once its database is on disk
+    std::fs::write(etag_path, etag)?;
 
     Ok(())
 }
