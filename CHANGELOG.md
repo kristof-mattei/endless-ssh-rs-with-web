@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.26.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.26.0..v0.26.1) - 2026-09-12
+
+### ⚙️ Miscellaneous Tasks
+
+- Update comment by [@kristof-mattei](https://github.com/kristof-mattei) ([`33f0222`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/33f0222d954c2105d7f800cb713efdcfbffb3309))
 ## [0.26.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.25.0..v0.26.0) - 2026-09-12
 
 ### 🚀 Features
