@@ -1,4 +1,13 @@
 <!-- header goes here -->
+## [0.27.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.26.1..v0.27.0) - 2026-09-12
+
+### 🚀 Features
+
+- Refresh the GeoIP database hourly while running by [@kristof-mattei](https://github.com/kristof-mattei) ([`c1ce584`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c1ce58448f869bb74186da4cd0f6d35858eb56e0))
+
+### 🐛 Bug Fixes
+
+- Store the GeoIP ETag only after the database is unpacked by [@kristof-mattei](https://github.com/kristof-mattei) ([`6eeebe2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/6eeebe27f8c4b4b7b6ccc1aae79b13f7421708b6))
 ## [0.26.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.26.0..v0.26.1) - 2026-09-12
 
 ### ⚙️ Miscellaneous Tasks
