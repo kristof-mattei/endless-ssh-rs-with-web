@@ -1,4 +1,13 @@
 <!-- header goes here -->
+## [0.27.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.0..v0.27.1) - 2026-09-13
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate maxminddb to v0.32.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`b272f3f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b272f3f0f572c662ce70d9ea285668d0c6615216))
+
+### 💼 Other
+
+- Name the entrypoint binary after the application by [@kristof-mattei](https://github.com/kristof-mattei) ([`31126fc`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/31126fc1e47b47022d7fd6f7a190cde21ccd93b5))
 ## [0.27.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.26.1..v0.27.0) - 2026-09-12
 
 ### 🚀 Features
