@@ -30,7 +30,7 @@ http = "=1.5.0"
 humantime = "=2.4.0"
 ipnet = "=2.12.2"
 libc = "=0.2.189"
-maxminddb = { version = "=0.31.0", features = ["mmap"] }
+maxminddb = { version = "=0.32.0", features = ["mmap"] }
 memmap2 = "=0.9.11"
 mimalloc = "=0.1.52"
 rand = "=0.10.2"
