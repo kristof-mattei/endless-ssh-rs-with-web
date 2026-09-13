@@ -156,7 +156,7 @@ COPY <<EOF /etc/group
 appgroup:x:900:appuser
 EOF
 
-COPY --from=rust-build /output/bin/${APPLICATION_NAME} /app/entrypoint
+COPY --from=rust-build /output/bin/${APPLICATION_NAME} /app/endless-ssh-rs-with-web
 # copy from the sbom layer so that it actually gets built
 COPY --from=typescript-sbom /dist /app/dist
 
@@ -172,4 +172,4 @@ ENV HTTP_LISTEN_ADDRESS=[::]:3000
 
 WORKDIR /app
 
-ENTRYPOINT ["/app/entrypoint"]
+ENTRYPOINT ["/app/endless-ssh-rs-with-web"]
