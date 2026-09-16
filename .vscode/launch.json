@@ -11,13 +11,7 @@
             "cargo": {
                 "args": ["run", "--bin=endless-ssh-rs-with-web"]
             },
-            "args": [],
-            "env": {
-                "RUST_BACKTRACE": "1",
-                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs_with_web=TRACE,tower_http::trace=TRACE"
-            },
-            "internalConsoleOptions": "neverOpen",
-            "terminal": "integrated"
+            "args": []
         },
         {
             "name": "Debug executable 'endless-ssh-rs-with-web' without RUST_LOG",
@@ -26,12 +20,7 @@
             "cargo": {
                 "args": ["run", "--bin=endless-ssh-rs-with-web"]
             },
-            "args": [],
-            "env": {
-                "RUST_BACKTRACE": "1"
-            },
-            "internalConsoleOptions": "neverOpen",
-            "terminal": "integrated"
+            "args": []
         },
         {
             "name": "Debug executable 'endless-ssh-rs-with-web' wrong-params",
@@ -40,13 +29,7 @@
             "cargo": {
                 "args": ["run", "--bin=endless-ssh-rs-with-web"]
             },
-            "args": ["wrong-params"],
-            "env": {
-                "RUST_BACKTRACE": "1",
-                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs_with_web=TRACE,tower_http::trace=TRACE"
-            },
-            "internalConsoleOptions": "neverOpen",
-            "terminal": "integrated"
+            "args": ["wrong-params"]
         },
         {
             "name": "Debug executable 'endless-ssh-rs-with-web' help",
@@ -55,13 +38,7 @@
             "cargo": {
                 "args": ["run", "--bin=endless-ssh-rs-with-web"]
             },
-            "args": ["-h"],
-            "env": {
-                "RUST_BACKTRACE": "1",
-                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs_with_web=TRACE,tower_http::trace=TRACE"
-            },
-            "internalConsoleOptions": "neverOpen",
-            "terminal": "integrated"
+            "args": ["-h"]
         },
         {
             "name": "Debug unit tests in executable 'endless-ssh-rs-with-web'",
@@ -70,13 +47,7 @@
             "cargo": {
                 "args": ["test", "--no-run", "--bin=endless-ssh-rs-with-web"]
             },
-            "args": [],
-            "env": {
-                "RUST_BACKTRACE": "1",
-                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs_with_web=TRACE,tower_http::trace=TRACE"
-            },
-            "internalConsoleOptions": "neverOpen",
-            "terminal": "integrated"
+            "args": []
         },
         {
             "name": "Debug integration test 'integration_tests'",
@@ -85,13 +56,7 @@
             "cargo": {
                 "args": ["test", "--no-run", "--test=integration_tests"]
             },
-            "args": [],
-            "env": {
-                "RUST_BACKTRACE": "1",
-                "RUST_LOG": "DEBUG,socketioxide=INFO,engineioxide=INFO,endless_ssh_rs_with_web=TRACE,tower_http::trace=TRACE"
-            },
-            "internalConsoleOptions": "neverOpen",
-            "terminal": "integrated"
+            "args": []
         }
     ]
 }
