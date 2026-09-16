@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.27.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.2..v0.27.3) - 2026-09-16
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update maplibre-gl (npm) to v6.10.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`236a263`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/236a2636eb822155e463ad197ee543daf288507b))
 ## [0.27.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.1..v0.27.2) - 2026-09-15
 
 ### 🐛 Bug Fixes
