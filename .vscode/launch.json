@@ -20,7 +20,10 @@
             "cargo": {
                 "args": ["run", "--bin=endless-ssh-rs-with-web"]
             },
-            "args": []
+            "args": [],
+            "env": {
+                "RUST_LOG": ""
+            }
         },
         {
             "name": "Debug executable 'endless-ssh-rs-with-web' wrong-params",
