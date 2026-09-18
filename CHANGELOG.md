@@ -1,4 +1,15 @@
 <!-- header goes here -->
+## [0.27.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.3..v0.27.4) - 2026-09-18
+
+### 🐛 Bug Fixes
+
+- Treat an empty or blank `RUST_LOG` like an absent one by [@kristof-mattei](https://github.com/kristof-mattei) ([`4815ff2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4815ff242684b3d8756297d71f2a4e8ed82e6c9e))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(codeql)* Install mold before the Rust analysis by [@kristof-mattei](https://github.com/kristof-mattei) ([`57ea65e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/57ea65e196db2aa5643351b8f5de254ad035cba6))
+- *(release)* Copy the container to Docker Hub from a `docker-io` environment that links to the released tags by [@kristof-mattei](https://github.com/kristof-mattei) ([`0e842b0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0e842b00a4b6b771dfc406af570eae697cf3337e))
+- Add the `authors` and `vendor` OCI labels to the container by [@kristof-mattei](https://github.com/kristof-mattei) ([`c99a47a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c99a47add3497590e832ec4c69e4027a13afa808))
 ## [0.27.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.2..v0.27.3) - 2026-09-16
 
 ### 🐛 Bug Fixes
