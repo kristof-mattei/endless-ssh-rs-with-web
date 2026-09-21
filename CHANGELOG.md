@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.27.5](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.4..v0.27.5) - 2026-09-21
+
+### 💼 Other
+
+- Link the container binaries with mold by [@kristof-mattei](https://github.com/kristof-mattei) ([`525e8a0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/525e8a0bed4f69ffeb72679c79ff7ba10fc034b2))
 ## [0.27.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.3..v0.27.4) - 2026-09-18
 
 ### 🐛 Bug Fixes
