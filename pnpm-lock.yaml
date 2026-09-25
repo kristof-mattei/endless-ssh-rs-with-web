@@ -188,8 +188,8 @@ importers:
         specifier: 10.7.2
         version: 10.7.2
       maplibre-gl:
-        specifier: 6.11.1
-        version: 6.11.1
+        specifier: 6.11.2
+        version: 6.11.2
       nuqs:
         specifier: 2.10.1
         version: 2.10.1(react@19.3.0)
@@ -204,7 +204,7 @@ importers:
         version: 19.3.0(react@19.3.0)
       react-map-gl:
         specifier: 8.1.3
-        version: 8.1.3(maplibre-gl@6.11.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 8.1.3(maplibre-gl@6.11.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       recharts:
         specifier: 3.10.1
         version: 3.10.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react-is@17.0.2)(react@19.3.0)(redux@5.0.1)
@@ -3014,8 +3014,8 @@ packages:
   magicast@0.5.5:
     resolution: {integrity: sha512-UicdXN8zQ3JHlxVq+28afMXPr1z7WNY6+7EJnzTdQWkTAlMLF5fNCCKxJHBQwGaNGR11581EiQmQzx73+MvszA==}
 
-  maplibre-gl@6.11.1:
-    resolution: {integrity: sha512-PaWLwfxWs6EddrPEsncrnPAyHNN0vm7KpQtoPWN1AQimJ7qwY/7GrwBeI+cB+YlSrw5sCyVKc2ZAbTwJ4MHUdA==}
+  maplibre-gl@6.11.2:
+    resolution: {integrity: sha512-Xh06pxoipjX/Ad1sUPGhiNh9go9naCNGZZ1IJm3sIeqK1kYGuMaMDSTIGDQ2igOLfVyukJU7kvEOA089VO7Z7g==}
     engines: {node: '>=16.14.0', npm: '>=8.1.0'}
 
   maplibre-gl@6.7.0:
@@ -5285,13 +5285,13 @@ snapshots:
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
 
-  '@vis.gl/react-maplibre@8.1.3(maplibre-gl@6.11.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@vis.gl/react-maplibre@8.1.3(maplibre-gl@6.11.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@maplibre/maplibre-gl-style-spec': 19.3.3
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
     optionalDependencies:
-      maplibre-gl: 6.11.1
+      maplibre-gl: 6.11.2
 
   '@vitejs/plugin-react@6.1.1(oxc-transform-react@0.151.0)(vite@8.3.0(@types/node@26.6.2)(jiti@2.7.0)(yaml@2.9.1))':
     dependencies:
@@ -6399,7 +6399,7 @@ snapshots:
       '@babel/types': 7.29.8
       source-map-js: 1.2.1
 
-  maplibre-gl@6.11.1:
+  maplibre-gl@6.11.2:
     dependencies:
       '@mapbox/point-geometry': 1.1.0
       '@mapbox/tiny-sdf': 2.2.0
@@ -6657,14 +6657,14 @@ snapshots:
 
   react-is@17.0.2: {}
 
-  react-map-gl@8.1.3(maplibre-gl@6.11.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+  react-map-gl@8.1.3(maplibre-gl@6.11.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@vis.gl/react-mapbox': 8.1.3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@vis.gl/react-maplibre': 8.1.3(maplibre-gl@6.11.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@vis.gl/react-maplibre': 8.1.3(maplibre-gl@6.11.2)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
     optionalDependencies:
-      maplibre-gl: 6.11.1
+      maplibre-gl: 6.11.2
 
   react-redux@9.3.0(@types/react@19.3.0)(react@19.3.0)(redux@5.0.1):
     dependencies:
