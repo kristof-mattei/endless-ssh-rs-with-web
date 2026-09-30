@@ -23,6 +23,10 @@
         "editor.defaultFormatter": "oxc.oxc-vscode",
         "editor.formatOnSave": true
     },
+    "[shellscript]": {
+        "editor.defaultFormatter": "mkhl.shfmt",
+        "editor.formatOnSave": true
+    },
     "[toml]": {
         "editor.defaultFormatter": "oxc.oxc-vscode",
         "editor.formatOnSave": true
@@ -68,5 +72,6 @@
     "rust-analyzer.rustfmt.extraArgs": ["+nightly"],
     "rust-analyzer.server.extraEnv": {
         // "SQLX_OFFLINE": "true",
-    }
+    },
+    "shfmt.formatIgnored": false
 }
