@@ -1,4 +1,12 @@
 <!-- header goes here -->
+## [0.27.6](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.5..v0.27.6) - 2026-10-03
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update maplibre-gl (npm) to v6.11.2 by [@renovate[bot]](https://github.com/renovate[bot]) ([`abe8226`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/abe8226dce3067163bf40d2408f4e993681c59fb))
+- *(deps)* Update pretty-bytes (npm) to v7.2.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`ff6bd09`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ff6bd0994f81757bde06189bd19fb151f92fadbe))
+- *(deps)* Update unovis to v1.7.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`18fea05`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/18fea05f6de6817d975162e76715916ed940e21d))
+- *(deps)* Update ip-address (npm) to v10.7.3 by [@renovate[bot]](https://github.com/renovate[bot]) ([`2e1d046`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2e1d046f37da1c87833d9cddab43ab9bac40fd94))
 ## [0.27.5](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.4..v0.27.5) - 2026-09-21
 
 ### 💼 Other
