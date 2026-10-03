@@ -22,7 +22,7 @@
         "@unovis/react": "1.7.1",
         "@unovis/ts": "1.7.1",
         "country-flag-emoji-polyfill": "0.1.10",
-        "ip-address": "10.7.2",
+        "ip-address": "10.7.3",
         "maplibre-gl": "6.11.2",
         "nuqs": "2.10.1",
         "pretty-bytes": "7.2.0",
