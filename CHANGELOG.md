@@ -1,4 +1,13 @@
 <!-- header goes here -->
+## [0.27.9](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.8..v0.27.9) - 2026-10-07
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove CodeQL by [@kristof-mattei](https://github.com/kristof-mattei) ([`e065d20`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e065d201dcd7901fa879e98f95795dd22adaec55))
+
+### 💼 Other
+
+- Inline `build-scripts` into the `Dockerfile` by [@kristof-mattei](https://github.com/kristof-mattei) ([`9fcfac0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9fcfac00d115a651c6de13c257c33ab217aef0e0))
 ## [0.27.8](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.7..v0.27.8) - 2026-10-07
 
 ### 🐛 Bug Fixes
