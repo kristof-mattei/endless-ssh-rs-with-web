@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [0.27.8](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.7..v0.27.8) - 2026-10-07
+
+### 🐛 Bug Fixes
+
+- Exit with 128+n as PID 1 instead of warning about a failed re-raise by [@kristof-mattei](https://github.com/kristof-mattei) ([`64b63c4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/64b63c414c36133950eeee59f8465f11f2ad353f))
 ## [0.27.7](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.6..v0.27.7) - 2026-10-07
 
 ### ⚙️ Miscellaneous Tasks
