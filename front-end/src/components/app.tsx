@@ -1,6 +1,7 @@
 /* oxlint-disable import/max-dependencies -- App renders every dashboard section */
 import type React from "react";
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 
 import { useCanonicalUrl } from "../hooks/use-canonical-url";
 import { useEventSource } from "../hooks/use-event-source";
@@ -9,6 +10,7 @@ import { INITIAL_WS_STATE, wsReducer } from "../lib/ws-state";
 import { ActiveConnections } from "./active-connections";
 import { ConnectionBadge } from "./connection-badge";
 import { EventFeed } from "./event-feed";
+import { SectionError } from "./section-error";
 import { StatsChart } from "./stats-chart";
 import { StatsPanel } from "./stats-panel";
 import { TimeRangeSelector } from "./time-range-selector";
@@ -47,38 +49,52 @@ export const App: React.FC = () => {
                     <ConnectionBadge status={status} />
                 </div>
 
-                <StatsPanel
-                    activeConnectionsCount={activeConnections.length}
-                    totalBytesSent={totalBytes}
-                    totalConnections={totalConnections}
-                    totalTimeWasted={totalTimeSpent}
-                />
+                <ErrorBoundary FallbackComponent={SectionError}>
+                    <StatsPanel
+                        activeConnectionsCount={activeConnections.length}
+                        totalBytesSent={totalBytes}
+                        totalConnections={totalConnections}
+                        totalTimeWasted={totalTimeSpent}
+                    />
+                </ErrorBoundary>
 
                 <div className="grid gap-3 lg:grid-cols-4">
                     <div className="lg:col-span-3">
-                        <WorldMap activeConnections={activeConnections} />
+                        <ErrorBoundary FallbackComponent={SectionError}>
+                            <WorldMap activeConnections={activeConnections} />
+                        </ErrorBoundary>
                     </div>
-                    <ActiveConnections activeConnections={activeConnections} />
+                    <ErrorBoundary FallbackComponent={SectionError}>
+                        <ActiveConnections activeConnections={activeConnections} />
+                    </ErrorBoundary>
                 </div>
             </section>
 
             <section className="mbe-6 space-y-2">
                 <h2 className="text-lg font-semibold text-gray-300">Stats</h2>
 
-                <TimeRangeSelector isLive={status === "live"} onData={setStatsData} />
+                <ErrorBoundary FallbackComponent={SectionError}>
+                    <TimeRangeSelector isLive={status === "live"} onData={setStatsData} />
+                </ErrorBoundary>
 
                 {statsData !== null && (
                     <div className="grid gap-3 lg:grid-cols-4">
                         <div className="lg:col-span-3">
-                            <StatsChart grid={statsData.grid} rows={statsData.rows} />
+                            <ErrorBoundary FallbackComponent={SectionError} resetKeys={[statsData]}>
+                                <StatsChart grid={statsData.grid} rows={statsData.rows} />
+                            </ErrorBoundary>
                         </div>
-                        <TopCountries rows={statsData.rows} />
+                        <ErrorBoundary FallbackComponent={SectionError} resetKeys={[statsData]}>
+                            <TopCountries rows={statsData.rows} />
+                        </ErrorBoundary>
                     </div>
                 )}
             </section>
 
             <section>
-                <EventFeed events={events} />
+                <ErrorBoundary FallbackComponent={SectionError}>
+                    <EventFeed events={events} />
+                </ErrorBoundary>
             </section>
         </div>
     );
