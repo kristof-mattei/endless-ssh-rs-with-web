@@ -16,7 +16,7 @@ import { TopCountries } from "./top-countries";
 import { WorldMap } from "./world-map";
 
 export const App: React.FC = () => {
-    const [{ activeConnections, events, maxSeenSequence, totalBytes, totalConnections, totalTimeSeconds }, dispatch] =
+    const [{ activeConnections, events, maxSeenSequence, totalBytes, totalConnections, totalTimeSpent }, dispatch] =
         useReducer(wsReducer, INITIAL_WS_STATE);
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
@@ -51,7 +51,7 @@ export const App: React.FC = () => {
                     activeConnectionsCount={activeConnections.length}
                     totalBytesSent={totalBytes}
                     totalConnections={totalConnections}
-                    totalSecondsWasted={totalTimeSeconds}
+                    totalTimeWasted={totalTimeSpent}
                 />
 
                 <div className="grid gap-3 lg:grid-cols-4">

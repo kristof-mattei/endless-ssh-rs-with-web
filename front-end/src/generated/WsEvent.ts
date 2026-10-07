@@ -2,7 +2,7 @@
 import type { ActiveConnectionInfo } from "./ActiveConnectionInfo";
 import type { Coordinates } from "./Coordinates";
 import type { Country } from "./Country";
-import type { Seconds } from "./Seconds";
+import type { Elapsed } from "./Elapsed";
 import type { Timestamp } from "./Timestamp";
 
 /**
@@ -18,7 +18,7 @@ export type WsEvent =
     active_connections: Array<ActiveConnectionInfo>;
     total_connections: number;
     total_bytes_sent: number;
-    total_time_spent: Seconds;
+    total_time_spent: Elapsed;
     /**
      * Totals cover exactly the connections with id at or below this.
      */
@@ -43,7 +43,7 @@ export type WsEvent =
     port: number;
     connected_at: Timestamp;
     disconnected_at: Timestamp;
-    time_spent: Seconds;
+    time_spent: Elapsed;
     bytes_sent: number;
     country: Country | null;
     city: string | null;

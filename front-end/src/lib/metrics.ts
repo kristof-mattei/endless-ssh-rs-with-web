@@ -1,3 +1,5 @@
+import { Temporal } from "temporal-polyfill";
+
 import { formatBytes, formatDuration } from "./formatting";
 
 // the chart's metrics, in display order
@@ -18,7 +20,8 @@ export function formatMetricValue(metric: Metric, value: number): string {
             return formatBytes(value);
         }
         case "time_spent": {
-            return formatDuration(value);
+            // axis ticks can be fractional, `Temporal.Duration.from` only takes integer fields
+            return formatDuration(Temporal.Duration.from({ seconds: Math.trunc(value) }));
         }
         case "connects": {
             if (value >= 1_000_000) {

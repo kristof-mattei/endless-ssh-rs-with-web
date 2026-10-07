@@ -29,9 +29,14 @@ function init(buildId: string): WsEvent {
         active_connections: [],
         total_connections: 0,
         total_bytes_sent: 0,
-        total_time_spent: 0,
+        total_time_spent: new Temporal.Duration(),
         last_counted_id: 0,
     };
+}
+
+// `Temporal.Duration#toJSON` writes a bare string, the server wraps it
+function initFrame(buildId: string): string {
+    return JSON.stringify({ ...init(buildId), total_time_spent: { $duration: "PT0S" } });
 }
 
 class FakeWebSocket extends EventTarget {
@@ -272,7 +277,7 @@ describe("useWebSocket", () => {
         openLatest();
 
         act(() => {
-            latestSocket().serverMessage(JSON.stringify(init("dev")));
+            latestSocket().serverMessage(initFrame("dev"));
         });
 
         expect(onEvent).toHaveBeenCalledWith(init("dev"));
@@ -286,7 +291,7 @@ describe("useWebSocket", () => {
         openLatest();
 
         act(() => {
-            latestSocket().serverMessage(JSON.stringify(init("other-build")));
+            latestSocket().serverMessage(initFrame("other-build"));
         });
 
         expect(reload).toHaveBeenCalledTimes(1);
@@ -306,7 +311,7 @@ describe("useWebSocket", () => {
         openLatest();
 
         act(() => {
-            latestSocket().serverMessage(JSON.stringify(init("other-build")));
+            latestSocket().serverMessage(initFrame("other-build"));
         });
 
         expect(reload).toHaveBeenCalledTimes(1);
@@ -320,7 +325,7 @@ describe("useWebSocket", () => {
         openLatest();
 
         act(() => {
-            latestSocket().serverMessage(JSON.stringify(init("other-build")));
+            latestSocket().serverMessage(initFrame("other-build"));
         });
 
         expect(reload).not.toHaveBeenCalled();

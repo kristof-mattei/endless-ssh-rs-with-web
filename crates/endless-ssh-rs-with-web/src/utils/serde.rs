@@ -1,3 +1,5 @@
+use std::fmt;
+
 use serde::{Serialize, Serializer};
 use time::{OffsetDateTime, SignedDuration};
 
@@ -27,17 +29,33 @@ impl Serialize for Timestamp {
     }
 }
 
-/// Wire duration: whole seconds over JSON.
+/// Wire duration, `{"$duration": "<ISO 8601>"}` in whole seconds. The front-end reviver turns the wrapper into a `Temporal.Duration`.
 #[derive(Clone, Debug)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
-pub struct Seconds(#[cfg_attr(test, ts(type = "number"))] pub SignedDuration);
+pub struct Elapsed(
+    #[cfg_attr(test, ts(type = "import(\"temporal-polyfill\").Temporal.Duration"))]
+    pub  SignedDuration,
+);
 
-impl Serialize for Seconds {
+impl Serialize for Elapsed {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        serializer.serialize_i64(self.0.whole_seconds())
+        #[derive(Serialize)]
+        struct Tagged<'a> {
+            #[serde(rename = "$duration")]
+            duration: fmt::Arguments<'a>,
+        }
+
+        let seconds = self.0.whole_seconds();
+        // ISO 8601 signs the whole duration, not the seconds field
+        let sign = if seconds < 0 { "-" } else { "" };
+
+        Tagged {
+            duration: format_args!("{}PT{}S", sign, seconds.unsigned_abs()),
+        }
+        .serialize(serializer)
     }
 }
 
@@ -46,7 +64,7 @@ mod tests {
     use pretty_assertions::assert_eq;
     use time::{OffsetDateTime, SignedDuration};
 
-    use super::{Seconds, Timestamp};
+    use super::{Elapsed, Timestamp};
 
     // `front-end/src/lib/wire.test.ts` parses these same literals
     #[test]
@@ -67,10 +85,22 @@ mod tests {
     }
 
     #[test]
-    fn serializes_whole_seconds() {
+    fn serializes_as_tagged_iso8601_whole_seconds() {
         assert_eq!(
-            serde_json::to_string(&Seconds(SignedDuration::new(90, 500_000_000))).unwrap(),
-            "90"
+            serde_json::to_string(&Elapsed(SignedDuration::new(90, 500_000_000))).unwrap(),
+            r#"{"$duration":"PT90S"}"#
+        );
+        assert_eq!(
+            serde_json::to_string(&Elapsed(SignedDuration::ZERO)).unwrap(),
+            r#"{"$duration":"PT0S"}"#
+        );
+    }
+
+    #[test]
+    fn serializes_a_negative_duration_with_a_leading_sign() {
+        assert_eq!(
+            serde_json::to_string(&Elapsed(SignedDuration::new(-90, -500_000_000))).unwrap(),
+            r#"{"$duration":"-PT90S"}"#
         );
     }
 }

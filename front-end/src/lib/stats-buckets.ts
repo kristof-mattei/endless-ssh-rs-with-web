@@ -7,6 +7,7 @@ import type { Metric } from "./metrics";
 // TimescaleDB's bucket origin, a Monday, so weekly buckets run Monday to Sunday. Every narrower width divides a day evenly, so only the weekly grid depends on the anchor.
 const BUCKET_ANCHOR_MS = Temporal.Instant.from("2000-01-03T00:00:00Z").epochMilliseconds;
 
+// chart values are plain numbers, `time_spent` in seconds
 export type BucketPointValues = Record<Metric, number>;
 
 export type BucketPoint = {
@@ -33,12 +34,12 @@ export function topCountries(rows: StatsRow[], limit: number): CountryTotals[] {
                 country: row.country,
                 connects: row.connects,
                 bytes_sent: row.bytes_sent,
-                time_spent: row.time_spent,
+                time_spent: row.time_spent.total("seconds"),
             });
         } else {
             existing.connects += row.connects;
             existing.bytes_sent += row.bytes_sent;
-            existing.time_spent += row.time_spent;
+            existing.time_spent += row.time_spent.total("seconds");
         }
     }
 
@@ -79,12 +80,12 @@ export function aggregate(rows: StatsRow[], { bucketWidthMs, range }: BucketGrid
                 bucket: row.bucket,
                 bytes_sent: row.bytes_sent,
                 connects: row.connects,
-                time_spent: row.time_spent,
+                time_spent: row.time_spent.total("seconds"),
             });
         } else {
             existing.bytes_sent += row.bytes_sent;
             existing.connects += row.connects;
-            existing.time_spent += row.time_spent;
+            existing.time_spent += row.time_spent.total("seconds");
         }
     }
 
