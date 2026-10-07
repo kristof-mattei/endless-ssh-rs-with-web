@@ -1,4 +1,15 @@
 <!-- header goes here -->
+## [0.27.7](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.6..v0.27.7) - 2026-10-07
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Increase timeouts by [@kristof-mattei](https://github.com/kristof-mattei) ([`afdcbb4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/afdcbb4ad0875a47571030915a6e00c07283b90e))
+- *(docker)* Compare the PR image against its base commit's image instead of `edge` by [@kristof-mattei](https://github.com/kristof-mattei) ([`73bd78b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/73bd78b97674f97a64d1b60f3fa294d8fcf5cf3a))
+- *(release)* Compare the release commit's base image instead of `edge` by [@kristof-mattei](https://github.com/kristof-mattei) ([`08f21ab`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/08f21ab3ca6724b24275b69c9479a49fba0823a2))
+- End the `grcov` test-module exclusion at the closing brace by [@kristof-mattei](https://github.com/kristof-mattei) ([`12d6daf`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/12d6daf7f488ff326e1ce0f0015c17b80a7a0971))
+- End the `grcov` test-module branch exclusion at the closing brace by [@kristof-mattei](https://github.com/kristof-mattei) ([`2a9d642`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2a9d6424a522b62e6c9f5bdd9b11c44bb8239dd1))
+- End the `grcov` test-module exclusions only at a bare closing brace by [@kristof-mattei](https://github.com/kristof-mattei) ([`0e0176f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0e0176f7f2120fa4ea73e52e1ad987ba62319b8f))
+- Consolidate the coverage pipeline into `generate-test-report.sh` by [@kristof-mattei](https://github.com/kristof-mattei) ([`a30c4db`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a30c4dbb2df96934f42afd83df484c328e3eeba0))
 ## [0.27.6](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.5..v0.27.6) - 2026-10-05
 
 ### 🐛 Bug Fixes
