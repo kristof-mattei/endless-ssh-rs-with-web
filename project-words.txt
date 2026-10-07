@@ -19,6 +19,7 @@ dropguard
 eagain
 econnaborted
 eintr
+einval
 emfile
 endfor
 endmacro
@@ -122,6 +123,7 @@ trunc
 tsgolint
 twemoji
 typesystem
+uncatchable
 uninit
 uninlined
 uninspectable
