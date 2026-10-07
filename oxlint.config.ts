@@ -322,6 +322,10 @@ const config: OxlintConfig = defineConfig({
             },
             rules: {
                 "import/no-nodejs-modules": "off",
+                "n/hashbang": "error",
+                "n/no-path-concat": "error",
+                "n/no-process-exit": "error",
+                "n/no-sync": "error",
             },
         },
         {
