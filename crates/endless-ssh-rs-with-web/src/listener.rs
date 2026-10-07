@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use color_eyre::eyre;
+use color_eyre::eyre::{self, Context as _};
 use time::OffsetDateTime;
 use tokio::net::TcpListener;
 use tokio::sync::{Semaphore, TryAcquireError};
@@ -31,9 +31,9 @@ pub async fn listen_for_new_connections(
     client_task_tracker: TaskTracker,
     internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
     semaphore: Arc<Semaphore>,
-) {
+) -> Result<(), eyre::Report> {
     // listen forever, accept new clients
-    let listener = match Listener::bind(
+    let listener = Listener::bind(
         Arc::clone(&config),
         client_task_tracker,
         cancellation_token.clone(),
@@ -41,36 +41,19 @@ pub async fn listen_for_new_connections(
         semaphore,
     )
     .await
-    {
-        Ok(l) => l,
-        Err(error) => {
-            event!(Level::ERROR, ?error);
-
-            return;
-        },
-    };
+    .wrap_err("Failed to bind the SSH listener")?;
 
     event!(Level::INFO, listener = ?listener.tcp_listener, "Bound and listening!");
 
     loop {
-        let result = tokio::select! {
+        tokio::select! {
             biased;
             () = cancellation_token.cancelled() => {
-                break;
+                return Ok(());
             },
             result = listener.accept() => {
-                result
+                result.wrap_err("Failed to accept a new connection")?;
             },
-        };
-
-        if let Err(error) = result {
-            event!(
-                Level::ERROR,
-                ?error,
-                "Failed to accept new connection, aborting."
-            );
-
-            break;
         }
     }
 }
