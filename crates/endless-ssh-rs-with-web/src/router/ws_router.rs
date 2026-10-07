@@ -146,16 +146,11 @@ async fn handle_socket(
     send_init_payload(&mut socket, active, totals).await?;
 
     // replay history, all connections with id > since
-    let mut last_sequence: i64 = since_id;
-
     let mut records = db::get_connections_since(&state.db_pool, since_id, Limit::Limit(1000));
 
     loop {
         match records.try_next().await {
             Ok(Some(record)) => {
-                // keep the lag catch-up cursor at the last record sent
-                last_sequence = record.id;
-
                 send_connection_record(&mut socket, record).await?;
             },
             Ok(None) => {
@@ -172,7 +167,7 @@ async fn handle_socket(
     // signal that history replay is done.
     send_ready_payload(&mut socket).await?;
 
-    // forward live broadcast events, handling lag with a DB catch-up
+    // forward live broadcast events
     let mut heartbeat = tokio::time::interval(HEARTBEAT_INTERVAL);
 
     loop {
@@ -189,7 +184,7 @@ async fn handle_socket(
 
             // outgoing events from the broadcast channel
             recv = broadcast_rx.recv() => {
-                handle_broadcast(&mut socket, &state, recv, &mut last_sequence).await?;
+                handle_broadcast(&mut socket, recv).await?;
             },
 
             // browsers cannot observe protocol pings, so liveness needs an application-level message
@@ -210,19 +205,11 @@ async fn handle_socket(
 
 async fn handle_broadcast(
     socket: &mut WebSocket,
-    state: &ApplicationState,
     recv: Result<WsEvent, tokio::sync::broadcast::error::RecvError>,
-    last_sequence: &mut i64,
 ) -> Result<(), ()> {
     match recv {
         Ok(ws_event) => {
-            // track last seen sequence for deduplication on reconnect
             // TODO this channel shouldn't use `WsEvent`, it should be a separate type
-            if let &WsEvent::Disconnected { sequence, .. } = &ws_event {
-                *last_sequence = sequence;
-            }
-
-            // forward
             match serde_json::to_string(&ws_event) {
                 Ok(json) => {
                     if socket.send(Message::Text(json.into())).await.is_err() {
@@ -235,32 +222,14 @@ async fn handle_broadcast(
             }
         },
         Err(broadcast::error::RecvError::Lagged(amount_lagged)) => {
+            // the reconnect sends a fresh `init` and replays from `since`
             event!(
                 Level::WARN,
                 amount_lagged,
-                "WS client lagged, replaying missed events from DB"
+                "WS client lagged, closing the socket"
             );
 
-            // re-query DB for missed events
-            let mut records =
-                db::get_connections_since(&state.db_pool, *last_sequence, Limit::Limit(1000));
-
-            loop {
-                match records.try_next().await {
-                    Ok(Some(record)) => {
-                        *last_sequence = record.id;
-
-                        send_connection_record(socket, record).await?;
-                    },
-                    Ok(None) => {
-                        break;
-                    },
-                    Err(error) => {
-                        event!(Level::ERROR, ?error, "Failed to catch up after WS lag");
-                        break;
-                    },
-                }
-            }
+            return Err(());
         },
         Err(broadcast::error::RecvError::Closed) => {
             return Err(());
