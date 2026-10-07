@@ -33,6 +33,8 @@ use color_eyre::config::HookBuilder;
 use color_eyre::eyre;
 use dashmap::DashMap;
 use dotenvy::dotenv;
+use futures::future::{BoxFuture, FutureExt as _};
+use futures::stream::{FuturesUnordered, StreamExt as _};
 use tokio::sync::{Semaphore, broadcast};
 use tokio::time::timeout;
 use tokio_util::sync::CancellationToken;
@@ -52,7 +54,6 @@ use crate::router::build_router;
 use crate::server::setup_server;
 use crate::shutdown::Shutdown;
 use crate::state::ApplicationState;
-use crate::task_tracker_ext::TaskTrackerExt as _;
 use crate::utils::flatten_shutdown_handle;
 use crate::utils::task::spawn_with_name;
 
@@ -217,9 +218,6 @@ async fn start_tasks() -> Shutdown {
     let active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>> =
         Arc::new(DashMap::new());
 
-    // shutdown broadcast: every task watches this token (or a child of it) to know
-    // when to stop, and holds a drop guard on it, so a task stopping on its own
-    // takes the others down with it
     let cancellation_token = CancellationToken::new();
     let client_cancellation_token = cancellation_token.child_token();
 
@@ -236,47 +234,32 @@ async fn start_tasks() -> Shutdown {
         Arc::clone(&active_connections),
     );
 
-    let tasks = TaskTracker::new();
+    let mut tasks = FuturesUnordered::new();
 
-    tasks.spawn_with_name(
+    tasks.push(spawn_task(
         "server",
-        set_up_server(
+        setup_server(
             config.http_listen_address,
-            application_state,
+            build_router(application_state),
             cancellation_token.clone(),
         ),
-    );
+    ));
 
-    {
-        let cancellation_token = cancellation_token.clone();
-        let client_tasks = client_tasks.clone();
-        let client_cancellation_token = client_cancellation_token.clone();
+    tasks.push(spawn_task(
+        "connection listener",
+        listen_for_new_connections(
+            config,
+            client_cancellation_token.clone(),
+            client_tasks.clone(),
+            internal_events_tx,
+            semaphore,
+        ),
+    ));
 
-        tasks.spawn_with_name("connection listener", async move {
-            let _guard = cancellation_token.drop_guard_ref();
-            let _client_guard = client_cancellation_token.clone().drop_guard();
-
-            listen_for_new_connections(
-                Arc::clone(&config),
-                client_cancellation_token,
-                client_tasks,
-                internal_events_tx,
-                semaphore,
-            )
-            .await;
-        });
-    }
-
-    {
-        let cancellation_token = cancellation_token.clone();
-        let db_pool = db_pool.clone();
+    tasks.push(spawn_task("database", {
         let geo_ip = Arc::clone(&geo_ip);
-        let ws_broadcast_tx = ws_broadcast_tx.clone();
-        let active_connections = Arc::clone(&active_connections);
 
-        tasks.spawn(async move {
-            let _guard = cancellation_token.drop_guard();
-
+        async move {
             database_listen_forever(
                 db_pool,
                 geo_ip,
@@ -285,38 +268,26 @@ async fn start_tasks() -> Shutdown {
                 active_connections,
             )
             .await;
-        });
-    }
+
+            Ok(())
+        }
+    }));
 
     if let Some(license_key) = maxmind_license_key {
         let cancellation_token = cancellation_token.clone();
-        let geo_ip = Arc::clone(&geo_ip);
 
-        tasks.spawn_with_name("geoip refresh", async move {
-            let _guard = cancellation_token.clone().drop_guard();
-
+        tasks.push(spawn_task("geoip refresh", async move {
             geoip::refresh_forever(cancellation_token, geo_ip, license_key).await;
-        });
+
+            Ok(())
+        }));
     }
 
-    // done enrolling tasks in this tracker
-    tasks.close();
-
-    // now we wait forever for either
-    // * the cancellation token. we only cancel it ourselves after this select, so
-    //   here it means a task stopped on its own, which tasks only do on failure
-    // * SIGTERM
-    // * CTRL+c (SIGINT)
     // biased so that when multiple are ready at once, task failure wins over signals
     let shutdown_reason = tokio::select! {
         biased;
-        () = cancellation_token.cancelled() => {
-            event!(Level::WARN, "Underlying task stopped, stopping all other tasks");
-
-            Shutdown::OperationalFailure {
-                code: ExitCode::FAILURE,
-                message: "A task failed, triggering a shutdown"
-            }
+        Some((name, result)) = tasks.next() => {
+            task_stopped(name, result)
         },
         result = signal_handlers::wait_for_sigterm() => {
             result
@@ -341,11 +312,22 @@ async fn start_tasks() -> Shutdown {
         );
     }
 
-    // cancel main, in case we forgot a dropguard somewhere
     cancellation_token.cancel();
 
-    // wait for the other tasks to shut down gracefully
-    let tasks_drained = timeout(Duration::from_secs(10), tasks.wait()).await.is_ok();
+    let tasks_drained = timeout(Duration::from_secs(10), async {
+        while let Some((name, result)) = tasks.next().await {
+            if let Err(report) = result {
+                event!(
+                    Level::ERROR,
+                    task = name,
+                    ?report,
+                    "Task failed during the shutdown"
+                );
+            }
+        }
+    })
+    .await
+    .is_ok();
 
     if !tasks_drained {
         event!(Level::ERROR, "Tasks didn't stop within allotted time!");
@@ -366,21 +348,33 @@ async fn start_tasks() -> Shutdown {
     shutdown_reason
 }
 
-async fn set_up_server(
-    bind_to: SocketAddr,
-    application_state: ApplicationState,
-    cancellation_token: CancellationToken,
-) {
-    let router = build_router(application_state);
+type TaskResult = Result<(), eyre::Report>;
 
-    let _guard = cancellation_token.clone().drop_guard();
+fn spawn_task<F>(name: &'static str, task: F) -> BoxFuture<'static, (&'static str, TaskResult)>
+where
+    F: Future<Output = TaskResult> + Send + 'static,
+{
+    let handle = spawn_with_name(name, task);
 
-    match setup_server(bind_to, router, cancellation_token).await {
-        Err(error) => {
-            event!(Level::ERROR, ?error, "Webserver died");
-        },
+    async move {
+        let result = match handle.await {
+            Ok(result) => result,
+            Err(join_error) => Err(eyre::Report::new(join_error)),
+        };
+
+        (name, result)
+    }
+    .boxed()
+}
+
+/// Every task runs until the shutdown, so one that stops before it is a failure.
+fn task_stopped(name: &'static str, result: TaskResult) -> Shutdown {
+    match result {
         Ok(()) => {
-            event!(Level::INFO, "Webserver shut down gracefully");
+            Shutdown::UnexpectedError(eyre::eyre!("Task `{}` stopped before the shutdown", name))
+        },
+        Err(report) => {
+            Shutdown::UnexpectedError(report.wrap_err(format!("Task `{}` failed", name)))
         },
     }
 }
