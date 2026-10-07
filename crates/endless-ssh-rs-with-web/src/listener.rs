@@ -13,6 +13,7 @@ use crate::client::{ClientContext, handle_client};
 use crate::config::Config;
 use crate::events::ClientEvent;
 use crate::ffi_wrapper::set_receive_buffer_size;
+use crate::task_tracker_ext::TaskTrackerExt as _;
 
 struct Listener {
     config: Arc<Config>,
@@ -114,17 +115,20 @@ impl Listener {
                         Ok(permit) => {
                             let connected_at = OffsetDateTime::now_utc();
 
-                            self.client_task_tracker.spawn(handle_client(
-                                socket,
-                                addr,
-                                connected_at,
-                                permit,
-                                Arc::clone(&self.config),
-                                ClientContext {
-                                    cancellation_token: self.cancellation_token.clone(),
-                                    internal_events_tx: self.internal_events_tx.clone(),
-                                },
-                            ));
+                            self.client_task_tracker.spawn_with_name(
+                                &format!("client-{}", addr),
+                                handle_client(
+                                    socket,
+                                    addr,
+                                    connected_at,
+                                    permit,
+                                    Arc::clone(&self.config),
+                                    ClientContext {
+                                        cancellation_token: self.cancellation_token.clone(),
+                                        internal_events_tx: self.internal_events_tx.clone(),
+                                    },
+                                ),
+                            );
 
                             // now that the client is registered, broadcast for the dashboard
                             let _r = self
