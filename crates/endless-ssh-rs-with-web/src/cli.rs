@@ -18,7 +18,8 @@ use crate::config::{
 pub struct Cli {
     #[clap(
         short = 'd',
-        long = "delay",
+        long,
+        env,
         default_value = humantime::format_duration(DEFAULT_DELAY).to_string(),
         help = "Delay between messages, for example 10s or 500ms",
         value_parser = humantime::parse_duration
@@ -27,7 +28,8 @@ pub struct Cli {
 
     #[clap(
         short = 'l',
-        long = "max-line-length",
+        long,
+        env,
         default_value_t = DEFAULT_MAX_LINE_LENGTH,
         help = "Maximum banner line length (3-255)",
         value_parser = value_parser!(u8).range(3..=255).try_map(NonZeroU8::try_from)
@@ -36,7 +38,8 @@ pub struct Cli {
 
     #[clap(
         short = 'm',
-        long = "max-clients",
+        long,
+        env,
         default_value_t = DEFAULT_MAX_CLIENTS,
         help = "Maximum number of clients"
     )]
@@ -96,10 +99,11 @@ mod tests {
     use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
     use std::num::NonZeroU8;
 
+    use clap::CommandFactory as _;
     use color_eyre::eyre;
     use pretty_assertions::{assert_eq, assert_matches};
 
-    use super::parse_cli_from;
+    use super::{Cli, parse_cli_from};
     use crate::config::Config;
 
     fn parse_factory(input: &'static str) -> Result<Config, eyre::Report> {
@@ -233,6 +237,27 @@ mod tests {
         let expected_ssh = SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), 2223);
 
         assert_matches!(result, Ok(config) if config.ssh_listen_address == expected_ssh);
+    }
+
+    #[test]
+    fn reads_every_option_from_the_environment() {
+        let command = Cli::command();
+
+        let env_names = command
+            .get_arguments()
+            .filter_map(|argument| argument.get_env()?.to_str())
+            .collect::<Vec<&str>>();
+
+        assert_eq!(
+            env_names,
+            [
+                "DELAY",
+                "MAX_LINE_LENGTH",
+                "MAX_CLIENTS",
+                "SSH_LISTEN_ADDRESS",
+                "HTTP_LISTEN_ADDRESS"
+            ]
+        );
     }
 
     #[test]
