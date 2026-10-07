@@ -5,8 +5,6 @@ use dashmap::DashMap;
 use serde::Serialize;
 use time::{OffsetDateTime, SignedDuration};
 use tokio::sync::broadcast;
-use tokio_util::sync::CancellationToken;
-use tracing::{Level, event};
 
 use crate::db;
 use crate::geoip::{Coordinates, Country, GeoIpReader};
@@ -91,40 +89,24 @@ pub struct ActiveConnectionInfo {
     pub city: Option<String>,
 }
 
-/// Main event-processing loop.
+/// Main event-processing loop. Ends when the last sender is dropped, so the disconnects of clients stopped by a shutdown are still stored.
 pub async fn database_listen_forever(
-    cancellation_token: CancellationToken,
     db_pool: sqlx::PgPool,
     geo_ip_reader: Arc<GeoIpReader>,
     mut internal_events_rx: tokio::sync::mpsc::Receiver<ClientEvent>,
     ws_broadcast_tx: broadcast::Sender<WsEvent>,
     active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 ) {
-    loop {
-        let result = tokio::select! {
-            biased;
-            () = cancellation_token.cancelled() => {
-                break;
-            },
-            result = internal_events_rx.recv() => {
-                result
-            }
-        };
-
-        if let Some(client_event) = result {
-            // TODO defer to separate handler loop so we don't hold up our side
-            handle_event(
-                client_event,
-                &db_pool,
-                &geo_ip_reader,
-                &ws_broadcast_tx,
-                &active_connections,
-            )
-            .await;
-        } else {
-            event!(Level::ERROR, "Internal event channel closed, aborting");
-            break;
-        }
+    while let Some(client_event) = internal_events_rx.recv().await {
+        // TODO defer to separate handler loop so we don't hold up our side
+        handle_event(
+            client_event,
+            &db_pool,
+            &geo_ip_reader,
+            &ws_broadcast_tx,
+            &active_connections,
+        )
+        .await;
     }
 }
 

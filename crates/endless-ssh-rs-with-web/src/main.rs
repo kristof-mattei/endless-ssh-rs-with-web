@@ -275,10 +275,9 @@ async fn start_tasks() -> Shutdown {
         let active_connections = Arc::clone(&active_connections);
 
         tasks.spawn(async move {
-            let _guard = cancellation_token.clone().drop_guard();
+            let _guard = cancellation_token.drop_guard();
 
             database_listen_forever(
-                cancellation_token,
                 db_pool,
                 geo_ip,
                 internal_events_rx,
