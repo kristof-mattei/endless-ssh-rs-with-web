@@ -36,7 +36,7 @@ use dotenvy::dotenv;
 use futures::future::{BoxFuture, FutureExt as _};
 use futures::stream::{FuturesUnordered, StreamExt as _};
 use tokio::sync::{Semaphore, broadcast};
-use tokio::time::timeout;
+use tokio::time::{Instant, timeout_at};
 use tokio_util::sync::CancellationToken;
 use tokio_util::task::TaskTracker;
 use tracing::{Level, event};
@@ -62,6 +62,9 @@ use crate::utils::task::spawn_with_name;
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 const SIZE_IN_BYTES: usize = 1;
+
+// under `docker stop`'s 10 second default grace period
+const DRAIN_BUDGET: Duration = Duration::from_secs(8);
 
 fn build_filter() -> (EnvFilter, Option<eyre::Report>) {
     fn build_default_filter() -> EnvFilter {
@@ -297,46 +300,58 @@ async fn start_tasks() -> Shutdown {
         },
     };
 
-    client_cancellation_token.cancel();
-    client_tasks.close();
+    let drain = async {
+        let deadline = Instant::now() + DRAIN_BUDGET;
 
-    // drain clients
-    let clients_drained = timeout(Duration::from_secs(10), client_tasks.wait())
+        client_cancellation_token.cancel();
+        client_tasks.close();
+
+        let clients_drained = timeout_at(deadline, client_tasks.wait()).await.is_ok();
+
+        if !clients_drained {
+            event!(
+                Level::ERROR,
+                "Client tasks didn't stop within allotted time!"
+            );
+        }
+
+        cancellation_token.cancel();
+
+        let tasks_drained = timeout_at(deadline, async {
+            while let Some((name, result)) = tasks.next().await {
+                if let Err(report) = result {
+                    event!(
+                        Level::ERROR,
+                        task = name,
+                        ?report,
+                        "Task failed during the shutdown"
+                    );
+                }
+            }
+        })
         .await
         .is_ok();
 
-    if !clients_drained {
-        event!(
-            Level::ERROR,
-            "Client tasks didn't stop within allotted time!"
-        );
-    }
-
-    cancellation_token.cancel();
-
-    let tasks_drained = timeout(Duration::from_secs(10), async {
-        while let Some((name, result)) = tasks.next().await {
-            if let Err(report) = result {
-                event!(
-                    Level::ERROR,
-                    task = name,
-                    ?report,
-                    "Task failed during the shutdown"
-                );
-            }
+        if !tasks_drained {
+            event!(Level::ERROR, "Tasks didn't stop within allotted time!");
         }
-    })
-    .await
-    .is_ok();
 
-    if !tasks_drained {
-        event!(Level::ERROR, "Tasks didn't stop within allotted time!");
-    }
+        clients_drained && tasks_drained
+    };
+
+    let stopped_in_time = tokio::select! {
+        biased;
+        stopped_in_time = drain => stopped_in_time,
+        second_signal = signal_handlers::wait_for_sigterm() => {
+            return abandon_drain(shutdown_reason, second_signal);
+        },
+        second_signal = signal_handlers::wait_for_sigint() => {
+            return abandon_drain(shutdown_reason, second_signal);
+        },
+    };
 
     // a shutdown that already reports a failure is returned unchanged
-    let drained = clients_drained && tasks_drained;
-
-    if !drained && matches!(shutdown_reason, Shutdown::Success | Shutdown::Signal(_)) {
+    if !stopped_in_time && matches!(shutdown_reason, Shutdown::Success | Shutdown::Signal(_)) {
         return Shutdown::OperationalFailure {
             code: ExitCode::FAILURE,
             message: "Tasks didn't stop within the allotted time",
@@ -365,6 +380,15 @@ where
         (name, result)
     }
     .boxed()
+}
+
+fn abandon_drain(shutdown_reason: Shutdown, second_signal: Shutdown) -> Shutdown {
+    event!(Level::WARN, "Second signal, abandoning the drain");
+
+    match shutdown_reason {
+        Shutdown::Success | Shutdown::Signal(_) => second_signal,
+        failure @ (Shutdown::OperationalFailure { .. } | Shutdown::UnexpectedError(_)) => failure,
+    }
 }
 
 /// Every task runs until the shutdown, so one that stops before it is a failure.
