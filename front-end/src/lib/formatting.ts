@@ -1,15 +1,17 @@
 import { Address4, Address6 } from "ip-address";
 import prettyBytes from "pretty-bytes";
-import { Temporal } from "temporal-polyfill";
+import type { Temporal } from "temporal-polyfill";
 
 export function formatBytes(bytes: number): string {
     return prettyBytes(bytes);
 }
 
-// zero parts below the largest unit are kept, so 86_405 is "1d 0h 0m 5s" and 0 is "0s"
-export function formatDuration(totalSeconds: number): string {
-    const { days, hours, minutes, seconds } = Temporal.Duration.from({ seconds: Math.floor(totalSeconds) }).round({
+// zero parts below the largest unit are kept, so 86_405 seconds is "1d 0h 0m 5s" and zero is "0s"
+export function formatDuration(duration: Temporal.Duration): string {
+    const { days, hours, minutes, seconds } = duration.round({
         largestUnit: "days",
+        roundingMode: "trunc",
+        smallestUnit: "seconds",
     });
 
     const parts: string[] = [];

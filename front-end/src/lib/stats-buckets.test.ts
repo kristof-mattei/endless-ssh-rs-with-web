@@ -12,12 +12,16 @@ function instant(iso: string): Temporal.Instant {
     return Temporal.Instant.from(iso);
 }
 
+function seconds(value: number): Temporal.Duration {
+    return Temporal.Duration.from({ seconds: value });
+}
+
 function row(bucket: string, overrides?: Partial<Omit<StatsRow, "bucket">>): StatsRow {
     return {
         bucket: instant(bucket),
         country: { code: "US", name: "United States" },
         connects: 1,
-        time_spent: 10,
+        time_spent: seconds(10),
         bytes_sent: 100,
         ...overrides,
     };
@@ -30,13 +34,13 @@ describe("aggregate", () => {
                 row("2026-01-01T00:01:00Z", {
                     country: { code: "US", name: "United States" },
                     connects: 2,
-                    time_spent: 10,
+                    time_spent: seconds(10),
                     bytes_sent: 100,
                 }),
                 row("2026-01-01T00:01:00Z", {
                     country: { code: "DE", name: "Germany" },
                     connects: 3,
-                    time_spent: 5,
+                    time_spent: seconds(5),
                     bytes_sent: 50,
                 }),
             ],

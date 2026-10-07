@@ -44,7 +44,7 @@ function row(bucket: string, connects: number): StatsRow {
         bytes_sent: connects * 1024,
         connects,
         country: null,
-        time_spent: connects * 1000,
+        time_spent: Temporal.Duration.from({ seconds: connects * 1000 }),
     };
 }
 

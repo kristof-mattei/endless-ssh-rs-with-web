@@ -15,7 +15,7 @@ use tracing::{Level, event};
 
 use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, DbPort, Limit};
 use crate::geoip::{Coordinates, Country, GeoInfo};
-use crate::utils::serde::{Seconds, Timestamp};
+use crate::utils::serde::{Elapsed, Timestamp};
 
 pub async fn create_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
     PgPoolOptions::new()
@@ -324,7 +324,7 @@ pub struct StatsRow {
     pub bucket: Timestamp,
     pub country: Option<Country>,
     pub connects: i64,
-    pub time_spent: Seconds,
+    pub time_spent: Elapsed,
     pub bytes_sent: i64,
 }
 
@@ -342,7 +342,7 @@ impl TryFrom<PgRow> for StatsRow {
                 code,
             }),
             connects: row.try_get("connects")?,
-            time_spent: Seconds(row.try_get::<DbDuration, _>("time_spent")?.into()),
+            time_spent: Elapsed(row.try_get::<DbDuration, _>("time_spent")?.into()),
             bytes_sent: row.try_get("bytes_sent")?,
         })
     }

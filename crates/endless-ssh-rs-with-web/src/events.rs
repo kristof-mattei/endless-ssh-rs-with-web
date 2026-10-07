@@ -10,7 +10,7 @@ use tracing::{Level, event};
 
 use crate::db;
 use crate::geoip::{Coordinates, Country, GeoIpReader};
-use crate::utils::serde::{Seconds, Timestamp};
+use crate::utils::serde::{Elapsed, Timestamp};
 
 /// Internal event bus.
 #[derive(Clone)]
@@ -43,7 +43,7 @@ pub enum WsEvent {
         active_connections: Vec<ActiveConnectionInfo>,
         total_connections: i64,
         total_bytes_sent: i64,
-        total_time_spent: Seconds,
+        total_time_spent: Elapsed,
         /// Totals cover exactly the connections with id at or below this.
         last_counted_id: i64,
     },
@@ -68,7 +68,7 @@ pub enum WsEvent {
         port: u16,
         connected_at: Timestamp,
         disconnected_at: Timestamp,
-        time_spent: Seconds,
+        time_spent: Elapsed,
         bytes_sent: usize,
         country: Option<Country>,
         city: Option<String>,
@@ -213,7 +213,7 @@ async fn handle_event(
                         port: addr.port(),
                         connected_at: Timestamp(connected_at),
                         disconnected_at: Timestamp(disconnected_at),
-                        time_spent: Seconds(time_spent),
+                        time_spent: Elapsed(time_spent),
                         bytes_sent,
                         country,
                         city,

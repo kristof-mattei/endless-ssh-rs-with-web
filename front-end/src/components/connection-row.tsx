@@ -1,12 +1,14 @@
 import type React from "react";
-import type { Temporal } from "temporal-polyfill";
+import { Temporal } from "temporal-polyfill";
 
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
 import { formatBytes, formatDuration, formatIp } from "../lib/formatting";
 import { CountryFlag } from "./country-flag";
 
-function secondsConnected(connectedAt: Temporal.Instant, now: Temporal.Instant): number {
-    return Math.max(0, connectedAt.until(now).total("seconds"));
+function timeConnected(connectedAt: Temporal.Instant, now: Temporal.Instant): Temporal.Duration {
+    const elapsed = connectedAt.until(now);
+
+    return elapsed.sign < 0 ? new Temporal.Duration() : elapsed;
 }
 
 export const ConnectionRow: React.FC<{ connection: ActiveConnectionInfo; now: Temporal.Instant }> = ({
@@ -23,7 +25,7 @@ export const ConnectionRow: React.FC<{ connection: ActiveConnectionInfo; now: Te
                 {ip}
             </span>
             <span className="text-end text-green-400">
-                {formatDuration(secondsConnected(connection.connected_at, now))}
+                {formatDuration(timeConnected(connection.connected_at, now))}
             </span>
             <span className="text-end text-gray-500">{formatBytes(connection.bytes_sent)}</span>
         </div>

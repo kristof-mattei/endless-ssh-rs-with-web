@@ -22,7 +22,7 @@ export interface WsState {
     maxSeenSequence: number;
     totalBytes: number;
     totalConnections: number;
-    totalTimeSeconds: number;
+    totalTimeSpent: Temporal.Duration;
 }
 
 export const INITIAL_WS_STATE: WsState = {
@@ -32,7 +32,7 @@ export const INITIAL_WS_STATE: WsState = {
     maxSeenSequence: 0,
     totalBytes: 0,
     totalConnections: 0,
-    totalTimeSeconds: 0,
+    totalTimeSpent: new Temporal.Duration(),
 };
 
 export function wsReducer(state: WsState, event: WsEvent): WsState {
@@ -44,7 +44,7 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
                 lastCountedId: event.last_counted_id,
                 totalBytes: event.total_bytes_sent,
                 totalConnections: event.total_connections,
-                totalTimeSeconds: event.total_time_spent,
+                totalTimeSpent: event.total_time_spent,
             };
         }
         case "ready": {
@@ -115,7 +115,7 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
                 ...next,
                 totalBytes: next.totalBytes + event.bytes_sent,
                 totalConnections: next.totalConnections + 1,
-                totalTimeSeconds: next.totalTimeSeconds + event.time_spent,
+                totalTimeSpent: next.totalTimeSpent.add(event.time_spent),
             };
         }
     }

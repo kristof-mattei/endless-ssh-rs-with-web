@@ -115,7 +115,10 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
 
             schedule(lifetimeMs, () => {
                 const disconnectedAt = Temporal.Now.instant();
-                const timeSpent = Math.round((disconnectedAt.epochMilliseconds - connectedAt.epochMilliseconds) / 1000);
+                const timeSpent = connectedAt.until(disconnectedAt, {
+                    roundingMode: "halfExpand",
+                    smallestUnit: "seconds",
+                });
 
                 sequence += 1;
 
@@ -141,7 +144,7 @@ export function useDemoWebSocket({ onEvent }: Options): { status: "demo" } {
             active_connections: [],
             total_connections: 0,
             total_bytes_sent: 0,
-            total_time_spent: 0,
+            total_time_spent: new Temporal.Duration(),
             last_counted_id: 0,
         });
 
