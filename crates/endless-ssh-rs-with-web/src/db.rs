@@ -213,10 +213,9 @@ async fn add_to_totals(
     Ok(())
 }
 
-/// Return up to `limit` of the most recent connection records with id > `since_id`, ordered by ascending id.
-pub fn get_connections_since<'e, E>(
+/// Return up to `limit` of the most recent connection records, ordered by ascending id.
+pub fn get_recent_connections<'e, E>(
     executor: E,
-    since_id: i64,
     limit: Limit,
 ) -> impl Stream<Item = Result<ConnectionRecord, sqlx::Error>> + Send + 'e
 where
@@ -253,16 +252,13 @@ where
                 , longitude
             FROM
                 connections
-            WHERE
-                id > $1
             ORDER BY
                 id DESC
-            LIMIT $2
+            LIMIT $1
         ) AS subquery
         ORDER BY
             id ASC
         "#,
-        since_id,
         limit as _
     )
     .fetch(executor)

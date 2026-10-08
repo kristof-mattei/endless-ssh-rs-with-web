@@ -6,7 +6,6 @@ import { useWebSocket } from "./use-web-sockets";
 export type EventSourceStatus = "demo" | ConnectionStatus;
 
 export interface EventSourceOptions {
-    getSince: () => number;
     onEvent: (event: WsEvent) => void;
 }
 

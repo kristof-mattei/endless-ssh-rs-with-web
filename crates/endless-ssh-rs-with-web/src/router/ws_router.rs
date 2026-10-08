@@ -1,10 +1,9 @@
 use std::time::Duration;
 
+use axum::extract::State;
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
-use axum::extract::{Query, State};
 use axum::response::IntoResponse;
 use futures::TryStreamExt as _;
-use serde::Deserialize;
 use tokio::sync::broadcast;
 use tracing::{Level, event};
 
@@ -18,20 +17,13 @@ use crate::utils::serde::{Elapsed, Timestamp};
 /// The client's watchdog assumes a multiple of this before declaring the connection half-dead.
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 
-#[derive(Debug, Deserialize)]
-pub struct WsQueryParams {
-    /// Client sends the last event sequence it received, we replay everything after it.
-    pub since: Option<i64>,
-}
-
 pub async fn ws_handler(
     ws: WebSocketUpgrade,
-    Query(params): Query<WsQueryParams>,
     State(state): State<ApplicationState>,
 ) -> impl IntoResponse {
     ws.on_upgrade(move |socket| async move {
         // this resolves when the client is gone
-        let _r = handle_socket(socket, params, state).await;
+        let _r = handle_socket(socket, state).await;
     })
 }
 
@@ -112,11 +104,7 @@ async fn send_ready_payload(socket: &mut WebSocket) -> Result<(), ()> {
     Ok(())
 }
 
-async fn handle_socket(
-    mut socket: WebSocket,
-    params: WsQueryParams,
-    state: ApplicationState,
-) -> Result<(), ()> {
+async fn handle_socket(mut socket: WebSocket, state: ApplicationState) -> Result<(), ()> {
     // subscribe to the WS broadcast channel BEFORE querying the DB so we don't miss events that arrive between the query and the loop start
     let mut broadcast_rx = state.ws_broadcast.subscribe();
 
@@ -126,8 +114,6 @@ async fn handle_socket(
         .iter()
         .map(|v| v.value().clone())
         .collect::<Vec<ActiveConnectionInfo>>();
-
-    let since_id = params.since.unwrap_or(0);
 
     let totals = match db::get_totals(&state.db_pool).await {
         Ok(totals) => totals,
@@ -145,8 +131,8 @@ async fn handle_socket(
 
     send_init_payload(&mut socket, active, totals).await?;
 
-    // replay history, all connections with id > since
-    let mut records = db::get_connections_since(&state.db_pool, since_id, Limit::Limit(1000));
+    // replay history, the most recent connections
+    let mut records = db::get_recent_connections(&state.db_pool, Limit::Limit(100));
 
     loop {
         match records.try_next().await {
@@ -222,7 +208,7 @@ async fn handle_broadcast(
             }
         },
         Err(broadcast::error::RecvError::Lagged(amount_lagged)) => {
-            // the reconnect sends a fresh `init` and replays from `since`
+            // the reconnect sends a fresh `init` and replays the most recent connections
             event!(
                 Level::WARN,
                 amount_lagged,

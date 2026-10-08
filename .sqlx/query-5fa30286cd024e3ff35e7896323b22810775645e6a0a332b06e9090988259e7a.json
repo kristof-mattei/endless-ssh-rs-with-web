@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            id\n            , ip_address as \"ip_address: DbIpAddr\"\n            , port as \"port: DbPort\"\n            , connected_at\n            , disconnected_at\n            , time_spent as \"time_spent: DbDuration\"\n            , bytes_sent\n            , country_code\n            , country_name\n            , city\n            , latitude\n            , longitude\n        FROM (\n            SELECT\n                id\n                , ip_address\n                , port\n                , connected_at\n                , disconnected_at\n                , time_spent\n                , bytes_sent\n                , country_code\n                , country_name\n                , city\n                , latitude\n                , longitude\n            FROM\n                connections\n            WHERE\n                id > $1\n            ORDER BY\n                id DESC\n            LIMIT $2\n        ) AS subquery\n        ORDER BY\n            id ASC\n        ",
+  "query": "\n        SELECT\n            id\n            , ip_address as \"ip_address: DbIpAddr\"\n            , port as \"port: DbPort\"\n            , connected_at\n            , disconnected_at\n            , time_spent as \"time_spent: DbDuration\"\n            , bytes_sent\n            , country_code\n            , country_name\n            , city\n            , latitude\n            , longitude\n        FROM (\n            SELECT\n                id\n                , ip_address\n                , port\n                , connected_at\n                , disconnected_at\n                , time_spent\n                , bytes_sent\n                , country_code\n                , country_name\n                , city\n                , latitude\n                , longitude\n            FROM\n                connections\n            ORDER BY\n                id DESC\n            LIMIT $1\n        ) AS subquery\n        ORDER BY\n            id ASC\n        ",
   "describe": {
     "columns": [
       {
@@ -138,7 +138,6 @@
     ],
     "parameters": {
       "Left": [
-        "Int8",
         "Int8"
       ]
     },
@@ -157,5 +156,5 @@
       true
     ]
   },
-  "hash": "c9e17651b51fde8e6793394487976a1fe32042bd21c7d4acbd511a6c0cf4c583"
+  "hash": "5fa30286cd024e3ff35e7896323b22810775645e6a0a332b06e9090988259e7a"
 }
