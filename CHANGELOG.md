@@ -1,4 +1,10 @@
 <!-- header goes here -->
+## [0.28.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.28.0..v0.28.1) - 2026-10-08
+
+### 🚜 Refactor
+
+- Replay the newest 100 connections and drop `since` by [@kristof-mattei](https://github.com/kristof-mattei) ([`debdbfa`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/debdbfa7bdd1b078831baa64e0d19dc75ed488e3))
+- Replace `Limit` with a `u32` by [@kristof-mattei](https://github.com/kristof-mattei) ([`e7298bd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e7298bdb7d01a550e64f83bd84403dfe31799ea2))
 ## [0.28.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.9..v0.28.0) - 2026-10-08
 
 ### 🚀 Features
