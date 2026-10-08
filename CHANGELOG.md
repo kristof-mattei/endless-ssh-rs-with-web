@@ -1,4 +1,24 @@
 <!-- header goes here -->
+## [0.28.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.9..v0.28.0) - 2026-10-08
+
+### 🚀 Features
+
+- Parse durations at the boundary by [@kristof-mattei](https://github.com/kristof-mattei) ([`ea1132e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ea1132e5922ff1bea02d5338a8be1ffbf63b59c6))
+- Read `DELAY`, `MAX_CLIENTS` and `MAX_LINE_LENGTH` from the environment by [@kristof-mattei](https://github.com/kristof-mattei) ([`d3cd921`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d3cd9211e4bcb536a2b6ae58a2fb25e8ff98cca7))
+- Name the client tasks by [@kristof-mattei](https://github.com/kristof-mattei) ([`1f794de`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1f794de60536dd4f9d5216082ab1defbf5771c88))
+- Keep the dashboard alive when one panel fails to render by [@kristof-mattei](https://github.com/kristof-mattei) ([`a0d7e96`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a0d7e962c8a3f308f4cc92b22a012e40c12c6710))
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update maplibre-gl (npm) to v6.13.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`1dca8f5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1dca8f57233eaf1cf8a924e08aa05678605aaf87))
+- Store the disconnects of clients stopped by a shutdown by [@kristof-mattei](https://github.com/kristof-mattei) ([`512a3eb`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/512a3eb6ed0089fcfd64322a5c9b7c07d0d5529e))
+- Close a lagging WebSocket instead of replaying from the database by [@kristof-mattei](https://github.com/kristof-mattei) ([`60ca5b3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/60ca5b346c044fba28a7e7277cf90b49897e9cdf))
+- Exit with the failing task's error instead of a canned message by [@kristof-mattei](https://github.com/kristof-mattei) ([`075e8ef`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/075e8ef7cdaae001b954c2a52753301d2a1b580f))
+- Abort the drain on a second signal and keep it under Docker's stop grace by [@kristof-mattei](https://github.com/kristof-mattei) ([`84ca99d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/84ca99d3dd21bbbd43c01231be13b18897a49720))
+
+### 🚜 Refactor
+
+- Replace `Shutdown::Signal(u8)` with a two-variant `Signal` by [@kristof-mattei](https://github.com/kristof-mattei) ([`3937426`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/393742633b499d1ef000ac4c427c9b1f4a2e14db))
 ## [0.27.9](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.27.8..v0.27.9) - 2026-10-07
 
 ### ⚙️ Miscellaneous Tasks
