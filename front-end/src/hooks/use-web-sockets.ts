@@ -6,8 +6,6 @@ import { reload } from "../lib/reload";
 import { parseWsEvent } from "../lib/wire";
 
 interface Options {
-    /** The highest `disconnected` sequence already applied. A reconnect replays everything after it. */
-    getSince: () => number;
     onEvent: (event: WsEvent) => void;
 }
 
@@ -54,17 +52,15 @@ export type InitEvent = Extract<WsEvent, { type: "init" }>;
 export type ReadyEvent = Extract<WsEvent, { type: "ready" }>;
 
 /* oxlint-disable max-lines-per-function -- one effect owns the socket, its timers and the retries */
-export function useWebSocket({ getSince, onEvent }: Options): { status: ConnectionStatus } {
+export function useWebSocket({ onEvent }: Options): { status: ConnectionStatus } {
     const [status, setStatus] = useState<ConnectionStatus>("connecting");
 
-    // stable callback references
+    // stable callback reference
     const onEventReference = useRef(onEvent);
-    const sinceGetterReference = useRef(getSince);
 
     useEffect(() => {
         onEventReference.current = onEvent;
-        sinceGetterReference.current = getSince;
-    }, [getSince, onEvent]);
+    }, [onEvent]);
 
     useEffect(() => {
         let isDisposed = false;
@@ -84,9 +80,7 @@ export function useWebSocket({ getSince, onEvent }: Options): { status: Connecti
         }
 
         function connect(): void {
-            const since = sinceGetterReference.current();
-
-            const url = `${globalThis.location.protocol === "https:" ? "wss" : "ws"}://${globalThis.location.host}/api/ws?since=${since}`;
+            const url = `${globalThis.location.protocol === "https:" ? "wss" : "ws"}://${globalThis.location.host}/api/ws`;
 
             const ws = new WebSocket(url);
             socket = ws;

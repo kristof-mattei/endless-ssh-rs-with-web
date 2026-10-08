@@ -90,21 +90,17 @@ function latestSocket(): FakeWebSocket {
 }
 
 function renderWebSocketHook(): {
-    getSince: Mock<() => number>;
     onEvent: Mock<(event: WsEvent) => void>;
     result: { current: { status: ConnectionStatus } };
     unmount: () => void;
 } {
     const onEvent = vi.fn<(event: WsEvent) => void>();
-    const getSince = vi.fn<() => number>(() => {
-        return 0;
-    });
 
     const { result, unmount } = renderHook(() => {
-        return useWebSocket({ getSince, onEvent });
+        return useWebSocket({ onEvent });
     });
 
-    return { getSince, onEvent, result, unmount };
+    return { onEvent, result, unmount };
 }
 
 function advance(milliseconds: number): void {
@@ -138,13 +134,13 @@ describe("useWebSocket", () => {
         vi.useRealTimers();
     });
 
-    it("starts in connecting and dials with the replay cursor at 0", () => {
+    it("starts in connecting and dials the WebSocket endpoint", () => {
         const { result } = renderWebSocketHook();
 
         expect(result.current.status).toBe("connecting");
         expect(FakeWebSocket.instances).toHaveLength(1);
         expect(latestSocket().url).toMatch(/^ws:/v);
-        expect(latestSocket().url).toContain("/api/ws?since=0");
+        expect(latestSocket().url).toMatch(/\/api\/ws$/v);
     });
 
     it("goes live on open", () => {
@@ -338,18 +334,6 @@ describe("useWebSocket", () => {
         advance(120_000);
 
         expect(FakeWebSocket.instances).toHaveLength(1);
-    });
-
-    it("dials the reconnect with the sequence getSince reports", () => {
-        const { getSince } = renderWebSocketHook();
-
-        openLatest();
-        getSince.mockReturnValue(42);
-
-        dropLatest();
-        advance(500);
-
-        expect(latestSocket().url).toContain("/api/ws?since=42");
     });
 
     it("force-closes a half-dead connection when the watchdog expires", () => {

@@ -1,6 +1,6 @@
 /* oxlint-disable import/max-dependencies -- App renders every dashboard section */
 import type React from "react";
-import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+import { useReducer, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 import { useCanonicalUrl } from "../hooks/use-canonical-url";
@@ -18,24 +18,15 @@ import { TopCountries } from "./top-countries";
 import { WorldMap } from "./world-map";
 
 export const App: React.FC = () => {
-    const [{ activeConnections, events, maxSeenSequence, totalBytes, totalConnections, totalTimeSpent }, dispatch] =
-        useReducer(wsReducer, INITIAL_WS_STATE);
+    const [{ activeConnections, events, totalBytes, totalConnections, totalTimeSpent }, dispatch] = useReducer(
+        wsReducer,
+        INITIAL_WS_STATE,
+    );
     const [statsData, setStatsData] = useState<null | StatsData>(null);
 
     useCanonicalUrl();
 
-    // the reducer owns delivery progress, the hook reads it through this ref when building the reconnect URL
-    const maxSeenSequenceReference = useRef(0);
-
-    useEffect(() => {
-        maxSeenSequenceReference.current = maxSeenSequence;
-    }, [maxSeenSequence]);
-
-    const getSince = useCallback(() => {
-        return maxSeenSequenceReference.current;
-    }, []);
-
-    const { status } = useEventSource({ getSince, onEvent: dispatch });
+    const { status } = useEventSource({ onEvent: dispatch });
 
     return (
         <div className="bg-gray-950 p-4 text-white min-block-screen">
