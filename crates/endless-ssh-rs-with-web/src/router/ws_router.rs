@@ -9,7 +9,7 @@ use tracing::{Level, event};
 
 use crate::build_env::COMPILE_TIME_BUILD_ID;
 use crate::db;
-use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, Limit};
+use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration};
 use crate::events::{ActiveConnectionInfo, WsEvent};
 use crate::state::ApplicationState;
 use crate::utils::serde::{Elapsed, Timestamp};
@@ -132,7 +132,7 @@ async fn handle_socket(mut socket: WebSocket, state: ApplicationState) -> Result
     send_init_payload(&mut socket, active, totals).await?;
 
     // replay history, the most recent connections
-    let mut records = db::get_recent_connections(&state.db_pool, Limit::Limit(100));
+    let mut records = db::get_recent_connections(&state.db_pool, 100);
 
     loop {
         match records.try_next().await {

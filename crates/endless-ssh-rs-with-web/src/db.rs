@@ -13,7 +13,7 @@ use sqlx::{AssertSqlSafe, PgExecutor, PgPool, Row as _};
 use time::{OffsetDateTime, SignedDuration};
 use tracing::{Level, event};
 
-use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, DbPort, Limit};
+use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, DbPort};
 use crate::geoip::{Coordinates, Country, GeoInfo};
 use crate::utils::serde::{Elapsed, Timestamp};
 
@@ -216,7 +216,7 @@ async fn add_to_totals(
 /// Return up to `limit` of the most recent connection records, ordered by ascending id.
 pub fn get_recent_connections<'e, E>(
     executor: E,
-    limit: Limit,
+    limit: u32,
 ) -> impl Stream<Item = Result<ConnectionRecord, sqlx::Error>> + Send + 'e
 where
     E: PgExecutor<'e> + 'e,
@@ -259,7 +259,7 @@ where
         ORDER BY
             id ASC
         "#,
-        limit as _
+        i64::from(limit)
     )
     .fetch(executor)
     .map_ok(|row| ConnectionRecord {

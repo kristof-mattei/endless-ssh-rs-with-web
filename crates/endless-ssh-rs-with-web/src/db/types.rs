@@ -11,31 +11,6 @@ use time::{OffsetDateTime, SignedDuration};
 use crate::db::conversions::{to_duration, to_inet, to_interval};
 use crate::geoip::{Coordinates, Country};
 
-#[derive(Copy, Clone)]
-pub enum Limit {
-    Limit(i64),
-    #[expect(unused, reason = "Not found a purpose yet")]
-    All,
-}
-
-impl Type<Postgres> for Limit {
-    fn type_info() -> PgTypeInfo {
-        <i64 as Type<Postgres>>::type_info()
-    }
-}
-
-impl Encode<'_, Postgres> for Limit {
-    fn encode_by_ref(&self, buf: &mut PgArgumentBuffer) -> Result<IsNull, BoxDynError> {
-        match *self {
-            Limit::Limit(l) => <i64 as Encode<Postgres>>::encode(l, buf),
-            Limit::All => {
-                // Postgres interprets LIMIT NULL as LIMIT ALL
-                Ok(IsNull::Yes)
-            },
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
 pub struct DbIpAddr(pub IpAddr);
 
