@@ -3,7 +3,6 @@ use std::time::Duration;
 use axum::extract::State;
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::response::IntoResponse;
-use futures::TryStreamExt as _;
 use tokio::sync::broadcast;
 use tracing::{Level, event};
 
@@ -132,22 +131,16 @@ async fn handle_socket(mut socket: WebSocket, state: ApplicationState) -> Result
     send_init_payload(&mut socket, active, totals).await?;
 
     // replay history, the most recent connections
-    let mut records = db::get_recent_connections(&state.db_pool, 100);
-
-    loop {
-        match records.try_next().await {
-            Ok(Some(record)) => {
+    match db::get_recent_connections(&state.db_pool, 100).await {
+        Ok(records) => {
+            for record in records {
                 send_connection_record(&mut socket, record).await?;
-            },
-            Ok(None) => {
-                break;
-            },
-            Err(error) => {
-                // don't abort, the client can still receive live events
-                event!(Level::ERROR, ?error, "Failed to query connection history");
-                break;
-            },
-        }
+            }
+        },
+        Err(error) => {
+            // don't abort, the client can still receive live events
+            event!(Level::ERROR, ?error, "Failed to query connection history");
+        },
     }
 
     // signal that history replay is done.

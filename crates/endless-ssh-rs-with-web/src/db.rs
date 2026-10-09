@@ -4,8 +4,7 @@ pub mod types;
 use std::cmp::Ordering;
 use std::net::IpAddr;
 
-use futures::TryStreamExt as _;
-use futures::stream::Stream;
+use futures::{TryStreamExt as _, future};
 use serde::Serialize;
 use sqlx::migrate::MigrateError;
 use sqlx::postgres::{PgPoolOptions, PgRow};
@@ -214,12 +213,12 @@ async fn add_to_totals(
 }
 
 /// Return up to `limit` of the most recent connection records, ordered by ascending id.
-pub fn get_recent_connections<'e, E>(
+pub async fn get_recent_connections<'e, E>(
     executor: E,
-    limit: u32,
-) -> impl Stream<Item = Result<ConnectionRecord, sqlx::Error>> + Send + 'e
+    limit: u16,
+) -> Result<Vec<ConnectionRecord>, sqlx::Error>
 where
-    E: PgExecutor<'e> + 'e,
+    E: PgExecutor<'e>,
 {
     sqlx::query!(
         r#"
@@ -283,6 +282,14 @@ where
                 longitude,
             }),
     })
+    .try_fold(
+        Vec::with_capacity(usize::from(limit)),
+        |mut records, record| {
+            records.push(record);
+            future::ok(records)
+        },
+    )
+    .await
 }
 
 pub async fn get_totals<'e, E>(executor: E) -> Result<AllTimeTotals, sqlx::Error>
