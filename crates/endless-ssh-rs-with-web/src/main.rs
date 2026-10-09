@@ -240,7 +240,7 @@ async fn start_tasks() -> Shutdown {
     };
 
     let (internal_events_tx, internal_events_rx) = tokio::sync::mpsc::channel::<ClientEvent>(1000);
-    let (ws_broadcast_tx, _ws_broadcast_rx) = broadcast::channel::<ConnectionFrame>(1000);
+    let ws_broadcast_tx = broadcast::Sender::<ConnectionFrame>::new(1000);
     let active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>> =
         Arc::new(DashMap::new());
 

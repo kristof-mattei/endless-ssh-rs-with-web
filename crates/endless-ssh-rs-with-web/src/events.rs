@@ -246,9 +246,13 @@ fn broadcast_connection_event(
     ws_broadcast_tx: &broadcast::Sender<ConnectionFrame>,
     connection_event: ConnectionEvent,
 ) {
+    if ws_broadcast_tx.receiver_count() == 0 {
+        return;
+    }
+
     match ConnectionFrame::new(connection_event) {
         Ok(frame) => {
-            // ignore send errors, no WS clients connected is fine
+            // the last receiver can drop between the count and the send
             let _r = ws_broadcast_tx.send(frame);
         },
         Err(error) => {
