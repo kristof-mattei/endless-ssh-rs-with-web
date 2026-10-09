@@ -10,7 +10,7 @@ use maxminddb::{Mmap, geoip2};
 use memmap2::MmapOptions;
 use serde::Serialize;
 use thiserror::Error;
-use tokio::time::{Instant, interval_at};
+use tokio::time::{Instant, interval_at, sleep};
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
@@ -58,42 +58,59 @@ pub struct GeoIpReader {
 
 impl GeoIpReader {
     pub async fn try_init(license_key: &str) -> GeoIpReader {
-        // TODO exponential back-off
-        for _ in 0..5 {
-            // TODO print try number
+        let mut backoff = INIT_INITIAL_BACKOFF;
+
+        for attempt in 1..=INIT_ATTEMPTS {
             if let Some(geo_ip_reader) = GeoIpDbWrapper::init(license_key).await {
                 return Self {
                     reader: ArcSwapOption::from_pointee(geo_ip_reader),
                 };
-            } else {
-                let geo_ip_path = database_path();
-                let geo_ip_path = geo_ip_path.as_path();
+            }
 
-                // remove files so that the download will trigger again
-                if let Err(db_removal) = std::fs::remove_file(geo_ip_path) {
-                    event!(
-                        Level::ERROR,
-                        ?db_removal,
-                        path = %geo_ip_path.display(),
-                        "Failed to delete the GeoLite2 database"
-                    );
-                }
+            let geo_ip_path = database_path();
+            let geo_ip_path = geo_ip_path.as_path();
 
-                if let Err(etag_removal) = std::fs::remove_file(geo_ip_path.with_extension("etag"))
-                {
-                    event!(
-                        Level::ERROR,
-                        ?etag_removal,
-                        path = %geo_ip_path.with_extension("etag").display(),
-                        "Failed to delete the GeoLite2 ETAG file"
-                    );
-                }
+            // remove files so that the download will trigger again
+            if let Err(db_removal) = std::fs::remove_file(geo_ip_path) {
+                event!(
+                    Level::ERROR,
+                    ?db_removal,
+                    path = %geo_ip_path.display(),
+                    "Failed to delete the GeoLite2 database"
+                );
+            }
+
+            if let Err(etag_removal) = std::fs::remove_file(geo_ip_path.with_extension("etag")) {
+                event!(
+                    Level::ERROR,
+                    ?etag_removal,
+                    path = %geo_ip_path.with_extension("etag").display(),
+                    "Failed to delete the GeoLite2 ETAG file"
+                );
+            }
+
+            if attempt < INIT_ATTEMPTS {
+                event!(
+                    Level::WARN,
+                    attempt,
+                    attempts = INIT_ATTEMPTS,
+                    backoff = %humantime::format_duration(backoff),
+                    "Failed to initialize the GeoLite2 database, retrying"
+                );
+
+                sleep(backoff).await;
+
+                backoff *= 2;
             }
         }
 
-        Self {
-            reader: ArcSwapOption::empty(),
-        }
+        event!(
+            Level::ERROR,
+            attempts = INIT_ATTEMPTS,
+            "Failed to initialize the GeoLite2 database, GeoIP lookup will be disabled"
+        );
+
+        Self::empty()
     }
 
     pub fn lookup(&self, ip: IpAddr) -> Option<GeoInfo> {
@@ -193,6 +210,10 @@ pub async fn refresh_forever(
 }
 
 const GEO_IP_PATH: &str = "./.local/ip-database/GeoLite2-City.mmdb";
+
+const INIT_ATTEMPTS: u32 = 5;
+
+const INIT_INITIAL_BACKOFF: Duration = Duration::from_secs(1);
 
 /// `MaxMind` advises checking throughout the day rather than trusting a release schedule.
 const REFRESH_INTERVAL: Duration = Duration::from_mins(60);
