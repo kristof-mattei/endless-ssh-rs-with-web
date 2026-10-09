@@ -65,43 +65,42 @@ impl GeoIpReader {
                 return Self {
                     reader: ArcSwapOption::from_pointee(geo_ip_reader),
                 };
-            } else {
-                let geo_ip_path = database_path();
-                let geo_ip_path = geo_ip_path.as_path();
+            }
 
-                // remove files so that the download will trigger again
-                if let Err(db_removal) = std::fs::remove_file(geo_ip_path) {
-                    event!(
-                        Level::ERROR,
-                        ?db_removal,
-                        path = %geo_ip_path.display(),
-                        "Failed to delete the GeoLite2 database"
-                    );
-                }
+            let geo_ip_path = database_path();
+            let geo_ip_path = geo_ip_path.as_path();
 
-                if let Err(etag_removal) = std::fs::remove_file(geo_ip_path.with_extension("etag"))
-                {
-                    event!(
-                        Level::ERROR,
-                        ?etag_removal,
-                        path = %geo_ip_path.with_extension("etag").display(),
-                        "Failed to delete the GeoLite2 ETAG file"
-                    );
-                }
+            // remove files so that the download will trigger again
+            if let Err(db_removal) = std::fs::remove_file(geo_ip_path) {
+                event!(
+                    Level::ERROR,
+                    ?db_removal,
+                    path = %geo_ip_path.display(),
+                    "Failed to delete the GeoLite2 database"
+                );
+            }
 
-                if attempt < INIT_ATTEMPTS {
-                    event!(
-                        Level::WARN,
-                        attempt,
-                        attempts = INIT_ATTEMPTS,
-                        backoff = %humantime::format_duration(backoff),
-                        "Failed to initialize the GeoLite2 database, retrying"
-                    );
+            if let Err(etag_removal) = std::fs::remove_file(geo_ip_path.with_extension("etag")) {
+                event!(
+                    Level::ERROR,
+                    ?etag_removal,
+                    path = %geo_ip_path.with_extension("etag").display(),
+                    "Failed to delete the GeoLite2 ETAG file"
+                );
+            }
 
-                    sleep(backoff).await;
+            if attempt < INIT_ATTEMPTS {
+                event!(
+                    Level::WARN,
+                    attempt,
+                    attempts = INIT_ATTEMPTS,
+                    backoff = %humantime::format_duration(backoff),
+                    "Failed to initialize the GeoLite2 database, retrying"
+                );
 
-                    backoff *= 2;
-                }
+                sleep(backoff).await;
+
+                backoff *= 2;
             }
         }
 
