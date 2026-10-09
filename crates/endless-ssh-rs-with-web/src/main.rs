@@ -47,7 +47,7 @@ use tracing_subscriber::{EnvFilter, Layer as _};
 use crate::build_env::get_build_env;
 use crate::cli::parse_cli;
 use crate::config::Config;
-use crate::events::{ActiveConnectionInfo, ClientEvent, WsEvent, database_listen_forever};
+use crate::events::{ActiveConnectionInfo, ClientEvent, ConnectionFrame, database_listen_forever};
 use crate::geoip::GeoIpReader;
 use crate::listener::listen_for_new_connections;
 use crate::router::build_router;
@@ -240,7 +240,7 @@ async fn start_tasks() -> Shutdown {
     };
 
     let (internal_events_tx, internal_events_rx) = tokio::sync::mpsc::channel::<ClientEvent>(1000);
-    let (ws_broadcast_tx, _ws_broadcast_rx) = broadcast::channel::<WsEvent>(1000);
+    let (ws_broadcast_tx, _ws_broadcast_rx) = broadcast::channel::<ConnectionFrame>(1000);
     let active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>> =
         Arc::new(DashMap::new());
 

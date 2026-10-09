@@ -1,10 +1,12 @@
 use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
 
+use axum::extract::ws::{Message, Utf8Bytes};
 use dashmap::DashMap;
 use serde::Serialize;
 use time::{OffsetDateTime, SignedDuration};
 use tokio::sync::broadcast;
+use tracing::{Level, event};
 
 use crate::db;
 use crate::geoip::{Coordinates, Country, GeoIpReader};
@@ -30,8 +32,8 @@ pub enum ClientEvent {
     },
 }
 
-/// WebSocket broadcast.
-#[derive(Clone, Serialize)]
+/// WebSocket message.
+#[derive(Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum WsEvent {
@@ -47,6 +49,15 @@ pub enum WsEvent {
     },
     Ready,
     Heartbeat,
+    #[serde(untagged)]
+    Connection(ConnectionEvent),
+}
+
+/// WebSocket broadcast.
+#[derive(Serialize)]
+#[cfg_attr(test, derive(ts_rs::TS), ts(export))]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum ConnectionEvent {
     Connected {
         ip: IpAddr,
         port: u16,
@@ -74,6 +85,24 @@ pub enum WsEvent {
     },
 }
 
+/// A `ConnectionEvent` serialized once for every subscriber.
+#[derive(Clone)]
+pub struct ConnectionFrame(Utf8Bytes);
+
+impl ConnectionFrame {
+    pub fn new(connection_event: ConnectionEvent) -> Result<Self, serde_json::Error> {
+        let json = serde_json::to_string(&WsEvent::Connection(connection_event))?;
+
+        Ok(Self(json.into()))
+    }
+}
+
+impl From<ConnectionFrame> for Message {
+    fn from(frame: ConnectionFrame) -> Self {
+        Message::Text(frame.0)
+    }
+}
+
 /// In-memory representation of currently connected clients.
 /// # Considerations
 /// We might merge this with the actual Client.
@@ -94,7 +123,7 @@ pub async fn database_listen_forever(
     db_pool: sqlx::PgPool,
     geo_ip_reader: Arc<GeoIpReader>,
     mut internal_events_rx: tokio::sync::mpsc::Receiver<ClientEvent>,
-    ws_broadcast_tx: broadcast::Sender<WsEvent>,
+    ws_broadcast_tx: broadcast::Sender<ConnectionFrame>,
     active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 ) {
     while let Some(client_event) = internal_events_rx.recv().await {
@@ -114,7 +143,7 @@ async fn handle_event(
     client_event: ClientEvent,
     db_pool: &sqlx::PgPool,
     geo_ip_reader: &GeoIpReader,
-    ws_broadcast_tx: &broadcast::Sender<WsEvent>,
+    ws_broadcast_tx: &broadcast::Sender<ConnectionFrame>,
     active_connections: &Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 ) {
     match client_event {
@@ -134,7 +163,7 @@ async fn handle_event(
             let country = geo.as_mut().and_then(|geo| geo.country.take());
             let city = geo.as_mut().and_then(|geo| geo.city.take());
 
-            let ws_event = WsEvent::Connected {
+            let connection_event = ConnectionEvent::Connected {
                 ip: info.ip,
                 port: info.port,
                 connected_at: info.connected_at,
@@ -145,8 +174,7 @@ async fn handle_event(
 
             active_connections.insert(addr, info);
 
-            // ignore send errors, no WS clients connected is fine
-            let _r = ws_broadcast_tx.send(ws_event);
+            broadcast_connection_event(ws_broadcast_tx, connection_event);
         },
 
         ClientEvent::BytesSent { addr, bytes_sent } => {
@@ -154,12 +182,14 @@ async fn handle_event(
                 info.bytes_sent = bytes_sent;
             }
 
-            // ignore send errors, no WS clients connected is fine
-            let _r = ws_broadcast_tx.send(WsEvent::BytesSent {
-                ip: addr.ip(),
-                port: addr.port(),
-                bytes_sent,
-            });
+            broadcast_connection_event(
+                ws_broadcast_tx,
+                ConnectionEvent::BytesSent {
+                    ip: addr.ip(),
+                    port: addr.port(),
+                    bytes_sent,
+                },
+            );
         },
 
         ClientEvent::Disconnected {
@@ -189,7 +219,7 @@ async fn handle_event(
                     let country = geo.as_mut().and_then(|geo| geo.country.take());
                     let city = geo.as_mut().and_then(|geo| geo.city.take());
 
-                    let ws_event = WsEvent::Disconnected {
+                    let connection_event = ConnectionEvent::Disconnected {
                         sequence,
                         ip: addr.ip(),
                         port: addr.port(),
@@ -202,13 +232,104 @@ async fn handle_event(
                         coordinates: geo.as_ref().and_then(|g| g.coordinates),
                     };
 
-                    // ignore send errors, no WS clients connected yet is fine
-                    let _r = ws_broadcast_tx.send(ws_event);
+                    broadcast_connection_event(ws_broadcast_tx, connection_event);
                 },
                 Err(error) => {
                     db::log_db_error(&error);
                 },
             }
         },
+    }
+}
+
+fn broadcast_connection_event(
+    ws_broadcast_tx: &broadcast::Sender<ConnectionFrame>,
+    connection_event: ConnectionEvent,
+) {
+    match ConnectionFrame::new(connection_event) {
+        Ok(frame) => {
+            // ignore send errors, no WS clients connected is fine
+            let _r = ws_broadcast_tx.send(frame);
+        },
+        Err(error) => {
+            event!(Level::ERROR, ?error, "Failed to serialize connection event");
+        },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::net::{IpAddr, Ipv4Addr};
+
+    use axum::extract::ws::Utf8Bytes;
+    use pretty_assertions::assert_eq;
+    use time::{OffsetDateTime, SignedDuration};
+
+    use super::{ConnectionEvent, ConnectionFrame};
+    use crate::geoip::{Coordinates, Country};
+    use crate::utils::serde::{Elapsed, Timestamp};
+
+    const IP: IpAddr = IpAddr::V4(Ipv4Addr::new(192, 0, 2, 1));
+
+    fn serialize(connection_event: ConnectionEvent) -> Utf8Bytes {
+        ConnectionFrame::new(connection_event).unwrap().0
+    }
+
+    #[test]
+    fn serializes_connected_as_a_flat_tagged_object() {
+        let connected = ConnectionEvent::Connected {
+            ip: IP,
+            port: 50000,
+            connected_at: Timestamp(OffsetDateTime::from_unix_timestamp(1_767_225_600).unwrap()),
+            country: Some(Country {
+                code: String::from("NL"),
+                name: String::from("Netherlands"),
+            }),
+            city: Some(String::from("Amsterdam")),
+            coordinates: Some(Coordinates {
+                latitude: 52.37,
+                longitude: 4.9,
+            }),
+        };
+
+        assert_eq!(
+            serialize(connected).as_str(),
+            r#"{"type":"connected","ip":"192.0.2.1","port":50000,"connected_at":{"$instant":"2026-01-01T00:00:00Z"},"country":{"code":"NL","name":"Netherlands"},"city":"Amsterdam","coordinates":{"latitude":52.37,"longitude":4.9}}"#
+        );
+    }
+
+    #[test]
+    fn serializes_bytes_sent_as_a_flat_tagged_object() {
+        let bytes_sent = ConnectionEvent::BytesSent {
+            ip: IP,
+            port: 50000,
+            bytes_sent: 100,
+        };
+
+        assert_eq!(
+            serialize(bytes_sent).as_str(),
+            r#"{"type":"bytes_sent","ip":"192.0.2.1","port":50000,"bytes_sent":100}"#
+        );
+    }
+
+    #[test]
+    fn serializes_disconnected_as_a_flat_tagged_object() {
+        let disconnected = ConnectionEvent::Disconnected {
+            sequence: 1,
+            ip: IP,
+            port: 50000,
+            connected_at: Timestamp(OffsetDateTime::from_unix_timestamp(1_767_225_600).unwrap()),
+            disconnected_at: Timestamp(OffsetDateTime::from_unix_timestamp(1_767_225_690).unwrap()),
+            time_spent: Elapsed(SignedDuration::seconds(90)),
+            bytes_sent: 100,
+            country: None,
+            city: None,
+            coordinates: None,
+        };
+
+        assert_eq!(
+            serialize(disconnected).as_str(),
+            r#"{"type":"disconnected","sequence":1,"ip":"192.0.2.1","port":50000,"connected_at":{"$instant":"2026-01-01T00:00:00Z"},"disconnected_at":{"$instant":"2026-01-01T00:01:30Z"},"time_spent":{"$duration":"PT90S"},"bytes_sent":100,"country":null,"city":null,"coordinates":null}"#
+        );
     }
 }
