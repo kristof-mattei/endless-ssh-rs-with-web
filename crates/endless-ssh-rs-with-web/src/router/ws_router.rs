@@ -9,7 +9,7 @@ use tracing::{Level, event};
 use crate::build_env::COMPILE_TIME_BUILD_ID;
 use crate::db;
 use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration};
-use crate::events::{ActiveConnectionInfo, WsEvent};
+use crate::events::{ActiveConnectionInfo, ConnectionEvent, ConnectionFrame, WsEvent};
 use crate::state::ApplicationState;
 use crate::utils::serde::{Elapsed, Timestamp};
 
@@ -62,7 +62,7 @@ async fn send_connection_record(
     socket: &mut WebSocket,
     record: ConnectionRecord,
 ) -> Result<(), ()> {
-    let ws_event = WsEvent::Disconnected {
+    let connection_event = ConnectionEvent::Disconnected {
         sequence: record.id,
         ip: record.ip_address.into(),
         port: record.port.into(),
@@ -74,9 +74,9 @@ async fn send_connection_record(
         city: record.city,
         coordinates: record.coordinates,
     };
-    match serde_json::to_string(&ws_event) {
-        Ok(json) => {
-            if socket.send(Message::Text(json.into())).await.is_err() {
+    match ConnectionFrame::new(connection_event) {
+        Ok(frame) => {
+            if socket.send(frame.into()).await.is_err() {
                 // client gone, abort
                 return Err(());
             }
@@ -184,20 +184,12 @@ async fn handle_socket(mut socket: WebSocket, state: ApplicationState) -> Result
 
 async fn handle_broadcast(
     socket: &mut WebSocket,
-    recv: Result<WsEvent, tokio::sync::broadcast::error::RecvError>,
+    recv: Result<ConnectionFrame, tokio::sync::broadcast::error::RecvError>,
 ) -> Result<(), ()> {
     match recv {
-        Ok(ws_event) => {
-            // TODO this channel shouldn't use `WsEvent`, it should be a separate type
-            match serde_json::to_string(&ws_event) {
-                Ok(json) => {
-                    if socket.send(Message::Text(json.into())).await.is_err() {
-                        return Err(());
-                    }
-                },
-                Err(error) => {
-                    event!(Level::ERROR, ?error, "Failed to serialize WS event");
-                },
+        Ok(frame) => {
+            if socket.send(frame.into()).await.is_err() {
+                return Err(());
             }
         },
         Err(broadcast::error::RecvError::Lagged(amount_lagged)) => {
