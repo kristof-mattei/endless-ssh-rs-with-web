@@ -2,7 +2,6 @@ use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
 
 use axum::extract::ws::{Message, Utf8Bytes};
-use dashmap::DashMap;
 use serde::Serialize;
 use time::{OffsetDateTime, SignedDuration};
 use tokio::sync::broadcast;
@@ -12,24 +11,12 @@ use crate::db;
 use crate::geoip::{Coordinates, Country, GeoIpReader};
 use crate::utils::serde::{Elapsed, Timestamp};
 
-/// Internal event bus.
-#[derive(Clone)]
-pub enum ClientEvent {
-    Connected {
-        addr: SocketAddr,
-        connected_at: OffsetDateTime,
-    },
-    BytesSent {
-        addr: SocketAddr,
-        bytes_sent: usize,
-    },
-    Disconnected {
-        addr: SocketAddr,
-        connected_at: OffsetDateTime,
-        disconnected_at: OffsetDateTime,
-        time_spent: SignedDuration,
-        bytes_sent: usize,
-    },
+pub struct ClosedConnection {
+    pub addr: SocketAddr,
+    pub connected_at: OffsetDateTime,
+    pub disconnected_at: OffsetDateTime,
+    pub time_spent: SignedDuration,
+    pub bytes_sent: usize,
 }
 
 /// WebSocket message.
@@ -118,131 +105,76 @@ pub struct ActiveConnectionInfo {
     pub city: Option<String>,
 }
 
-/// Main event-processing loop. Ends when the last sender is dropped, so the disconnects of clients stopped by a shutdown are still stored.
+/// Stores closed connections one at a time. Concurrent inserts can commit out of id order, and `last_counted_id` assumes every id up to it is committed. Ends when the last sender is dropped, so the disconnects of clients stopped by a shutdown are still stored.
 pub async fn database_listen_forever(
     db_pool: sqlx::PgPool,
     geo_ip_reader: Arc<GeoIpReader>,
-    mut internal_events_rx: tokio::sync::mpsc::Receiver<ClientEvent>,
+    mut closed_connections_rx: tokio::sync::mpsc::Receiver<ClosedConnection>,
     ws_broadcast_tx: broadcast::Sender<ConnectionFrame>,
-    active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 ) {
-    while let Some(client_event) = internal_events_rx.recv().await {
-        // TODO defer to separate handler loop so we don't hold up our side
-        handle_event(
-            client_event,
+    while let Some(closed_connection) = closed_connections_rx.recv().await {
+        store_closed_connection(
+            closed_connection,
             &db_pool,
             &geo_ip_reader,
             &ws_broadcast_tx,
-            &active_connections,
         )
         .await;
     }
 }
 
-async fn handle_event(
-    client_event: ClientEvent,
+async fn store_closed_connection(
+    ClosedConnection {
+        addr,
+        connected_at,
+        disconnected_at,
+        time_spent,
+        bytes_sent,
+    }: ClosedConnection,
     db_pool: &sqlx::PgPool,
     geo_ip_reader: &GeoIpReader,
     ws_broadcast_tx: &broadcast::Sender<ConnectionFrame>,
-    active_connections: &Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 ) {
-    match client_event {
-        ClientEvent::Connected { addr, connected_at } => {
-            let mut geo = (*geo_ip_reader).lookup(addr.ip());
+    let mut geo = geo_ip_reader.lookup(addr.ip());
 
-            let info = ActiveConnectionInfo {
-                ip: addr.ip(),
-                port: addr.port(),
-                connected_at: Timestamp(connected_at),
-                bytes_sent: 0,
-                coordinates: geo.as_ref().and_then(|g| g.coordinates),
-                country: geo.as_ref().and_then(|g| g.country.clone()),
-                city: geo.as_ref().and_then(|g| g.city.clone()),
-            };
-
+    match db::insert_connection(
+        db_pool,
+        addr.ip(),
+        addr.port(),
+        connected_at,
+        disconnected_at,
+        time_spent,
+        bytes_sent,
+        geo.as_ref(),
+    )
+    .await
+    {
+        Ok(sequence) => {
             let country = geo.as_mut().and_then(|geo| geo.country.take());
             let city = geo.as_mut().and_then(|geo| geo.city.take());
 
-            let connection_event = ConnectionEvent::Connected {
-                ip: info.ip,
-                port: info.port,
-                connected_at: info.connected_at,
+            let connection_event = ConnectionEvent::Disconnected {
+                sequence,
+                ip: addr.ip(),
+                port: addr.port(),
+                connected_at: Timestamp(connected_at),
+                disconnected_at: Timestamp(disconnected_at),
+                time_spent: Elapsed(time_spent),
+                bytes_sent,
                 country,
                 city,
-                coordinates: info.coordinates,
+                coordinates: geo.as_ref().and_then(|g| g.coordinates),
             };
-
-            active_connections.insert(addr, info);
 
             broadcast_connection_event(ws_broadcast_tx, connection_event);
         },
-
-        ClientEvent::BytesSent { addr, bytes_sent } => {
-            if let Some(mut info) = active_connections.get_mut(&addr) {
-                info.bytes_sent = bytes_sent;
-            }
-
-            broadcast_connection_event(
-                ws_broadcast_tx,
-                ConnectionEvent::BytesSent {
-                    ip: addr.ip(),
-                    port: addr.port(),
-                    bytes_sent,
-                },
-            );
-        },
-
-        ClientEvent::Disconnected {
-            addr,
-            connected_at,
-            disconnected_at,
-            time_spent,
-            bytes_sent,
-        } => {
-            active_connections.remove(&addr);
-
-            let mut geo = (*geo_ip_reader).lookup(addr.ip());
-
-            match db::insert_connection(
-                db_pool,
-                addr.ip(),
-                addr.port(),
-                connected_at,
-                disconnected_at,
-                time_spent,
-                bytes_sent,
-                geo.as_ref(),
-            )
-            .await
-            {
-                Ok(sequence) => {
-                    let country = geo.as_mut().and_then(|geo| geo.country.take());
-                    let city = geo.as_mut().and_then(|geo| geo.city.take());
-
-                    let connection_event = ConnectionEvent::Disconnected {
-                        sequence,
-                        ip: addr.ip(),
-                        port: addr.port(),
-                        connected_at: Timestamp(connected_at),
-                        disconnected_at: Timestamp(disconnected_at),
-                        time_spent: Elapsed(time_spent),
-                        bytes_sent,
-                        country,
-                        city,
-                        coordinates: geo.as_ref().and_then(|g| g.coordinates),
-                    };
-
-                    broadcast_connection_event(ws_broadcast_tx, connection_event);
-                },
-                Err(error) => {
-                    db::log_db_error(&error);
-                },
-            }
+        Err(error) => {
+            db::log_db_error(&error);
         },
     }
 }
 
-fn broadcast_connection_event(
+pub fn broadcast_connection_event(
     ws_broadcast_tx: &broadcast::Sender<ConnectionFrame>,
     connection_event: ConnectionEvent,
 ) {

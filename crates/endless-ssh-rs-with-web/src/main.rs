@@ -46,8 +46,11 @@ use tracing_subscriber::{EnvFilter, Layer as _};
 
 use crate::build_env::get_build_env;
 use crate::cli::parse_cli;
+use crate::client::ClientContext;
 use crate::config::Config;
-use crate::events::{ActiveConnectionInfo, ClientEvent, ConnectionFrame, database_listen_forever};
+use crate::events::{
+    ActiveConnectionInfo, ClosedConnection, ConnectionFrame, database_listen_forever,
+};
 use crate::geoip::GeoIpReader;
 use crate::listener::listen_for_new_connections;
 use crate::router::build_router;
@@ -239,7 +242,8 @@ async fn start_tasks() -> Shutdown {
         },
     };
 
-    let (internal_events_tx, internal_events_rx) = tokio::sync::mpsc::channel::<ClientEvent>(1000);
+    let (closed_connections_tx, closed_connections_rx) =
+        tokio::sync::mpsc::channel::<ClosedConnection>(1000);
     let ws_broadcast_tx = broadcast::Sender::<ConnectionFrame>::new(1000);
     let active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>> =
         Arc::new(DashMap::new());
@@ -277,7 +281,13 @@ async fn start_tasks() -> Shutdown {
             config,
             client_cancellation_token.clone(),
             client_tasks.clone(),
-            internal_events_tx,
+            ClientContext {
+                cancellation_token: client_cancellation_token.clone(),
+                geo_ip_reader: Arc::clone(&geo_ip),
+                active_connections,
+                ws_broadcast_tx: ws_broadcast_tx.clone(),
+                closed_connections_tx,
+            },
             semaphore,
         ),
     ));
@@ -286,14 +296,7 @@ async fn start_tasks() -> Shutdown {
         let geo_ip = Arc::clone(&geo_ip);
 
         async move {
-            database_listen_forever(
-                db_pool,
-                geo_ip,
-                internal_events_rx,
-                ws_broadcast_tx,
-                active_connections,
-            )
-            .await;
+            database_listen_forever(db_pool, geo_ip, closed_connections_rx, ws_broadcast_tx).await;
 
             Ok(())
         }
