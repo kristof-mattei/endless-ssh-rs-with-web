@@ -29,6 +29,7 @@ use std::process::{ExitCode, Termination as _};
 use std::sync::Arc;
 use std::time::Duration;
 
+use arc_swap::ArcSwap;
 use color_eyre::config::HookBuilder;
 use color_eyre::eyre;
 use dashmap::DashMap;
@@ -49,7 +50,8 @@ use crate::cli::parse_cli;
 use crate::client::ClientContext;
 use crate::config::Config;
 use crate::events::{
-    ActiveConnectionInfo, ClosedConnection, ConnectionFrame, database_listen_forever,
+    ActiveConnectionInfo, ClosedConnection, ConnectionFrame, DashboardSnapshot,
+    database_listen_forever,
 };
 use crate::geoip::GeoIpReader;
 use crate::listener::listen_for_new_connections;
@@ -214,6 +216,19 @@ async fn start_tasks() -> Shutdown {
             return Err(Shutdown::from(eyre::Report::new(error)));
         }
 
+        let dashboard_snapshot = match DashboardSnapshot::load(&db_pool).await {
+            Ok(dashboard_snapshot) => Arc::new(ArcSwap::from_pointee(dashboard_snapshot)),
+            Err(error) => {
+                event!(
+                    Level::ERROR,
+                    ?error,
+                    "Failed to load the dashboard snapshot"
+                );
+
+                return Err(Shutdown::from(eyre::Report::new(error)));
+            },
+        };
+
         event!(Level::INFO, "Database ready");
 
         let geo_ip = if let Some(ref key) = maxmind_license_key {
@@ -227,11 +242,11 @@ async fn start_tasks() -> Shutdown {
             Arc::new(GeoIpReader::empty())
         };
 
-        Ok((db_pool, geo_ip))
+        Ok((db_pool, geo_ip, dashboard_snapshot))
     };
 
     // biased so that when both are ready at once, startup failure wins over signals
-    let (db_pool, geo_ip) = tokio::select! {
+    let (db_pool, geo_ip, dashboard_snapshot) = tokio::select! {
         biased;
         started = startup => match started {
             Ok(started) => started,
@@ -262,6 +277,7 @@ async fn start_tasks() -> Shutdown {
         Arc::clone(&geo_ip),
         ws_broadcast_tx.clone(),
         Arc::clone(&active_connections),
+        Arc::clone(&dashboard_snapshot),
     );
 
     let mut tasks = FuturesUnordered::new();
@@ -296,7 +312,14 @@ async fn start_tasks() -> Shutdown {
         let geo_ip = Arc::clone(&geo_ip);
 
         async move {
-            database_listen_forever(db_pool, geo_ip, closed_connections_rx, ws_broadcast_tx).await;
+            database_listen_forever(
+                db_pool,
+                geo_ip,
+                closed_connections_rx,
+                dashboard_snapshot,
+                ws_broadcast_tx,
+            )
+            .await;
 
             Ok(())
         }

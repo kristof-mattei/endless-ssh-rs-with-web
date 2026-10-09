@@ -7,11 +7,10 @@ use tokio::sync::broadcast;
 use tracing::{Level, event};
 
 use crate::build_env::COMPILE_TIME_BUILD_ID;
-use crate::db;
-use crate::db::types::{AllTimeTotals, ConnectionRecord};
-use crate::events::{ActiveConnectionInfo, ConnectionEvent, ConnectionFrame, WsEvent};
+use crate::db::types::AllTimeTotals;
+use crate::events::{ActiveConnectionInfo, ConnectionFrame, WsEvent};
 use crate::state::ApplicationState;
-use crate::utils::serde::{Elapsed, Timestamp};
+use crate::utils::serde::Elapsed;
 
 /// The client's watchdog assumes a multiple of this before declaring the connection half-dead.
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
@@ -29,14 +28,14 @@ pub async fn ws_handler(
 async fn send_init_payload(
     socket: &mut WebSocket,
     active_connections: Vec<ActiveConnectionInfo>,
-    totals: AllTimeTotals,
+    totals: &AllTimeTotals,
 ) -> Result<(), ()> {
     let init_payload = match serde_json::to_string(&WsEvent::Init {
         build_id: COMPILE_TIME_BUILD_ID,
         active_connections,
         total_connections: totals.total_connections,
         total_bytes_sent: totals.total_bytes_sent,
-        total_time_spent: Elapsed(totals.total_time_spent.into()),
+        total_time_spent: Elapsed(totals.total_time_spent.0),
         last_counted_id: totals.last_counted_id,
     }) {
         Ok(s) => s,
@@ -58,37 +57,6 @@ async fn send_init_payload(
     Ok(())
 }
 
-async fn send_connection_record(
-    socket: &mut WebSocket,
-    record: ConnectionRecord,
-) -> Result<(), ()> {
-    let connection_event = ConnectionEvent::Disconnected {
-        sequence: record.id,
-        ip: record.ip_address.into(),
-        port: record.port.into(),
-        connected_at: Timestamp(record.connected_at),
-        disconnected_at: Timestamp(record.disconnected_at),
-        time_spent: Elapsed(record.time_spent.into()),
-        bytes_sent: usize::try_from(record.bytes_sent).unwrap_or(0),
-        country: record.country,
-        city: record.city,
-        coordinates: record.coordinates,
-    };
-    match ConnectionFrame::new(connection_event) {
-        Ok(frame) => {
-            if socket.send(frame.into()).await.is_err() {
-                // client gone, abort
-                return Err(());
-            }
-        },
-        Err(error) => {
-            event!(Level::ERROR, ?error, "Failed to serialize history event");
-        },
-    }
-
-    Ok(())
-}
-
 async fn send_ready_payload(socket: &mut WebSocket) -> Result<(), ()> {
     if socket
         .send(Message::Text(
@@ -104,7 +72,7 @@ async fn send_ready_payload(socket: &mut WebSocket) -> Result<(), ()> {
 }
 
 async fn handle_socket(mut socket: WebSocket, state: ApplicationState) -> Result<(), ()> {
-    // subscribe to the WS broadcast channel BEFORE querying the DB so we don't miss events that arrive between the query and the loop start
+    // subscribe to the WS broadcast channel BEFORE loading the snapshot so we don't miss events that arrive between the load and the loop start
     let mut broadcast_rx = state.ws_broadcast.subscribe();
 
     // build and send the init message, which is a snapshot of live connections
@@ -114,28 +82,15 @@ async fn handle_socket(mut socket: WebSocket, state: ApplicationState) -> Result
         .map(|v| v.value().clone())
         .collect::<Vec<ActiveConnectionInfo>>();
 
-    let totals = match db::get_totals(&state.db_pool).await {
-        Ok(totals) => totals,
-        Err(error) => {
-            event!(Level::ERROR, ?error, "Failed to query all-time totals");
+    let snapshot = state.dashboard_snapshot.load_full();
 
-            return Err(());
-        },
-    };
-
-    send_init_payload(&mut socket, active, totals).await?;
+    send_init_payload(&mut socket, active, &snapshot.totals).await?;
 
     // replay history, the most recent connections
-    match db::get_recent_connections(&state.db_pool, 100).await {
-        Ok(records) => {
-            for record in records {
-                send_connection_record(&mut socket, record).await?;
-            }
-        },
-        Err(error) => {
-            // don't abort, the client can still receive live events
-            event!(Level::ERROR, ?error, "Failed to query connection history");
-        },
+    for frame in &snapshot.recent {
+        if socket.send(frame.clone().into()).await.is_err() {
+            return Err(());
+        }
     }
 
     // signal that history replay is done.

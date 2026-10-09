@@ -1,6 +1,7 @@
 use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
 
+use arc_swap::ArcSwap;
 use axum::extract::ws::{Message, Utf8Bytes};
 use serde::Serialize;
 use time::{OffsetDateTime, SignedDuration};
@@ -8,8 +9,11 @@ use tokio::sync::broadcast;
 use tracing::{Level, event};
 
 use crate::db;
+use crate::db::types::{AllTimeTotals, ConnectionRecord};
 use crate::geoip::{Coordinates, Country, GeoIpReader};
 use crate::utils::serde::{Elapsed, Timestamp};
+
+const RECENT_CONNECTIONS: u16 = 100;
 
 pub struct ClosedConnection {
     pub addr: SocketAddr,
@@ -90,6 +94,63 @@ impl From<ConnectionFrame> for Message {
     }
 }
 
+impl From<ConnectionRecord> for ConnectionEvent {
+    fn from(record: ConnectionRecord) -> Self {
+        ConnectionEvent::Disconnected {
+            sequence: record.id,
+            ip: record.ip_address.into(),
+            port: record.port.into(),
+            connected_at: Timestamp(record.connected_at),
+            disconnected_at: Timestamp(record.disconnected_at),
+            time_spent: Elapsed(record.time_spent.into()),
+            bytes_sent: usize::try_from(record.bytes_sent).unwrap_or(0),
+            country: record.country,
+            city: record.city,
+            coordinates: record.coordinates,
+        }
+    }
+}
+
+pub struct DashboardSnapshot {
+    pub totals: AllTimeTotals,
+    /// Oldest first.
+    pub recent: Vec<ConnectionFrame>,
+}
+
+impl DashboardSnapshot {
+    pub async fn load(db_pool: &sqlx::PgPool) -> Result<Self, sqlx::Error> {
+        let totals = db::get_totals(db_pool).await?;
+
+        let recent = db::get_recent_connections(db_pool, RECENT_CONNECTIONS)
+            .await?
+            .into_iter()
+            .filter_map(|record| {
+                ConnectionFrame::new(record.into())
+                    .inspect_err(|error| {
+                        event!(Level::ERROR, ?error, "Failed to serialize history event");
+                    })
+                    .ok()
+            })
+            .collect();
+
+        Ok(Self { totals, recent })
+    }
+
+    fn with_stored(&self, totals: AllTimeTotals, frame: ConnectionFrame) -> Self {
+        let evicted = (self.recent.len() + 1).saturating_sub(usize::from(RECENT_CONNECTIONS));
+
+        let recent = self
+            .recent
+            .iter()
+            .skip(evicted)
+            .cloned()
+            .chain(std::iter::once(frame))
+            .collect();
+
+        Self { totals, recent }
+    }
+}
+
 /// In-memory representation of currently connected clients.
 /// # Considerations
 /// We might merge this with the actual Client.
@@ -110,6 +171,7 @@ pub async fn database_listen_forever(
     db_pool: sqlx::PgPool,
     geo_ip_reader: Arc<GeoIpReader>,
     mut closed_connections_rx: tokio::sync::mpsc::Receiver<ClosedConnection>,
+    dashboard_snapshot: Arc<ArcSwap<DashboardSnapshot>>,
     ws_broadcast_tx: broadcast::Sender<ConnectionFrame>,
 ) {
     while let Some(closed_connection) = closed_connections_rx.recv().await {
@@ -117,6 +179,7 @@ pub async fn database_listen_forever(
             closed_connection,
             &db_pool,
             &geo_ip_reader,
+            &dashboard_snapshot,
             &ws_broadcast_tx,
         )
         .await;
@@ -133,11 +196,12 @@ async fn store_closed_connection(
     }: ClosedConnection,
     db_pool: &sqlx::PgPool,
     geo_ip_reader: &GeoIpReader,
+    dashboard_snapshot: &ArcSwap<DashboardSnapshot>,
     ws_broadcast_tx: &broadcast::Sender<ConnectionFrame>,
 ) {
     let mut geo = geo_ip_reader.lookup(addr.ip());
 
-    match db::insert_connection(
+    let totals = match db::insert_connection(
         db_pool,
         addr.ip(),
         addr.port(),
@@ -149,29 +213,45 @@ async fn store_closed_connection(
     )
     .await
     {
-        Ok(sequence) => {
-            let country = geo.as_mut().and_then(|geo| geo.country.take());
-            let city = geo.as_mut().and_then(|geo| geo.city.take());
-
-            let connection_event = ConnectionEvent::Disconnected {
-                sequence,
-                ip: addr.ip(),
-                port: addr.port(),
-                connected_at: Timestamp(connected_at),
-                disconnected_at: Timestamp(disconnected_at),
-                time_spent: Elapsed(time_spent),
-                bytes_sent,
-                country,
-                city,
-                coordinates: geo.as_ref().and_then(|g| g.coordinates),
-            };
-
-            broadcast_connection_event(ws_broadcast_tx, connection_event);
-        },
+        Ok(totals) => totals,
         Err(error) => {
             db::log_db_error(&error);
+
+            return;
         },
-    }
+    };
+
+    let country = geo.as_mut().and_then(|geo| geo.country.take());
+    let city = geo.as_mut().and_then(|geo| geo.city.take());
+
+    let connection_event = ConnectionEvent::Disconnected {
+        sequence: totals.last_counted_id,
+        ip: addr.ip(),
+        port: addr.port(),
+        connected_at: Timestamp(connected_at),
+        disconnected_at: Timestamp(disconnected_at),
+        time_spent: Elapsed(time_spent),
+        bytes_sent,
+        country,
+        city,
+        coordinates: geo.as_ref().and_then(|g| g.coordinates),
+    };
+
+    let frame = match ConnectionFrame::new(connection_event) {
+        Ok(frame) => frame,
+        Err(error) => {
+            event!(Level::ERROR, ?error, "Failed to serialize connection event");
+
+            return;
+        },
+    };
+
+    // sockets subscribe before loading the snapshot, so storing it before the broadcast means no socket misses this frame
+    dashboard_snapshot.store(Arc::new(
+        dashboard_snapshot.load().with_stored(totals, frame.clone()),
+    ));
+
+    let _r = ws_broadcast_tx.send(frame);
 }
 
 pub fn broadcast_connection_event(
@@ -201,7 +281,8 @@ mod tests {
     use pretty_assertions::assert_eq;
     use time::{OffsetDateTime, SignedDuration};
 
-    use super::{ConnectionEvent, ConnectionFrame};
+    use super::{ConnectionEvent, ConnectionFrame, DashboardSnapshot, RECENT_CONNECTIONS};
+    use crate::db::types::{AllTimeTotals, DbDuration};
     use crate::geoip::{Coordinates, Country};
     use crate::utils::serde::{Elapsed, Timestamp};
 
@@ -267,5 +348,62 @@ mod tests {
             serialize(disconnected).as_str(),
             r#"{"type":"disconnected","sequence":1,"ip":"192.0.2.1","port":50000,"connected_at":{"$instant":"2026-01-01T00:00:00Z"},"disconnected_at":{"$instant":"2026-01-01T00:01:30Z"},"time_spent":{"$duration":"PT90S"},"bytes_sent":100,"country":null,"city":null,"coordinates":null}"#
         );
+    }
+
+    fn bytes_sent_frame(port: u16) -> ConnectionFrame {
+        ConnectionFrame::new(ConnectionEvent::BytesSent {
+            ip: IP,
+            port,
+            bytes_sent: 0,
+        })
+        .unwrap()
+    }
+
+    fn totals(last_counted_id: i64) -> AllTimeTotals {
+        AllTimeTotals {
+            total_connections: last_counted_id,
+            total_bytes_sent: 0,
+            total_time_spent: DbDuration(SignedDuration::ZERO),
+            last_counted_id,
+        }
+    }
+
+    fn texts(frames: &[ConnectionFrame]) -> Vec<&str> {
+        frames.iter().map(|frame| frame.0.as_str()).collect()
+    }
+
+    #[test]
+    fn stored_frame_is_appended_below_the_cap() {
+        let snapshot = DashboardSnapshot {
+            totals: totals(1),
+            recent: vec![bytes_sent_frame(1)],
+        };
+
+        let next = snapshot.with_stored(totals(2), bytes_sent_frame(2));
+
+        assert_eq!(next.totals.last_counted_id, 2);
+        assert_eq!(
+            texts(&next.recent),
+            texts(&[bytes_sent_frame(1), bytes_sent_frame(2)])
+        );
+    }
+
+    #[test]
+    fn stored_frame_evicts_the_oldest_at_the_cap() {
+        let snapshot = DashboardSnapshot {
+            totals: totals(i64::from(RECENT_CONNECTIONS)),
+            recent: (0..RECENT_CONNECTIONS).map(bytes_sent_frame).collect(),
+        };
+
+        let next = snapshot.with_stored(
+            totals(i64::from(RECENT_CONNECTIONS) + 1),
+            bytes_sent_frame(RECENT_CONNECTIONS),
+        );
+
+        let expected = (1..=RECENT_CONNECTIONS)
+            .map(bytes_sent_frame)
+            .collect::<Vec<_>>();
+
+        assert_eq!(texts(&next.recent), texts(&expected));
     }
 }

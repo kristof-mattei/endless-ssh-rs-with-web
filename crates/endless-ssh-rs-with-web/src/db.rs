@@ -52,7 +52,7 @@ pub async fn insert_connection(
     time_spent: time::SignedDuration,
     bytes_sent: usize,
     geo: Option<&GeoInfo>,
-) -> Result<i64, sqlx::Error> {
+) -> Result<AllTimeTotals, sqlx::Error> {
     let bytes_sent = i64::try_from(bytes_sent)
         .inspect_err(|_| {
             event!(
@@ -85,11 +85,11 @@ pub async fn insert_connection(
 
     let id = insert_feed_row(&mut *tx, &row).await?;
     insert_log_row(&mut *tx, &row).await?;
-    add_to_totals(&mut *tx, &row).await?;
+    let totals = add_to_totals(&mut *tx, &row, id).await?;
 
     tx.commit().await?;
 
-    Ok(id)
+    Ok(totals)
 }
 
 async fn insert_feed_row(
@@ -193,8 +193,9 @@ async fn insert_log_row(
 async fn add_to_totals(
     executor: impl PgExecutor<'_>,
     row: &NewConnection,
-) -> Result<(), sqlx::Error> {
-    sqlx::query!(
+    id: i64,
+) -> Result<AllTimeTotals, sqlx::Error> {
+    let totals = sqlx::query!(
         r#"
         UPDATE totals
         SET
@@ -202,14 +203,23 @@ async fn add_to_totals(
             , total_bytes_sent = total_bytes_sent + $1
             , total_time_spent = total_time_spent + $2
         WHERE id = 1
+        RETURNING
+            total_connections
+            , total_bytes_sent
+            , total_time_spent AS "total_time_spent: DbDuration"
         "#,
         row.bytes_sent,
         DbDuration(row.time_spent) as _,
     )
-    .execute(executor)
+    .fetch_one(executor)
     .await?;
 
-    Ok(())
+    Ok(AllTimeTotals {
+        total_connections: totals.total_connections,
+        total_bytes_sent: totals.total_bytes_sent,
+        total_time_spent: totals.total_time_spent,
+        last_counted_id: id,
+    })
 }
 
 /// Return up to `limit` of the most recent connection records, ordered by ascending id.

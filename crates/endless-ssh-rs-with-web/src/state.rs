@@ -2,13 +2,14 @@ use std::convert::Infallible;
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+use arc_swap::ArcSwap;
 use axum::extract::{FromRef, FromRequestParts};
 use axum::http::request::Parts;
 use dashmap::DashMap;
 use sqlx::PgPool;
 use tokio::sync::broadcast;
 
-use crate::events::{ActiveConnectionInfo, ConnectionFrame};
+use crate::events::{ActiveConnectionInfo, ConnectionFrame, DashboardSnapshot};
 use crate::geoip::GeoIpReader;
 use crate::states::config::Config;
 
@@ -33,6 +34,7 @@ pub struct ApplicationState {
     pub geo_ip_reader: Arc<GeoIpReader>,
     pub ws_broadcast: broadcast::Sender<ConnectionFrame>,
     pub active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
+    pub dashboard_snapshot: Arc<ArcSwap<DashboardSnapshot>>,
 }
 
 impl ApplicationState {
@@ -42,6 +44,7 @@ impl ApplicationState {
         geo_ip_reader: Arc<GeoIpReader>,
         ws_broadcast: broadcast::Sender<ConnectionFrame>,
         active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
+        dashboard_snapshot: Arc<ArcSwap<DashboardSnapshot>>,
     ) -> Self {
         ApplicationState {
             config: Arc::new(config),
@@ -49,6 +52,7 @@ impl ApplicationState {
             geo_ip_reader,
             ws_broadcast,
             active_connections,
+            dashboard_snapshot,
         }
     }
 }
