@@ -4,7 +4,7 @@ pub mod types;
 use std::cmp::Ordering;
 use std::net::IpAddr;
 
-use futures::{TryStreamExt as _, future};
+use futures::TryStreamExt as _;
 use serde::Serialize;
 use sqlx::migrate::MigrateError;
 use sqlx::postgres::{PgPoolOptions, PgRow};
@@ -220,7 +220,7 @@ pub async fn get_recent_connections<'e, E>(
 where
     E: PgExecutor<'e>,
 {
-    sqlx::query!(
+    let mut rows = sqlx::query!(
         r#"
         SELECT
             id
@@ -260,36 +260,35 @@ where
         "#,
         i64::from(limit)
     )
-    .fetch(executor)
-    .map_ok(|row| ConnectionRecord {
-        id: row.id,
-        ip_address: row.ip_address,
-        port: row.port,
-        connected_at: row.connected_at,
-        disconnected_at: row.disconnected_at,
-        time_spent: row.time_spent,
-        bytes_sent: row.bytes_sent,
-        country: row.country_code.map(|code| Country {
-            name: row.country_name.unwrap_or_else(|| code.clone()),
-            code,
-        }),
-        city: row.city,
-        coordinates: row
-            .latitude
-            .zip(row.longitude)
-            .map(|(latitude, longitude)| Coordinates {
-                latitude,
-                longitude,
+    .fetch(executor);
+
+    let mut records = Vec::with_capacity(usize::from(limit));
+
+    while let Some(row) = rows.try_next().await? {
+        records.push(ConnectionRecord {
+            id: row.id,
+            ip_address: row.ip_address,
+            port: row.port,
+            connected_at: row.connected_at,
+            disconnected_at: row.disconnected_at,
+            time_spent: row.time_spent,
+            bytes_sent: row.bytes_sent,
+            country: row.country_code.map(|code| Country {
+                name: row.country_name.unwrap_or_else(|| code.clone()),
+                code,
             }),
-    })
-    .try_fold(
-        Vec::with_capacity(usize::from(limit)),
-        |mut records, record| {
-            records.push(record);
-            future::ok(records)
-        },
-    )
-    .await
+            city: row.city,
+            coordinates: row
+                .latitude
+                .zip(row.longitude)
+                .map(|(latitude, longitude)| Coordinates {
+                    latitude,
+                    longitude,
+                }),
+        });
+    }
+
+    Ok(records)
 }
 
 pub async fn get_totals<'e, E>(executor: E) -> Result<AllTimeTotals, sqlx::Error>
