@@ -2,24 +2,34 @@ use std::net::SocketAddr;
 use std::os::fd::{AsRawFd, FromRawFd as _, OwnedFd};
 use std::sync::Arc;
 
+use dashmap::DashMap;
 use time::{OffsetDateTime, SignedDuration};
 use tokio::io::unix::{AsyncFd, AsyncFdReadyGuard};
 use tokio::net::TcpStream;
-use tokio::sync::OwnedSemaphorePermit;
 use tokio::sync::mpsc::Sender;
+use tokio::sync::{OwnedSemaphorePermit, broadcast};
 use tokio::time::{Instant, sleep};
 use tokio_util::sync::CancellationToken;
 use tracing::{Level, event};
 
 use crate::config::Config;
-use crate::events::ClientEvent;
+use crate::events::{
+    ActiveConnectionInfo, ClosedConnection, ConnectionEvent, ConnectionFrame,
+    broadcast_connection_event,
+};
+use crate::geoip::GeoIpReader;
 use crate::sender;
+use crate::utils::serde::Timestamp;
 
 const INTERESTED_EVENTS: u32 = (libc::EPOLLRDHUP | libc::EPOLLERR | libc::EPOLLHUP).cast_unsigned();
 
+#[derive(Clone)]
 pub struct ClientContext {
     pub cancellation_token: CancellationToken,
-    pub internal_events_tx: Sender<ClientEvent>,
+    pub geo_ip_reader: Arc<GeoIpReader>,
+    pub active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
+    pub ws_broadcast_tx: broadcast::Sender<ConnectionFrame>,
+    pub closed_connections_tx: Sender<ClosedConnection>,
 }
 
 /// Creates an epoll fd that monitors `socket_fd` for `EPOLLRDHUP | EPOLLERR | EPOLLHUP`,
@@ -183,10 +193,18 @@ async fn listen_forever(
             time_spent += config.delay;
             bytes_sent += sent;
 
-            // try_send: a full channel drops this update, but the next one has the updated running total
-            let _r = context
-                .internal_events_tx
-                .try_send(ClientEvent::BytesSent { addr, bytes_sent });
+            if let Some(mut info) = context.active_connections.get_mut(&addr) {
+                info.bytes_sent = bytes_sent;
+            }
+
+            broadcast_connection_event(
+                &context.ws_broadcast_tx,
+                ConnectionEvent::BytesSent {
+                    ip: addr.ip(),
+                    port: addr.port(),
+                    bytes_sent,
+                },
+            );
 
             send_next = Instant::now() + config.delay;
         } else {
@@ -213,6 +231,8 @@ pub async fn handle_client(
     config: Arc<Config>,
     context: ClientContext,
 ) {
+    register_active_connection(addr, connected_at, &context);
+
     let (time_spent, bytes_sent) =
         listen_forever(stream, addr, connected_at, &config, &context).await;
 
@@ -232,24 +252,59 @@ pub async fn handle_client(
 
     event!(Level::INFO, available_slots = available_slots + 1);
 
-    let internal_events_tx = context.internal_events_tx.clone();
+    // the entry can already belong to a reconnect from the same address
+    context
+        .active_connections
+        .remove_if(&addr, |_, info| info.connected_at.0 == connected_at);
 
-    tokio::spawn(async move {
-        if let Err(error) = internal_events_tx
-            .send(ClientEvent::Disconnected {
-                addr,
-                connected_at,
-                disconnected_at,
-                time_spent,
-                bytes_sent,
-            })
-            .await
-        {
-            event!(
-                Level::WARN,
-                ?error,
-                "Failed to send internal client disconnected event"
-            );
-        }
-    });
+    let closed_connection = ClosedConnection {
+        addr,
+        connected_at,
+        disconnected_at,
+        time_spent,
+        bytes_sent,
+    };
+
+    if let Err(error) = context.closed_connections_tx.try_send(closed_connection) {
+        event!(
+            Level::ERROR,
+            ?error,
+            %addr,
+            "Failed to queue the closed connection, dropping its record"
+        );
+    }
+}
+
+fn register_active_connection(
+    addr: SocketAddr,
+    connected_at: OffsetDateTime,
+    context: &ClientContext,
+) {
+    let mut geo = context.geo_ip_reader.lookup(addr.ip());
+
+    let info = ActiveConnectionInfo {
+        ip: addr.ip(),
+        port: addr.port(),
+        connected_at: Timestamp(connected_at),
+        bytes_sent: 0,
+        coordinates: geo.as_ref().and_then(|g| g.coordinates),
+        country: geo.as_ref().and_then(|g| g.country.clone()),
+        city: geo.as_ref().and_then(|g| g.city.clone()),
+    };
+
+    let country = geo.as_mut().and_then(|geo| geo.country.take());
+    let city = geo.as_mut().and_then(|geo| geo.city.take());
+
+    let connection_event = ConnectionEvent::Connected {
+        ip: info.ip,
+        port: info.port,
+        connected_at: info.connected_at,
+        country,
+        city,
+        coordinates: info.coordinates,
+    };
+
+    context.active_connections.insert(addr, info);
+
+    broadcast_connection_event(&context.ws_broadcast_tx, connection_event);
 }

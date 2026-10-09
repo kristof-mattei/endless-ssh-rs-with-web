@@ -11,7 +11,6 @@ use tracing::{Level, event};
 use crate::SIZE_IN_BYTES;
 use crate::client::{ClientContext, handle_client};
 use crate::config::Config;
-use crate::events::ClientEvent;
 use crate::ffi_wrapper::set_receive_buffer_size;
 use crate::task_tracker_ext::TaskTrackerExt as _;
 
@@ -20,8 +19,7 @@ struct Listener {
     #[expect(clippy::struct_field_names, reason = "Clarity")]
     tcp_listener: TcpListener,
     client_task_tracker: TaskTracker,
-    cancellation_token: CancellationToken,
-    internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
+    client_context: ClientContext,
     semaphore: Arc<Semaphore>,
 }
 
@@ -29,15 +27,14 @@ pub async fn listen_for_new_connections(
     config: Arc<Config>,
     cancellation_token: CancellationToken,
     client_task_tracker: TaskTracker,
-    internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
+    client_context: ClientContext,
     semaphore: Arc<Semaphore>,
 ) -> Result<(), eyre::Report> {
     // listen forever, accept new clients
     let listener = Listener::bind(
         Arc::clone(&config),
         client_task_tracker,
-        cancellation_token.clone(),
-        internal_events_tx,
+        client_context,
         semaphore,
     )
     .await
@@ -62,8 +59,7 @@ impl Listener {
     pub async fn bind(
         config: Arc<Config>,
         client_task_tracker: TaskTracker,
-        cancellation_token: CancellationToken,
-        internal_events_tx: tokio::sync::mpsc::Sender<ClientEvent>,
+        client_context: ClientContext,
         semaphore: Arc<Semaphore>,
     ) -> Result<Self, eyre::Report> {
         let listener = TcpListener::bind(config.ssh_listen_address).await?;
@@ -72,8 +68,7 @@ impl Listener {
             config,
             tcp_listener: listener,
             client_task_tracker,
-            cancellation_token,
-            internal_events_tx,
+            client_context,
             semaphore,
         })
     }
@@ -106,18 +101,9 @@ impl Listener {
                                     connected_at,
                                     permit,
                                     Arc::clone(&self.config),
-                                    ClientContext {
-                                        cancellation_token: self.cancellation_token.clone(),
-                                        internal_events_tx: self.internal_events_tx.clone(),
-                                    },
+                                    self.client_context.clone(),
                                 ),
                             );
-
-                            // now that the client is registered, broadcast for the dashboard
-                            let _r = self
-                                .internal_events_tx
-                                .send(ClientEvent::Connected { addr, connected_at })
-                                .await;
 
                             let current_clients = usize::from(self.config.max_clients.get())
                                 - self.semaphore.available_permits();
