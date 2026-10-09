@@ -4,12 +4,9 @@ use std::ptr::null_mut;
 use color_eyre::eyre;
 use libc::{c_int, sigaction};
 #[cfg(not(miri))]
-use tokio::signal::unix::SignalKind;
-#[cfg(not(miri))]
-use tokio::signal::unix::signal;
+use tokio::signal::unix::{self, SignalKind, signal};
 use tracing::{Level, event};
 
-use crate::shutdown::Shutdown;
 use crate::wrap_and_report;
 
 #[expect(
@@ -27,6 +24,7 @@ const SIGINT: u8 = libc::SIGINT as u8;
 const SIGTERM: u8 = libc::SIGTERM as u8;
 
 #[derive(Clone, Copy)]
+#[cfg_attr(miri, expect(dead_code, reason = "No signal listeners in Miri"))]
 pub enum Signal {
     Interrupt,
     Terminate,
@@ -41,53 +39,58 @@ impl Signal {
     }
 }
 
-async fn receive_sigterm() -> Result<(), std::io::Error> {
+/// A signal that arrives while no `wait` is running is buffered for a later `wait`.
+pub struct SignalListeners {
     #[cfg(not(miri))]
-    signal(SignalKind::terminate())?.recv().await;
-
-    #[cfg(miri)]
-    let _r = std::future::pending::<Result<(), std::io::Error>>().await;
-
-    Ok(())
+    terminate: unix::Signal,
+    #[cfg(not(miri))]
+    interrupt: unix::Signal,
 }
 
-/// Waits forever for a `SIGTERM`.
-pub async fn wait_for_sigterm() -> Shutdown {
-    if let Err(error) = receive_sigterm().await {
-        Shutdown::UnexpectedError(wrap_and_report!(
-            Level::ERROR,
-            error,
-            "Failed to register SIGTERM handler"
-        ))
-    } else {
-        event!(Level::WARN, "SIGTERM detected, stopping all tasks");
+impl SignalListeners {
+    #[cfg(not(miri))]
+    pub fn register() -> Result<Self, eyre::Report> {
+        let terminate = signal(SignalKind::terminate()).map_err(|error| {
+            wrap_and_report!(Level::ERROR, error, "Failed to register SIGTERM handler")
+        })?;
 
-        Shutdown::Signal(Signal::Terminate)
+        let interrupt = signal(SignalKind::interrupt()).map_err(|error| {
+            wrap_and_report!(Level::ERROR, error, "Failed to register CTRL+c handler")
+        })?;
+
+        Ok(Self {
+            terminate,
+            interrupt,
+        })
     }
-}
-
-async fn receive_sigint() -> Result<(), std::io::Error> {
-    #[cfg(not(miri))]
-    tokio::signal::ctrl_c().await?;
 
     #[cfg(miri)]
-    let _r = std::future::pending::<Result<(), std::io::Error>>().await;
+    pub fn register() -> Result<Self, eyre::Report> {
+        Ok(Self {})
+    }
 
-    Ok(())
-}
+    pub async fn wait(&mut self) -> Signal {
+        let signal = self.receive().await;
 
-/// Waits forever for a `SIGINT`.
-pub async fn wait_for_sigint() -> Shutdown {
-    if let Err(error) = receive_sigint().await {
-        Shutdown::UnexpectedError(wrap_and_report!(
-            Level::ERROR,
-            error,
-            "Failed to register CTRL+c handler"
-        ))
-    } else {
-        event!(Level::WARN, "CTRL+c detected, stopping all tasks");
+        match signal {
+            Signal::Terminate => event!(Level::WARN, "SIGTERM received"),
+            Signal::Interrupt => event!(Level::WARN, "CTRL+c received"),
+        }
 
-        Shutdown::Signal(Signal::Interrupt)
+        signal
+    }
+
+    #[cfg(not(miri))]
+    async fn receive(&mut self) -> Signal {
+        tokio::select! {
+            _ = self.terminate.recv() => Signal::Terminate,
+            _ = self.interrupt.recv() => Signal::Interrupt,
+        }
+    }
+
+    #[cfg(miri)]
+    async fn receive(&mut self) -> Signal {
+        std::future::pending().await
     }
 }
 
@@ -177,7 +180,7 @@ mod tests {
     use pretty_assertions::assert_eq;
     use tokio::signal::unix::{SignalKind, signal};
 
-    use super::{Signal, terminate_by_signal};
+    use super::{Signal, SignalListeners, terminate_by_signal};
 
     const CHILD_MARKER: &str = "ENDLESS_SSH_RS_TERMINATE_BY_SIGNAL_CHILD";
 
@@ -215,5 +218,19 @@ mod tests {
             .unwrap();
 
         assert_eq!(status.signal(), Some(libc::SIGTERM));
+    }
+
+    #[tokio::test]
+    async fn wait_returns_a_signal_raised_before_the_call() {
+        let mut signal_listeners = SignalListeners::register().unwrap();
+
+        // SAFETY: `raise(3)` has no preconditions
+        unsafe {
+            libc::raise(libc::SIGINT);
+        }
+
+        let signal = signal_listeners.wait().await;
+
+        assert!(matches!(signal, Signal::Interrupt));
     }
 }

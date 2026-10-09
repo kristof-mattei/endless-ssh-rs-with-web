@@ -53,6 +53,7 @@ use crate::listener::listen_for_new_connections;
 use crate::router::build_router;
 use crate::server::setup_server;
 use crate::shutdown::Shutdown;
+use crate::signal_handlers::{Signal, SignalListeners};
 use crate::state::ApplicationState;
 use crate::utils::flatten_shutdown_handle;
 use crate::utils::task::spawn_with_name;
@@ -172,6 +173,12 @@ fn get_config() -> Result<Arc<Config>, eyre::Report> {
 async fn start_tasks() -> Shutdown {
     print_header();
 
+    // when running as PID 1, a signal before this registration is discarded
+    let mut signal_listeners = match SignalListeners::register() {
+        Ok(signal_listeners) => signal_listeners,
+        Err(report) => return Shutdown::from(report),
+    };
+
     let config = match get_config() {
         Ok(config) => config,
         Err(error) => return Shutdown::from(error),
@@ -185,35 +192,51 @@ async fn start_tasks() -> Shutdown {
         return Shutdown::from(eyre::eyre!("DATABASE_URL not set"));
     };
 
-    let db_pool = match db::create_pool(&database_url).await {
-        Ok(pool) => pool,
-        Err(error) => {
-            event!(Level::ERROR, ?error, "Failed to connect to database");
-            return Shutdown::from(eyre::Report::new(error));
-        },
-    };
-
-    if let Err(error) = db::run_migrations(&db_pool).await {
-        event!(Level::ERROR, ?error, "Failed to run database migrations");
-
-        return Shutdown::from(eyre::Report::new(error));
-    }
-
-    event!(Level::INFO, "Database ready");
-
     let maxmind_license_key = std::env::var("MAXMIND_LICENSE_KEY")
         .ok()
         .filter(|key| !key.is_empty());
 
-    let geo_ip = if let Some(ref key) = maxmind_license_key {
-        Arc::new(GeoIpReader::try_init(key).await)
-    } else {
-        event!(
-            Level::INFO,
-            "`MAXMIND_LICENSE_KEY` not set, GeoIP lookup will be disabled"
-        );
+    let startup = async {
+        let db_pool = match db::create_pool(&database_url).await {
+            Ok(pool) => pool,
+            Err(error) => {
+                event!(Level::ERROR, ?error, "Failed to connect to database");
+                return Err(Shutdown::from(eyre::Report::new(error)));
+            },
+        };
 
-        Arc::new(GeoIpReader::empty())
+        if let Err(error) = db::run_migrations(&db_pool).await {
+            event!(Level::ERROR, ?error, "Failed to run database migrations");
+
+            return Err(Shutdown::from(eyre::Report::new(error)));
+        }
+
+        event!(Level::INFO, "Database ready");
+
+        let geo_ip = if let Some(ref key) = maxmind_license_key {
+            Arc::new(GeoIpReader::try_init(key).await)
+        } else {
+            event!(
+                Level::INFO,
+                "`MAXMIND_LICENSE_KEY` not set, GeoIP lookup will be disabled"
+            );
+
+            Arc::new(GeoIpReader::empty())
+        };
+
+        Ok((db_pool, geo_ip))
+    };
+
+    // biased so that when both are ready at once, startup failure wins over signals
+    let (db_pool, geo_ip) = tokio::select! {
+        biased;
+        started = startup => match started {
+            Ok(started) => started,
+            Err(shutdown) => return shutdown,
+        },
+        signal = signal_listeners.wait() => {
+            return Shutdown::Signal(signal);
+        },
     };
 
     let (internal_events_tx, internal_events_rx) = tokio::sync::mpsc::channel::<ClientEvent>(1000);
@@ -292,11 +315,8 @@ async fn start_tasks() -> Shutdown {
         Some((name, result)) = tasks.next() => {
             task_stopped(name, result)
         },
-        result = signal_handlers::wait_for_sigterm() => {
-            result
-        },
-        result = signal_handlers::wait_for_sigint() => {
-            result
+        signal = signal_listeners.wait() => {
+            Shutdown::Signal(signal)
         },
     };
 
@@ -342,10 +362,7 @@ async fn start_tasks() -> Shutdown {
     let stopped_in_time = tokio::select! {
         biased;
         stopped_in_time = drain => stopped_in_time,
-        second_signal = signal_handlers::wait_for_sigterm() => {
-            return abandon_drain(shutdown_reason, second_signal);
-        },
-        second_signal = signal_handlers::wait_for_sigint() => {
+        second_signal = signal_listeners.wait() => {
             return abandon_drain(shutdown_reason, second_signal);
         },
     };
@@ -382,11 +399,11 @@ where
     .boxed()
 }
 
-fn abandon_drain(shutdown_reason: Shutdown, second_signal: Shutdown) -> Shutdown {
+fn abandon_drain(shutdown_reason: Shutdown, second_signal: Signal) -> Shutdown {
     event!(Level::WARN, "Second signal, abandoning the drain");
 
     match shutdown_reason {
-        Shutdown::Success | Shutdown::Signal(_) => second_signal,
+        Shutdown::Success | Shutdown::Signal(_) => Shutdown::Signal(second_signal),
         failure @ (Shutdown::OperationalFailure { .. } | Shutdown::UnexpectedError(_)) => failure,
     }
 }
