@@ -261,6 +261,7 @@ fn broadcast_connection_event(
 mod tests {
     use std::net::{IpAddr, Ipv4Addr};
 
+    use axum::extract::ws::Utf8Bytes;
     use pretty_assertions::assert_eq;
     use time::{OffsetDateTime, SignedDuration};
 
@@ -270,11 +271,8 @@ mod tests {
 
     const IP: IpAddr = IpAddr::V4(Ipv4Addr::new(192, 0, 2, 1));
 
-    fn serialize(connection_event: ConnectionEvent) -> String {
-        ConnectionFrame::new(connection_event)
-            .unwrap()
-            .0
-            .to_string()
+    fn serialize(connection_event: ConnectionEvent) -> Utf8Bytes {
+        ConnectionFrame::new(connection_event).unwrap().0
     }
 
     #[test]
@@ -295,7 +293,7 @@ mod tests {
         };
 
         assert_eq!(
-            serialize(connected),
+            serialize(connected).as_str(),
             r#"{"type":"connected","ip":"192.0.2.1","port":50000,"connected_at":{"$instant":"2026-01-01T00:00:00Z"},"country":{"code":"NL","name":"Netherlands"},"city":"Amsterdam","coordinates":{"latitude":52.37,"longitude":4.9}}"#
         );
     }
@@ -309,7 +307,7 @@ mod tests {
         };
 
         assert_eq!(
-            serialize(bytes_sent),
+            serialize(bytes_sent).as_str(),
             r#"{"type":"bytes_sent","ip":"192.0.2.1","port":50000,"bytes_sent":100}"#
         );
     }
@@ -330,7 +328,7 @@ mod tests {
         };
 
         assert_eq!(
-            serialize(disconnected),
+            serialize(disconnected).as_str(),
             r#"{"type":"disconnected","sequence":1,"ip":"192.0.2.1","port":50000,"connected_at":{"$instant":"2026-01-01T00:00:00Z"},"disconnected_at":{"$instant":"2026-01-01T00:01:30Z"},"time_spent":{"$duration":"PT90S"},"bytes_sent":100,"country":null,"city":null,"coordinates":null}"#
         );
     }
