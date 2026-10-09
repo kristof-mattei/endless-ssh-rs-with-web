@@ -1,3 +1,4 @@
+use std::convert::Infallible;
 use std::net::SocketAddr;
 use std::sync::Arc;
 
@@ -65,8 +66,7 @@ where
     Self: FromRef<S>,
     S: Send + Sync,
 {
-    // TODO State not found error
-    type Rejection = ();
+    type Rejection = Infallible;
 
     #[expect(clippy::unused_async_trait_impl, reason = "Library code")]
     async fn from_request_parts(_parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
