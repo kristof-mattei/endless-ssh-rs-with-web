@@ -8,7 +8,7 @@ use tracing::{Level, event};
 
 use crate::build_env::COMPILE_TIME_BUILD_ID;
 use crate::db;
-use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration};
+use crate::db::types::{AllTimeTotals, ConnectionRecord};
 use crate::events::{ActiveConnectionInfo, ConnectionEvent, ConnectionFrame, WsEvent};
 use crate::state::ApplicationState;
 use crate::utils::serde::{Elapsed, Timestamp};
@@ -119,12 +119,7 @@ async fn handle_socket(mut socket: WebSocket, state: ApplicationState) -> Result
         Err(error) => {
             event!(Level::ERROR, ?error, "Failed to query all-time totals");
 
-            AllTimeTotals {
-                total_connections: 0,
-                total_bytes_sent: 0,
-                total_time_spent: DbDuration(time::SignedDuration::ZERO),
-                last_counted_id: 0,
-            }
+            return Err(());
         },
     };
 
