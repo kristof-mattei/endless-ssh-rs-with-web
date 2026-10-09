@@ -3,9 +3,9 @@ use std::ptr::null_mut;
 
 use color_eyre::eyre;
 use libc::{c_int, sigaction};
-#[cfg(not(any(target_os = "windows", miri)))]
+#[cfg(not(miri))]
 use tokio::signal::unix::SignalKind;
-#[cfg(not(any(target_os = "windows", miri)))]
+#[cfg(not(miri))]
 use tokio::signal::unix::signal;
 use tracing::{Level, event};
 
@@ -42,10 +42,10 @@ impl Signal {
 }
 
 async fn receive_sigterm() -> Result<(), std::io::Error> {
-    #[cfg(not(any(target_os = "windows", miri)))]
+    #[cfg(not(miri))]
     signal(SignalKind::terminate())?.recv().await;
 
-    #[cfg(any(target_os = "windows", miri))]
+    #[cfg(miri)]
     let _r = std::future::pending::<Result<(), std::io::Error>>().await;
 
     Ok(())
