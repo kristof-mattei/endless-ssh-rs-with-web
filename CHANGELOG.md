@@ -1,4 +1,36 @@
 <!-- header goes here -->
+## [0.28.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.28.1..v0.28.2) - 2026-10-10
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update nuqs (npm) to v2.10.2 by [@renovate[bot]](https://github.com/renovate[bot]) ([`a016e00`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a016e00983fc6465220d92dcf80f5c57e60271e3))
+- *(deps)* Update rust crate tokio-util to v0.7.20 by [@renovate[bot]](https://github.com/renovate[bot]) ([`21b7bbc`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/21b7bbc7a4f1a31f84f97438cc4237f0eadf315e))
+- *(deps)* Update rust crate uuid to v1.28.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`5dbe250`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5dbe2508a49664a9befc802419e9b82f3d4581a0))
+- Back off between GeoIP init attempts and log the attempt number by [@kristof-mattei](https://github.com/kristof-mattei) ([`898f9be`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/898f9bee878584175b9d84ec35a80e45525f6bac))
+- Handle `SIGTERM` and `SIGINT` during startup by [@kristof-mattei](https://github.com/kristof-mattei) ([`121cf6f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/121cf6fba30d259475708615679fca1a2ecf8438))
+- Read the connection history before writing it to the socket by [@kristof-mattei](https://github.com/kristof-mattei) ([`064e3d5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/064e3d5ee18539ef6ec290ecc9e327360ae2d23b))
+- Close the socket when `get_totals` fails by [@kristof-mattei](https://github.com/kristof-mattei) ([`d02241a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d02241a3101253034513eee7fbb6d2727c3b3db0))
+- Stop a slow database from stalling the tarpit by [@kristof-mattei](https://github.com/kristof-mattei) ([`0af5ca2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0af5ca2238778f9719abc521cbadf3cda96d6c48))
+
+### ⚡ Performance
+
+- Serialize each broadcast `ConnectionEvent` once by [@kristof-mattei](https://github.com/kristof-mattei) ([`652683e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/652683e8f96da33af142d8a9fb42c0915caa0855))
+- Skip serializing broadcast events without subscribers by [@kristof-mattei](https://github.com/kristof-mattei) ([`063cfd5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/063cfd59bf917610c7f760d11d5f7dea473e16e9))
+
+### 🚜 Refactor
+
+- Use `Infallible` as the `ApplicationState` extractor rejection by [@kristof-mattei](https://github.com/kristof-mattei) ([`13097e4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/13097e45e6557dfa60bcf656673f6bc838df08a2))
+- Remove a level of nesting in `GeoIpReader::try_init` by [@kristof-mattei](https://github.com/kristof-mattei) ([`5b9f2cc`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5b9f2ccdf5ab3e82d346bc1b2040e4184ef0566a))
+- Remove the Windows `cfg` gates from signal handling by [@kristof-mattei](https://github.com/kristof-mattei) ([`1137558`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/11375585562751e9cd30b21649658316591bf341))
+- Replace `try_fold` with a `while let` loop in `get_recent_connections` by [@kristof-mattei](https://github.com/kristof-mattei) ([`8d4ebc3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8d4ebc3c72fd5d4623662afbeb512aae6359eda4))
+
+### 🧪 Testing
+
+- Compare serialized frames through `Utf8Bytes::as_str` by [@kristof-mattei](https://github.com/kristof-mattei) ([`db59f51`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/db59f51d6e2195db4cd8504b245b0bf35d7b819e))
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove the merge-SHA `TODO` that the retag base check covers by [@kristof-mattei](https://github.com/kristof-mattei) ([`cfebda2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/cfebda2941093385c351175c27760fff87bc5681))
 ## [0.28.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.28.0..v0.28.1) - 2026-10-08
 
 ### 🚜 Refactor
