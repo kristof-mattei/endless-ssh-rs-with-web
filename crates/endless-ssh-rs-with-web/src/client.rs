@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use time::{OffsetDateTime, SignedDuration};
+use tokio::io::Interest;
 use tokio::io::unix::{AsyncFd, AsyncFdReadyGuard};
 use tokio::net::TcpStream;
 use tokio::sync::mpsc::Sender;
@@ -32,12 +33,12 @@ pub struct ClientContext {
     pub closed_connections_tx: Sender<ClosedConnection>,
 }
 
-/// Creates an epoll fd that monitors `socket_fd` for `EPOLLRDHUP | EPOLLERR | EPOLLHUP`,
-/// but NOT `EPOLLIN`. This lets us detect disconnects without spending
-/// time reading what the client sends.
-fn make_disconnect_epoll(socket_fd: i32) -> Result<OwnedFd, std::io::Error> {
+/// Creates an epoll fd that monitors `socket_fd` for `EPOLLRDHUP | EPOLLERR | EPOLLHUP`, but NOT `EPOLLIN`, and registers it with the tokio reactor.
+/// This allows us to detect the client closing the connection or shutting down its writing half, without reading what it sends.
+fn make_disconnect_epoll(socket_fd: i32) -> Result<AsyncFd<OwnedFd>, std::io::Error> {
     // SAFETY: syscall
     let epfd = unsafe { libc::epoll_create1(libc::EPOLL_CLOEXEC) };
+
     if epfd < 0 {
         return Err(std::io::Error::last_os_error());
     }
@@ -60,11 +61,14 @@ fn make_disconnect_epoll(socket_fd: i32) -> Result<OwnedFd, std::io::Error> {
             &raw mut ev,
         )
     };
+
     if ret != 0 {
         return Err(std::io::Error::last_os_error());
     }
 
-    Ok(owned_epfd)
+    let async_epfd = AsyncFd::with_interest(owned_epfd, Interest::READABLE)?;
+
+    Ok(async_epfd)
 }
 
 async fn await_async_epfd<T>(async_fd: Option<&'_ AsyncFd<T>>) -> AsyncFdReadyGuard<'_, T>
@@ -100,16 +104,11 @@ async fn listen_forever(
 
     // register the stream for disconnect events only, failures are non-fatal and
     // disable disconnect detection for this client (i.e. falls back to send-based detection)
-    let async_epfd: Option<AsyncFd<OwnedFd>> = match make_disconnect_epoll(stream.as_raw_fd())
-        .and_then(|epfd| AsyncFd::new(epfd))
-    {
-        Ok(fd) => Some(fd),
-        Err(error) => {
+    let async_epfd = make_disconnect_epoll(stream.as_raw_fd())
+        .inspect_err(|error| {
             event!(Level::WARN, %addr, ?error, "epoll setup failed, disconnect detection disabled");
-
-            None
-        },
-    };
+        })
+        .ok();
 
     loop {
         let wait_started_at = Instant::now();
@@ -124,7 +123,7 @@ async fn listen_forever(
                 () = context.cancellation_token.cancelled() => {
                     return (time_spent, bytes_sent);
                 },
-                guard = await_async_epfd::<OwnedFd>(async_epfd.as_ref()) => {
+                guard = await_async_epfd(async_epfd.as_ref()) => {
                     Some(guard)
                 },
                 () = sleep(until_ready) => {
