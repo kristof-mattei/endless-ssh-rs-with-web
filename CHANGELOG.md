@@ -1,4 +1,15 @@
 <!-- header goes here -->
+## [0.28.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.28.2..v0.28.3) - 2026-10-14
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate serde_json to v1.0.154 by [@renovate[bot]](https://github.com/renovate[bot]) ([`8d3c71a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8d3c71abd4d100e3ec8ca53b7677c7319811b19e))
+- *(deps)* Update ip-address (npm) to v10.7.4 by [@renovate[bot]](https://github.com/renovate[bot]) ([`e2c9a62`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e2c9a622cb9b06b5a2a64b23787bd30243396313))
+- *(deps)* Update rust crate tokio to v1.53.3 by [@renovate[bot]](https://github.com/renovate[bot]) ([`c45f22b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c45f22b21d4724a82142890c4ff8c64d34669e5a))
+- *(deps)* Update maplibre-gl (npm) to v6.14.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d81da03`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d81da037c6cdc7939805bb7c75ff816ba00ac734))
+- *(deps)* Update temporal-polyfill (npm) to v1.0.6 by [@renovate[bot]](https://github.com/renovate[bot]) ([`71db4fa`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/71db4fa3843cfb17eedd2271827b019e13b2dcc5))
+- Use `AsyncFd::with_interest` by [@kristof-mattei](https://github.com/kristof-mattei) ([`9f0b6fc`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9f0b6fc78c245e0608ca53408546d8a025f919da))
+- Replace deprecated `AsyncFd::with_interest` with `AsyncFd::register_with_interest` by [@kristof-mattei](https://github.com/kristof-mattei) ([`7ab8c3b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7ab8c3b54151bc67e5ad431f57f296ebac9bb245))
 ## [0.28.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.28.1..v0.28.2) - 2026-10-10
 
 ### 🐛 Bug Fixes
