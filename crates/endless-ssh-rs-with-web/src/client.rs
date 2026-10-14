@@ -66,7 +66,8 @@ fn make_disconnect_epoll(socket_fd: i32) -> Result<AsyncFd<OwnedFd>, std::io::Er
         return Err(std::io::Error::last_os_error());
     }
 
-    let async_epfd = AsyncFd::with_interest(owned_epfd, Interest::READABLE)?;
+    // SAFETY: `OwnedFd` keeps the epoll fd open and returns it from `as_raw_fd` until dropped
+    let async_epfd = unsafe { AsyncFd::register_with_interest(owned_epfd, Interest::READABLE) }?;
 
     Ok(async_epfd)
 }
