@@ -1,11 +1,12 @@
-use std::env;
+#[cfg(test)]
 use std::ffi::OsString;
 use std::net::SocketAddr;
 use std::num::NonZeroU8;
 use std::time::Duration;
 
 use clap::builder::TypedValueParser as _;
-use clap::{ArgAction, Parser, value_parser};
+use clap::{Parser, value_parser};
+#[cfg(test)]
 use color_eyre::eyre;
 
 use crate::config::{
@@ -14,7 +15,7 @@ use crate::config::{
 };
 
 #[derive(Debug, Parser)]
-#[command(disable_help_flag = true)]
+#[command(about, version)]
 pub struct Cli {
     #[clap(
         short = 'd',
@@ -60,14 +61,6 @@ pub struct Cli {
         help = "HTTP listen address"
     )]
     http_listen_address: SocketAddr,
-
-    #[clap(
-        short = 'h',
-        long = "help",
-        help = "Print this help message and exit",
-        action = ArgAction::Help,
-    )]
-    help: (),
 }
 
 impl From<Cli> for Config {
@@ -82,10 +75,7 @@ impl From<Cli> for Config {
     }
 }
 
-pub fn parse_cli() -> Result<Config, eyre::Error> {
-    parse_cli_from(env::args_os())
-}
-
+#[cfg(test)]
 pub fn parse_cli_from<I, T>(from: I) -> Result<Config, eyre::Error>
 where
     I: IntoIterator<Item = T>,
