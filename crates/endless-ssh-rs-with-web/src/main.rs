@@ -131,6 +131,12 @@ fn main() -> Shutdown {
         };
     }
 
+    print_header();
+
+    let config = Config::from(cli);
+
+    config.log();
+
     // initialize the runtime
     let shutdown: Shutdown = tokio::runtime::Builder::new_multi_thread()
         .enable_io()
@@ -140,7 +146,7 @@ fn main() -> Shutdown {
         .block_on(async {
             // explicitly launch everything in a spawned task
             // see https://docs.rs/tokio/latest/tokio/attr.main.html#non-worker-async-function
-            let handle = spawn_with_name("main task runner", start_tasks(cli));
+            let handle = spawn_with_name("main task runner", start_tasks(config));
 
             flatten_shutdown_handle(handle).await
         });
@@ -167,18 +173,14 @@ fn print_header() {
 /// starts all the tasks, such as the web server, the key refresh, ...
 /// ensures all tasks are gracefully shutdown in case of error, `CTRL+c` or `SIGTERM`.
 #[expect(clippy::too_many_lines, reason = "Entrypoint")]
-async fn start_tasks(cli: Cli) -> Shutdown {
-    print_header();
-
+async fn start_tasks(config: Config) -> Shutdown {
     // when running as PID 1, a signal before this registration is discarded
     let mut signal_listeners = match SignalListeners::register() {
         Ok(signal_listeners) => signal_listeners,
         Err(report) => return Shutdown::from(report),
     };
 
-    let config = Arc::new(Config::from(cli));
-
-    config.log();
+    let config = Arc::new(config);
 
     let Ok(database_url) = env::var("DATABASE_URL") else {
         event!(Level::ERROR, "DATABASE_URL environment variable is not set");
