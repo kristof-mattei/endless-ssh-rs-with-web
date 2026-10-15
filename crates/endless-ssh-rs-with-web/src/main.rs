@@ -28,6 +28,7 @@ use std::process::ExitCode;
 use std::sync::Arc;
 use std::time::Duration;
 
+use clap::Parser as _;
 use color_eyre::config::HookBuilder;
 use color_eyre::eyre;
 use dashmap::DashMap;
@@ -45,7 +46,7 @@ use tracing_subscriber::util::SubscriberInitExt as _;
 use tracing_subscriber::{EnvFilter, Layer as _};
 
 use crate::build_env::get_build_env;
-use crate::cli::parse_cli;
+use crate::cli::Cli;
 use crate::client::ClientContext;
 use crate::config::Config;
 use crate::events::{
@@ -114,6 +115,9 @@ fn main() -> Shutdown {
         .install()
         .expect("Failed to install panic handler");
 
+    // parse before tracing is set up, so clap's help and usage errors are not preceded by log output
+    let cli = Cli::parse();
+
     let (env_filter, parsing_error) = build_filter();
 
     init_tracing(env_filter).expect("Failed to set up tracing");
@@ -136,7 +140,7 @@ fn main() -> Shutdown {
         .block_on(async {
             // explicitly launch everything in a spawned task
             // see https://docs.rs/tokio/latest/tokio/attr.main.html#non-worker-async-function
-            let handle = spawn_with_name("main task runner", start_tasks());
+            let handle = spawn_with_name("main task runner", start_tasks(cli));
 
             flatten_shutdown_handle(handle).await
         });
@@ -160,24 +164,10 @@ fn print_header() {
     );
 }
 
-fn get_config() -> Result<Arc<Config>, eyre::Report> {
-    let config = Arc::new(parse_cli().inspect_err(|error| {
-        // this prints the error in color and exits
-        // can't do anything else until
-        // https://github.com/clap-rs/clap/issues/2914
-        // is merged in
-        if let Some(clap_error) = error.downcast_ref::<clap::error::Error>() {
-            clap_error.exit();
-        }
-    })?);
-
-    Ok(config)
-}
-
 /// starts all the tasks, such as the web server, the key refresh, ...
 /// ensures all tasks are gracefully shutdown in case of error, `CTRL+c` or `SIGTERM`.
 #[expect(clippy::too_many_lines, reason = "Entrypoint")]
-async fn start_tasks() -> Shutdown {
+async fn start_tasks(cli: Cli) -> Shutdown {
     print_header();
 
     // when running as PID 1, a signal before this registration is discarded
@@ -186,10 +176,7 @@ async fn start_tasks() -> Shutdown {
         Err(report) => return Shutdown::from(report),
     };
 
-    let config = match get_config() {
-        Ok(config) => config,
-        Err(error) => return Shutdown::from(error),
-    };
+    let config = Arc::new(Config::from(cli));
 
     config.log();
 
