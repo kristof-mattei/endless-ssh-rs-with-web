@@ -2,12 +2,11 @@ use std::io::{Error, Write as _};
 use std::ptr::null_mut;
 
 use color_eyre::eyre;
+use color_eyre::eyre::WrapErr as _;
 use libc::{c_int, sigaction};
 #[cfg(not(miri))]
 use tokio::signal::unix::{self, SignalKind, signal};
 use tracing::{Level, event};
-
-use crate::wrap_and_report;
 
 #[expect(
     clippy::as_conversions,
@@ -50,13 +49,11 @@ pub struct SignalListeners {
 impl SignalListeners {
     #[cfg(not(miri))]
     pub fn register() -> Result<Self, eyre::Report> {
-        let terminate = signal(SignalKind::terminate()).map_err(|error| {
-            wrap_and_report!(Level::ERROR, error, "Failed to register SIGTERM handler")
-        })?;
+        let terminate =
+            signal(SignalKind::terminate()).wrap_err("Failed to register SIGTERM handler")?;
 
-        let interrupt = signal(SignalKind::interrupt()).map_err(|error| {
-            wrap_and_report!(Level::ERROR, error, "Failed to register CTRL+c handler")
-        })?;
+        let interrupt =
+            signal(SignalKind::interrupt()).wrap_err("Failed to register CTRL+c handler")?;
 
         Ok(Self {
             terminate,
@@ -141,11 +138,7 @@ pub unsafe fn set_up_handler(
 
         // SAFETY: the pointer is valid for writes of `sigset_t`
         if unsafe { libc::sigemptyset(sa_mask.as_mut_ptr()) } == -1 {
-            return Err(wrap_and_report!(
-                Level::ERROR,
-                Error::last_os_error(),
-                "Failure to initialize the signal mask"
-            ));
+            return Err(Error::last_os_error()).wrap_err("Failure to initialize the signal mask");
         }
 
         // SAFETY: `sigemptyset` returned 0, so the set is initialized
@@ -165,11 +158,7 @@ pub unsafe fn set_up_handler(
     // SAFETY: `sa` is initialized and valid for reads. A null `oldact` is
     // permitted by sigaction(2).
     if unsafe { sigaction(signum, &raw const sa, null_mut()) } == -1 {
-        return Err(wrap_and_report!(
-            Level::ERROR,
-            Error::last_os_error(),
-            "Failure to install signal handler"
-        ));
+        return Err(Error::last_os_error()).wrap_err("Failure to install signal handler");
     }
 
     Ok(())

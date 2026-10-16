@@ -6,7 +6,6 @@ mod db;
 mod events;
 mod ffi_wrapper;
 mod geoip;
-mod helpers;
 mod line;
 mod listener;
 mod router;
