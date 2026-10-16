@@ -1,9 +1,13 @@
+#[cfg(not(target_os = "windows"))]
 use std::io::Write as _;
 
 use color_eyre::eyre;
+#[cfg(not(target_os = "windows"))]
 use libc::c_int;
-#[cfg(not(miri))]
+#[cfg(not(any(target_os = "windows", miri)))]
 use tokio::signal::unix::{self, SignalKind, signal};
+#[cfg(all(target_os = "windows", not(miri)))]
+use tokio::signal::windows;
 use tracing::{Level, event};
 
 #[cfg(not(miri))]
@@ -27,6 +31,10 @@ const SIGTERM: u8 = libc::SIGTERM as u8;
 #[cfg_attr(miri, expect(dead_code, reason = "No signal listeners in Miri"))]
 pub enum Signal {
     Interrupt,
+    #[cfg_attr(
+        all(target_os = "windows", not(miri)),
+        expect(dead_code, reason = "No SIGTERM on Windows")
+    )]
     Terminate,
 }
 
@@ -41,14 +49,16 @@ impl Signal {
 
 /// A signal that arrives while no `wait` is running is buffered for a later `wait`.
 pub struct SignalListeners {
-    #[cfg(not(miri))]
+    #[cfg(not(any(target_os = "windows", miri)))]
     terminate: unix::Signal,
-    #[cfg(not(miri))]
+    #[cfg(not(any(target_os = "windows", miri)))]
     interrupt: unix::Signal,
+    #[cfg(all(target_os = "windows", not(miri)))]
+    interrupt: windows::CtrlC,
 }
 
 impl SignalListeners {
-    #[cfg(not(miri))]
+    #[cfg(not(any(target_os = "windows", miri)))]
     pub fn register() -> Result<Self, eyre::Report> {
         let terminate = signal(SignalKind::terminate()).map_err(|error| {
             wrap_and_report!(Level::ERROR, error, "Failed to register SIGTERM handler")
@@ -62,6 +72,15 @@ impl SignalListeners {
             terminate,
             interrupt,
         })
+    }
+
+    #[cfg(all(target_os = "windows", not(miri)))]
+    pub fn register() -> Result<Self, eyre::Report> {
+        let interrupt = windows::ctrl_c().map_err(|error| {
+            wrap_and_report!(Level::ERROR, error, "Failed to register CTRL+c handler")
+        })?;
+
+        Ok(Self { interrupt })
     }
 
     #[cfg(miri)]
@@ -80,12 +99,19 @@ impl SignalListeners {
         signal
     }
 
-    #[cfg(not(miri))]
+    #[cfg(not(any(target_os = "windows", miri)))]
     async fn receive(&mut self) -> Signal {
         tokio::select! {
             _ = self.terminate.recv() => Signal::Terminate,
             _ = self.interrupt.recv() => Signal::Interrupt,
         }
+    }
+
+    #[cfg(all(target_os = "windows", not(miri)))]
+    async fn receive(&mut self) -> Signal {
+        self.interrupt.recv().await;
+
+        Signal::Interrupt
     }
 
     #[cfg(miri)]
@@ -96,6 +122,7 @@ impl SignalListeners {
 
 /// Sets signal back to its default action and raises it, killing this process.
 /// Returns when the raise did not terminate the process: PID 1 of a PID namespace only receives signals it has a handler for, and the reset removes it.
+#[cfg(not(target_os = "windows"))]
 pub fn terminate_by_signal(signal: Signal) {
     let signum = c_int::from(signal.number());
 
@@ -115,6 +142,9 @@ pub fn terminate_by_signal(signal: Signal) {
         libc::raise(signum);
     }
 }
+
+#[cfg(target_os = "windows")]
+pub fn terminate_by_signal(_signal: Signal) {}
 
 #[cfg(test)]
 mod tests {
