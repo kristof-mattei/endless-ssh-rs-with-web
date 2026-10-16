@@ -13,6 +13,7 @@ mod router;
 mod sender;
 mod server;
 mod shutdown;
+mod sigaction;
 mod signal_handlers;
 mod span;
 mod state;
