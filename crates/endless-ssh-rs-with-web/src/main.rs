@@ -79,7 +79,7 @@ fn build_filter() -> (EnvFilter, Option<FromEnvError>) {
             .expect("Default filter should always work")
     }
 
-    let (filter, parsing_error) = match env::var(EnvFilter::DEFAULT_ENV) {
+    match env::var(EnvFilter::DEFAULT_ENV) {
         Ok(user_directive) => match user_directive.trim() {
             "" => (build_default_filter(), None),
             user_directive => match EnvFilter::builder().parse(user_directive) {
@@ -89,9 +89,7 @@ fn build_filter() -> (EnvFilter, Option<FromEnvError>) {
         },
         Err(VarError::NotPresent) => (build_default_filter(), None),
         Err(error @ VarError::NotUnicode(_)) => (build_default_filter(), Some(error.into())),
-    };
-
-    (filter, parsing_error)
+    }
 }
 
 fn init_tracing(filter: EnvFilter) -> Result<(), eyre::Report> {
