@@ -182,10 +182,15 @@ async fn start_tasks(config: Config) -> Shutdown {
 
     let config = Arc::new(config);
 
-    let Ok(database_url) = env::var("DATABASE_URL") else {
-        event!(Level::ERROR, "DATABASE_URL environment variable is not set");
-
-        return Shutdown::from(eyre::eyre!("DATABASE_URL not set"));
+    let database_url = match env::var("DATABASE_URL") {
+        Ok(database_url) => database_url,
+        Err(error) => {
+            return Shutdown::from(wrap_and_report!(
+                Level::ERROR,
+                error,
+                "Failed to read `DATABASE_URL`"
+            ));
+        },
     };
 
     let maxmind_license_key = std::env::var("MAXMIND_LICENSE_KEY")
@@ -196,15 +201,20 @@ async fn start_tasks(config: Config) -> Shutdown {
         let db_pool = match db::create_pool(&database_url).await {
             Ok(pool) => pool,
             Err(error) => {
-                event!(Level::ERROR, ?error, "Failed to connect to database");
-                return Err(Shutdown::from(eyre::Report::new(error)));
+                return Err(Shutdown::from(wrap_and_report!(
+                    Level::ERROR,
+                    error,
+                    "Failed to connect to database"
+                )));
             },
         };
 
         if let Err(error) = db::run_migrations(&db_pool).await {
-            event!(Level::ERROR, ?error, "Failed to run database migrations");
-
-            return Err(Shutdown::from(eyre::Report::new(error)));
+            return Err(Shutdown::from(wrap_and_report!(
+                Level::ERROR,
+                error,
+                "Failed to run database migrations"
+            )));
         }
 
         event!(Level::INFO, "Database ready");
