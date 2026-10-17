@@ -1,5 +1,43 @@
 <!-- header goes here -->
-## [0.28.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.28.2..v0.28.3) - 2026-10-14
+## [0.29.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.28.3..v0.29.0) - 2026-10-17
+
+### 🚀 Features
+
+- Log the error that ends the process through tracing by [@kristof-mattei](https://github.com/kristof-mattei) ([`09f386a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/09f386ae56a2ae3dadb29c1038126cbafcba9e7c))
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update react monorepo to v19.3.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`71196ee`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/71196eeafd188627a19f7ceae8ac8a4e3b6b5071))
+- *(deps)* Update rust crate libc to v0.2.191 by [@renovate[bot]](https://github.com/renovate[bot]) ([`fe3041d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fe3041da67abe55294c03bf26b2db11a94200f31))
+- Flush stdout before re-raising the signal by [@kristof-mattei](https://github.com/kristof-mattei) ([`4dd2115`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4dd21151b5f3507d18baa9a18f77f3d61981d5c9))
+- Report an invalid `RUST_LOG` as an operational failure by [@kristof-mattei](https://github.com/kristof-mattei) ([`b0cd535`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b0cd5356ab27623cc176ccebaac3abc80d45fbf6))
+- [**breaking**] Let clap handle `--help`, `--version` and usage errors by [@kristof-mattei](https://github.com/kristof-mattei) ([`9c1af8a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9c1af8a35b69ee949927c91f65353e0b4503a097))
+- Separate `error=true` from the `skip` list in the Dockerfile `check` directive by [@kristof-mattei](https://github.com/kristof-mattei) ([`a2d3c17`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a2d3c17ccf0b8155d91fb1861f92a09056706246))
+- Log the full error chain in `wrap_and_report!` by [@kristof-mattei](https://github.com/kristof-mattei) ([`3dfd5e8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3dfd5e8e725b476122f90eb0e72e33bd95dd9598))
+- Report the `Shutdown::from` caller as the error's location by [@kristof-mattei](https://github.com/kristof-mattei) ([`af4fb93`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/af4fb935384ca05aa4fa0c1f900288bae0a77226))
+- Log the `DATABASE_URL`, database and migration failures with their error chain by [@kristof-mattei](https://github.com/kristof-mattei) ([`0616fb1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0616fb1c994c5bfcc77270a6621388da172634e6))
+
+### 🚜 Refactor
+
+- Remove the unused `Display` impl for `Shutdown` by [@kristof-mattei](https://github.com/kristof-mattei) ([`995b4e9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/995b4e92da54a4b95557e27c96ab9460bd68dc3d))
+- Return `Shutdown` from `main` by [@kristof-mattei](https://github.com/kristof-mattei) ([`664ea10`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/664ea104b10338207e27ff1a1f0812416fe61f31))
+- Pass `Config` to `start_tasks` by [@kristof-mattei](https://github.com/kristof-mattei) ([`abb9d50`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/abb9d50b8e959b3fe327335f95fdb0a8064a4378))
+- Move `set_up_handler` into its own module by [@kristof-mattei](https://github.com/kristof-mattei) ([`651b631`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/651b6311e8db4bae0f5e626901f00c822c0f07e1))
+- Build the signal handlers on Windows by [@kristof-mattei](https://github.com/kristof-mattei) ([`36d22d8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/36d22d8e435723357c1d1a70e7f906c66d6beaf7))
+- Return the `match` from `build_filter` by [@kristof-mattei](https://github.com/kristof-mattei) ([`fae5577`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fae5577507533dab51e9a243961f27635be7d9d3))
+
+### 🧪 Testing
+
+- Run the signal tests only on Unix and outside Miri by [@kristof-mattei](https://github.com/kristof-mattei) ([`580f7c7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/580f7c70226338b7cf494da71150019a4c1cfb0b))
+- Drop the crate name from the signal test's child marker by [@kristof-mattei](https://github.com/kristof-mattei) ([`f0fe4b0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f0fe4b05a2e99c4516f5a9d07a12a6cd4867fab9))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Check new ballot entries by default by [@kristof-mattei](https://github.com/kristof-mattei) ([`5289fde`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5289fde59cfc0439d843f2c8f37df2f7e91fac56))
+- *(release)* Verify the release commit against the rendered ballot by [@kristof-mattei](https://github.com/kristof-mattei) ([`4de328a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4de328a3550b5e4972c766d8c36296d4ca8ce8be))
+- *(release)* Exclude superseded dependency bumps through `.cliffignore` by [@kristof-mattei](https://github.com/kristof-mattei) ([`029c3c1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/029c3c143158eef954188717243b1a6abc37839e))
+- Preload the `docker/scout-action` binary with a token by [@kristof-mattei](https://github.com/kristof-mattei) ([`590641a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/590641abb20536d4b3d3d522513dbc806d6ba24e))
+## [0.28.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.28.2..v0.28.3) - 2026-10-15
 
 ### 🐛 Bug Fixes
 
