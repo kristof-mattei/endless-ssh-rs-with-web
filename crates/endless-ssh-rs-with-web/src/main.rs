@@ -137,7 +137,7 @@ fn main() -> Shutdown {
     config.log();
 
     // initialize the runtime
-    let shutdown: Shutdown = tokio::runtime::Builder::new_multi_thread()
+    let Err(shutdown) = tokio::runtime::Builder::new_multi_thread()
         .enable_io()
         .enable_time()
         .build()
@@ -172,49 +172,27 @@ fn print_header() {
 /// starts all the tasks, such as the web server, the key refresh, ...
 /// ensures all tasks are gracefully shutdown in case of error, `CTRL+c` or `SIGTERM`.
 #[expect(clippy::too_many_lines, reason = "Entrypoint")]
-async fn start_tasks(config: Config) -> Shutdown {
+async fn start_tasks(config: Config) -> Result<!, Shutdown> {
     // when running as PID 1, a signal before this registration is discarded
-    let mut signal_listeners = match SignalListeners::register() {
-        Ok(signal_listeners) => signal_listeners,
-        Err(report) => return Shutdown::from(report),
-    };
+    let mut signal_listeners = SignalListeners::register()?;
 
     let config = Arc::new(config);
 
-    let database_url = match env::var("DATABASE_URL") {
-        Ok(database_url) => database_url,
-        Err(error) => {
-            return Shutdown::from(wrap_and_report!(
-                Level::ERROR,
-                error,
-                "Failed to read `DATABASE_URL`"
-            ));
-        },
-    };
+    let database_url = env::var("DATABASE_URL")
+        .map_err(|error| wrap_and_report!(Level::ERROR, error, "Failed to read `DATABASE_URL`"))?;
 
     let maxmind_license_key = std::env::var("MAXMIND_LICENSE_KEY")
         .ok()
         .filter(|key| !key.is_empty());
 
     let startup = async {
-        let db_pool = match db::create_pool(&database_url).await {
-            Ok(pool) => pool,
-            Err(error) => {
-                return Err(Shutdown::from(wrap_and_report!(
-                    Level::ERROR,
-                    error,
-                    "Failed to connect to database"
-                )));
-            },
-        };
+        let db_pool = db::create_pool(&database_url).await.map_err(|error| {
+            wrap_and_report!(Level::ERROR, error, "Failed to connect to database")
+        })?;
 
-        if let Err(error) = db::run_migrations(&db_pool).await {
-            return Err(Shutdown::from(wrap_and_report!(
-                Level::ERROR,
-                error,
-                "Failed to run database migrations"
-            )));
-        }
+        db::run_migrations(&db_pool).await.map_err(|error| {
+            wrap_and_report!(Level::ERROR, error, "Failed to run database migrations")
+        })?;
 
         event!(Level::INFO, "Database ready");
 
@@ -229,18 +207,15 @@ async fn start_tasks(config: Config) -> Shutdown {
             Arc::new(GeoIpReader::empty())
         };
 
-        Ok((db_pool, geo_ip))
+        Ok::<_, Shutdown>((db_pool, geo_ip))
     };
 
     // biased so that when both are ready at once, startup failure wins over signals
     let (db_pool, geo_ip) = tokio::select! {
         biased;
-        started = startup => match started {
-            Ok(started) => started,
-            Err(shutdown) => return shutdown,
-        },
+        started = startup => started?,
         signal = signal_listeners.wait() => {
-            return Shutdown::Signal(signal);
+            return Err(Shutdown::Signal(signal));
         },
     };
 
@@ -368,22 +343,22 @@ async fn start_tasks(config: Config) -> Shutdown {
         biased;
         stopped_in_time = drain => stopped_in_time,
         second_signal = signal_listeners.wait() => {
-            return abandon_drain(shutdown_reason, second_signal);
+            return Err(abandon_drain(shutdown_reason, second_signal));
         },
     };
 
     // a shutdown that already reports a failure is returned unchanged
     if !stopped_in_time && matches!(shutdown_reason, Shutdown::Success | Shutdown::Signal(_)) {
-        return Shutdown::OperationalFailure {
+        return Err(Shutdown::OperationalFailure {
             code: ExitCode::FAILURE,
             message: "Tasks didn't stop within the allotted time",
             error: None,
-        };
+        });
     }
 
     event!(Level::INFO, "Shutdown completed");
 
-    shutdown_reason
+    Err(shutdown_reason)
 }
 
 type TaskResult = Result<(), eyre::Report>;
