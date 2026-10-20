@@ -1,4 +1,11 @@
 <!-- header goes here -->
+## [0.29.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.29.0..v0.29.1) - 2026-10-20
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate arc-swap to v1.9.3 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d308ea3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d308ea37466fae91c9726d919b76e3c7545e8708))
+- *(deps)* Update maplibre-gl (npm) to v6.15.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`7f468dd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7f468dd60731b7d84d16007985d36a1f2d088e0b))
+- *(deps)* Update rust crate tokio to v1.54.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d66ed57`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d66ed57f3ad19aa8027f99bfdd4473a366950a06))
 ## [0.29.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.28.3..v0.29.0) - 2026-10-17
 
 ### 🚀 Features
