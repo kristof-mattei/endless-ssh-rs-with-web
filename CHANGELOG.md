@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [1.0.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.29.1..v1.0.0) - 2026-10-20
+
+### 🐛 Bug Fixes
+
+- [**breaking**] Graduate to v1.0.0 by [@kristof-mattei](https://github.com/kristof-mattei) ([`2315ff5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2315ff57a72b97575f6a6fa8d698ffe9945395a6))
 ## [0.29.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.29.0..v0.29.1) - 2026-10-20
 
 ### 🐛 Bug Fixes
