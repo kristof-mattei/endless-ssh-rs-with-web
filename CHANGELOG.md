@@ -1,9 +1,15 @@
 <!-- header goes here -->
+## [1.0.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.0..v1.0.1) - 2026-10-20
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* List breaking changes in a section of their own by [@kristof-mattei](https://github.com/kristof-mattei) ([`e2a4a21`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e2a4a2167f6921d49bc2b7d43b62b3c13a9d1e11))
+- Shorten the retag run wait below the `ubuntu-slim` 15-minute job limit by [@kristof-mattei](https://github.com/kristof-mattei) ([`e847e26`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e847e266d79c0a7e97558b09659652cc2a58aed9))
 ## [1.0.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.29.1..v1.0.0) - 2026-10-20
 
-### 🐛 Bug Fixes
+### ⚠️ Breaking Changes
 
-- [**breaking**] Graduate to v1.0.0 by [@kristof-mattei](https://github.com/kristof-mattei) ([`2315ff5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2315ff57a72b97575f6a6fa8d698ffe9945395a6))
+- Graduate to v1.0.0 by [@kristof-mattei](https://github.com/kristof-mattei) ([`2315ff5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2315ff57a72b97575f6a6fa8d698ffe9945395a6))
 ## [0.29.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.29.0..v0.29.1) - 2026-10-20
 
 ### 🐛 Bug Fixes
@@ -12,6 +18,10 @@
 - *(deps)* Update maplibre-gl (npm) to v6.15.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`7f468dd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7f468dd60731b7d84d16007985d36a1f2d088e0b))
 - *(deps)* Update rust crate tokio to v1.54.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d66ed57`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d66ed57f3ad19aa8027f99bfdd4473a366950a06))
 ## [0.29.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.28.3..v0.29.0) - 2026-10-17
+
+### ⚠️ Breaking Changes
+
+- Let clap handle `--help`, `--version` and usage errors by [@kristof-mattei](https://github.com/kristof-mattei) ([`9c1af8a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9c1af8a35b69ee949927c91f65353e0b4503a097))
 
 ### 🚀 Features
 
@@ -23,7 +33,6 @@
 - *(deps)* Update rust crate libc to v0.2.191 by [@renovate[bot]](https://github.com/renovate[bot]) ([`fe3041d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/fe3041da67abe55294c03bf26b2db11a94200f31))
 - Flush stdout before re-raising the signal by [@kristof-mattei](https://github.com/kristof-mattei) ([`4dd2115`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4dd21151b5f3507d18baa9a18f77f3d61981d5c9))
 - Report an invalid `RUST_LOG` as an operational failure by [@kristof-mattei](https://github.com/kristof-mattei) ([`b0cd535`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b0cd5356ab27623cc176ccebaac3abc80d45fbf6))
-- [**breaking**] Let clap handle `--help`, `--version` and usage errors by [@kristof-mattei](https://github.com/kristof-mattei) ([`9c1af8a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9c1af8a35b69ee949927c91f65353e0b4503a097))
 - Separate `error=true` from the `skip` list in the Dockerfile `check` directive by [@kristof-mattei](https://github.com/kristof-mattei) ([`a2d3c17`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a2d3c17ccf0b8155d91fb1861f92a09056706246))
 - Log the full error chain in `wrap_and_report!` by [@kristof-mattei](https://github.com/kristof-mattei) ([`3dfd5e8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3dfd5e8e725b476122f90eb0e72e33bd95dd9598))
 - Report the `Shutdown::from` caller as the error's location by [@kristof-mattei](https://github.com/kristof-mattei) ([`af4fb93`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/af4fb935384ca05aa4fa0c1f900288bae0a77226))
@@ -202,9 +211,9 @@
 - Update comment by [@kristof-mattei](https://github.com/kristof-mattei) ([`33f0222`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/33f0222d954c2105d7f800cb713efdcfbffb3309))
 ## [0.26.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.25.0..v0.26.0) - 2026-09-12
 
-### 🚀 Features
+### ⚠️ Breaking Changes
 
-- [**breaking**] Parse `--delay` as a humantime duration by [@kristof-mattei](https://github.com/kristof-mattei) ([`e1dc59e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e1dc59e7fdb17b6336d0e3cd3d3b9e94bb2475b1))
+- Parse `--delay` as a humantime duration by [@kristof-mattei](https://github.com/kristof-mattei) ([`e1dc59e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e1dc59e7fdb17b6336d0e3cd3d3b9e94bb2475b1))
 
 ### 🐛 Bug Fixes
 
@@ -298,10 +307,14 @@
 - Enforce one component per file by [@kristof-mattei](https://github.com/kristof-mattei) ([`9c76c03`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9c76c03c1b311b7424f458a20d14ab0708f2a6f6))
 ## [0.20.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.19.0..v0.20.0) - 2026-08-24
 
+### ⚠️ Breaking Changes
+
+- Replace the migration history with one clean-sheet schema by [@kristof-mattei](https://github.com/kristof-mattei) ([`17513e2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/17513e2713f484d5daf7d2f3123bc24dd508f2b3))
+  - This changes the scheme
+
 ### 🚀 Features
 
 - Oxlint by [@kristof-mattei](https://github.com/kristof-mattei) ([`ddbb700`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ddbb700949662d28fc44fd2a5a7a9f3e69104a9f))
-- [**breaking**] Replace the migration history with one clean-sheet schema by [@kristof-mattei](https://github.com/kristof-mattei) ([`17513e2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/17513e2713f484d5daf7d2f3123bc24dd508f2b3))
 
 ### 🐛 Bug Fixes
 
@@ -339,6 +352,11 @@
 - Sort `package.json` keys into oxfmt's canonical order by [@kristof-mattei](https://github.com/kristof-mattei) ([`beee173`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/beee173ca1b945016bf979600389defc4a966ab4))
 ## [0.19.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.18.1..v0.19.0) - 2026-08-14
 
+### ⚠️ Breaking Changes
+
+- Rebucket the rollup chain on `disconnected_at` by [@kristof-mattei](https://github.com/kristof-mattei) ([`e1e620f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e1e620f9ef594bd6b418072ec34dbda1c7d5b45a))
+  - A connection counts in the bucket where it ended, not where it began, with all its `time_spent` attributed there.
+
 ### 🚀 Features
 
 - Detect half-dead websockets with a heartbeat and watchdog by [@kristof-mattei](https://github.com/kristof-mattei) ([`274318b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/274318bd3146a5705a11e89305222c1209d9e3c5))
@@ -346,7 +364,6 @@
 
 ### 🐛 Bug Fixes
 
-- [**breaking**] Rebucket the rollup chain on `disconnected_at` by [@kristof-mattei](https://github.com/kristof-mattei) ([`e1e620f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e1e620f9ef594bd6b418072ec34dbda1c7d5b45a))
 - Pick the stats tier by retention and return the bucket width used by [@kristof-mattei](https://github.com/kristof-mattei) ([`7ef6fa2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7ef6fa2eeea722198d7d084f2ece315ba571f167))
 - Stop hardcoding "all time" at 365 days by [@kristof-mattei](https://github.com/kristof-mattei) ([`a93a7ec`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a93a7ec714d5970fa4d15344b1fdcdee629790d2))
 - Serve the open-ended stats query as weekly buckets past two years by [@kristof-mattei](https://github.com/kristof-mattei) ([`341f29b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/341f29b91aeeacb7a937af7182f1d7af47a1039d))
@@ -403,6 +420,10 @@
 - Show active connections by [@kristof-mattei](https://github.com/kristof-mattei) ([`0c9b3fe`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0c9b3fe001f5aeed7c825f1be1d2aceaeed4cfed))
 ## [0.16.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v0.15.0..v0.16.0) - 2026-08-13
 
+### ⚠️ Breaking Changes
+
+- Configurable ssh listen address by [@kristof-mattei](https://github.com/kristof-mattei) ([`b7def34`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b7def34eaa7da687ad0b38548a003f266805de8e))
+
 ### 🚀 Features
 
 - *(dev)* Save VITE_PORT parsing by [@kristof-mattei](https://github.com/kristof-mattei) ([`8558f5f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8558f5f7bdda187d51eadd42c0ba7737333c667c))
@@ -410,7 +431,6 @@
 - Add favicon, the honeypot emoji by [@kristof-mattei](https://github.com/kristof-mattei) ([`be00b87`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/be00b87578600ac97682c10a202dcfd9757f2310))
 - Replace emoji favicon with a Twemoji icon set by [@kristof-mattei](https://github.com/kristof-mattei) ([`16afc20`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/16afc208f1f3bb6208339eab1a3e500ddd52bc38))
 - Configurable http listen address by [@kristof-mattei](https://github.com/kristof-mattei) ([`ca63f0a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ca63f0a17d3d522f109694f440a4c6a3614e33f4))
-- [**breaking**] Configurable ssh listen address by [@kristof-mattei](https://github.com/kristof-mattei) ([`b7def34`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b7def34eaa7da687ad0b38548a003f266805de8e))
 
 ### 🐛 Bug Fixes
 
