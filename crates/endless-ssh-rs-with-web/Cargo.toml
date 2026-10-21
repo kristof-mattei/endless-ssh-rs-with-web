@@ -54,7 +54,7 @@ time = { version = "=0.3.55", features = [
     "serde",
     "serde-human-readable",
 ] }
-tokio = { version = "=1.54.0", features = [
+tokio = { version = "=1.54.1", features = [
     "io-util",
     "macros",
     "net",
