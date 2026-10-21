@@ -47,7 +47,7 @@
         "@vitest/ui": "5.0.5",
         "cspell": "10.4.0",
         "dependency-cruiser": "18.7.0",
-        "eslint-plugin-better-tailwindcss": "4.9.1",
+        "eslint-plugin-better-tailwindcss": "4.10.0",
         "eslint-plugin-n": "18.5.0",
         "eslint-plugin-perfectionist": "5.12.1",
         "eslint-plugin-react-hook-form": "0.3.1",

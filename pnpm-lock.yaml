@@ -255,8 +255,8 @@ importers:
         specifier: 18.7.0
         version: 18.7.0
       eslint-plugin-better-tailwindcss:
-        specifier: 4.9.1
-        version: 4.9.1(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(oxlint@1.88.0(oxlint-tsgolint@7.0.2004))(tailwindcss@4.3.3)(typescript@6.0.3)
+        specifier: 4.10.0
+        version: 4.10.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(oxlint@1.88.0(oxlint-tsgolint@7.0.2004))(tailwindcss@4.3.3)(typescript@6.0.3)
       eslint-plugin-n:
         specifier: 18.5.0
         version: 18.5.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(typescript@6.0.3)
@@ -2431,8 +2431,8 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
-  eslint-plugin-better-tailwindcss@4.9.1:
-    resolution: {integrity: sha512-WOuUOlc27Ib3tcYNt6qhRpvQUie5Y/pNTkwO779QGdfF1tu0k51avWtmvfPv++7/1oVjntoFHcUK4+5a6SPZvA==}
+  eslint-plugin-better-tailwindcss@4.10.0:
+    resolution: {integrity: sha512-EvcfEScF7N39LXuqX8fDnDsgylhbBZe5bbNb+6oN8ht06ou3MvwfPQ5hVgm2LWIPLOB5LBwNDCY6gBQGW4KHGA==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=23.0.0}
     peerDependencies:
       eslint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
@@ -5899,7 +5899,7 @@ snapshots:
       eslint: 10.13.0(jiti@2.7.0)(supports-color@7.2.0)
       semver: 7.8.5
 
-  eslint-plugin-better-tailwindcss@4.9.1(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(oxlint@1.88.0(oxlint-tsgolint@7.0.2004))(tailwindcss@4.3.3)(typescript@6.0.3):
+  eslint-plugin-better-tailwindcss@4.10.0(eslint@10.13.0(jiti@2.7.0)(supports-color@7.2.0))(oxlint@1.88.0(oxlint-tsgolint@7.0.2004))(tailwindcss@4.3.3)(typescript@6.0.3):
     dependencies:
       '@eslint/css-tree': 4.1.2
       '@valibot/to-json-schema': 1.8.0(valibot@1.5.0(typescript@6.0.3))
