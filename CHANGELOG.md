@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [1.0.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.1..v1.0.2) - 2026-10-21
+
+### 🐛 Bug Fixes
+
+- Build the CA bundle in an uncached `certs` stage by [@kristof-mattei](https://github.com/kristof-mattei) ([`e303f6f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e303f6fa5ab30ca008f1ac7325cd31f9758edd8d))
 ## [1.0.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.0..v1.0.1) - 2026-10-20
 
 ### ⚙️ Miscellaneous Tasks
