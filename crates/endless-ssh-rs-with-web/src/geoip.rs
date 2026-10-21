@@ -446,7 +446,6 @@ fn try_mmap_file(path: &Path) -> Result<Mmap, MmapError> {
         return Err(MmapError::from(error));
     }
 
-    // SAFETY: we take an advisory lock.
-    // we should probably run as our own user
+    // SAFETY: the file is never modified in place, see `download_database`
     Ok(unsafe { MmapOptions::new().map(&file_read) }?)
 }
