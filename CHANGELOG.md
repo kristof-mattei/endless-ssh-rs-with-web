@@ -1,4 +1,11 @@
 <!-- header goes here -->
+## [1.0.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.2..v1.0.3) - 2026-10-21
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Github Actions lockfile by [@kristof-mattei](https://github.com/kristof-mattei) ([`cbb2c25`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/cbb2c25d049203198a0d136334cf72546363c1e6))
+- *(ci)* Allow ref-pinned actions in `zizmor` since `actions.lock` pins them by [@kristof-mattei](https://github.com/kristof-mattei) ([`7b78db9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7b78db9c9c257e04524ad83949334b7bc1af6ecc))
+- *(ci)* Github Actions lockfile by [@kristof-mattei](https://github.com/kristof-mattei) ([`20f4dde`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/20f4dde078719d6e31d27ce7187206122544de1c))
 ## [1.0.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.1..v1.0.2) - 2026-10-21
 
 ### 🐛 Bug Fixes
