@@ -124,7 +124,7 @@ RUN [ ! -s version-bump.patch ] || patch --strip 1 < version-bump.patch
 RUN cargo auditable install --frozen --path "./crates/${APPLICATION_NAME}/" --root /output --target "${TARGET}"
 
 # front-end (NPM) build
-FROM --platform=${BUILDPLATFORM} node:26.12.1-alpine3.24@sha256:9bd229b644e391df00fb989efa732335aefc6170a05d8c163c5c8ca9870da401 AS typescript-build
+FROM --platform=${BUILDPLATFORM} node:26.12.1-alpine3.24@sha256:ae8e1c19d56886270987e99b3cfcef13a919f0655b376ae322bc64ada76f88cd AS typescript-build
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
