@@ -25,7 +25,7 @@ async fn healthz() -> impl IntoResponse {
     (StatusCode::OK, "Hello, world!")
 }
 
-pub fn build_router(state: ApplicationState) -> Router {
+pub(crate) fn build_router(state: ApplicationState) -> Router {
     let api_router = build_api_router(state);
     let html_router = build_html_router();
 

@@ -3,7 +3,7 @@ use std::fmt::Display;
 use libc::timespec;
 use time::SignedDuration;
 
-pub enum Timeout {
+pub(crate) enum Timeout {
     Infinite,
     Duration(SignedDuration),
 }
@@ -18,7 +18,7 @@ impl std::fmt::Debug for Timeout {
 }
 
 impl Timeout {
-    pub fn as_c_timeout(&self) -> i32 {
+    pub(crate) fn as_c_timeout(&self) -> i32 {
         // note the + 1
         // Duration stores data as seconds and nanoseconds internally.
         // if the nanoseconds < 1 milliseconds it gets lost
@@ -30,7 +30,7 @@ impl Timeout {
     }
 
     #[expect(unused, reason = "Library code")]
-    pub fn as_c_timespec(&self) -> Option<timespec> {
+    pub(crate) fn as_c_timespec(&self) -> Option<timespec> {
         match *self {
             Timeout::Infinite => None,
             Timeout::Duration(m) => Some(timespec {

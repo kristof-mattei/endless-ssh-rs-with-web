@@ -1,11 +1,13 @@
 use std::io::Error;
-use std::mem::size_of_val;
 use std::os::unix::prelude::AsRawFd as _;
 
 use libc::{SO_RCVBUF, SOL_SOCKET, c_int, c_void, setsockopt, socklen_t};
 use tokio::net::TcpStream;
 
-pub fn set_receive_buffer_size(tcp_stream: &TcpStream, size_in_bytes: usize) -> Result<(), Error> {
+pub(crate) fn set_receive_buffer_size(
+    tcp_stream: &TcpStream,
+    size_in_bytes: usize,
+) -> Result<(), Error> {
     // Set the smallest possible receive buffer. This reduces local
     // resource usage and slows down the remote end.
     let value: i32 = i32::try_from(size_in_bytes).expect("Byte buffer didn't fit in an i32");

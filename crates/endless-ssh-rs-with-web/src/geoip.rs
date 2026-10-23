@@ -32,32 +32,32 @@ enum MmapError {
 
 #[derive(Debug, Clone, Copy, Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
-pub struct Coordinates {
+pub(crate) struct Coordinates {
     pub latitude: f64,
     pub longitude: f64,
 }
 
 #[derive(Debug, Clone, Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
-pub struct Country {
+pub(crate) struct Country {
     /// Two-character ISO 3166-1 alpha-2 country code. See <https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>.
     pub code: String,
     pub name: String,
 }
 
 #[derive(Debug, Clone)]
-pub struct GeoInfo {
+pub(crate) struct GeoInfo {
     pub country: Option<Country>,
     pub city: Option<String>,
     pub coordinates: Option<Coordinates>,
 }
 
-pub struct GeoIpReader {
+pub(crate) struct GeoIpReader {
     reader: ArcSwapOption<GeoIpDbWrapper>,
 }
 
 impl GeoIpReader {
-    pub async fn try_init(license_key: &str) -> GeoIpReader {
+    pub(crate) async fn try_init(license_key: &str) -> GeoIpReader {
         let mut backoff = INIT_INITIAL_BACKOFF;
 
         for attempt in 1..=INIT_ATTEMPTS {
@@ -113,7 +113,7 @@ impl GeoIpReader {
         Self::empty()
     }
 
-    pub fn lookup(&self, ip: IpAddr) -> Option<GeoInfo> {
+    pub(crate) fn lookup(&self, ip: IpAddr) -> Option<GeoInfo> {
         // this guard lives for the whole lookup, so a refresh cannot swap the database out from under it
         let reader = self.reader.load();
 
@@ -122,7 +122,7 @@ impl GeoIpReader {
             .db
             .lookup(ip)
             .ok()?
-            .decode::<geoip2::City>()
+            .decode::<geoip2::City<'_>>()
             .ok()??;
 
         let country = city.country.iso_code.map(|code| Country {
@@ -148,7 +148,7 @@ impl GeoIpReader {
         })
     }
 
-    pub fn empty() -> Self {
+    pub(crate) fn empty() -> Self {
         Self {
             reader: ArcSwapOption::empty(),
         }
@@ -190,7 +190,7 @@ impl GeoIpReader {
     }
 }
 
-pub async fn refresh_forever(
+pub(crate) async fn refresh_forever(
     cancellation_token: CancellationToken,
     reader: Arc<GeoIpReader>,
     license_key: String,

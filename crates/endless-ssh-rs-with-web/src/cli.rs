@@ -16,7 +16,7 @@ use crate::config::{
 
 #[derive(Debug, Parser)]
 #[command(about, version)]
-pub struct Cli {
+pub(crate) struct Cli {
     #[clap(
         short = 'd',
         long,
@@ -76,7 +76,7 @@ impl From<Cli> for Config {
 }
 
 #[cfg(test)]
-pub fn parse_cli_from<I, T>(from: I) -> Result<Config, eyre::Error>
+pub(crate) fn parse_cli_from<I, T>(from: I) -> Result<Config, eyre::Error>
 where
     I: IntoIterator<Item = T>,
     T: Into<OsString> + Clone,

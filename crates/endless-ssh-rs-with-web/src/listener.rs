@@ -23,7 +23,7 @@ struct Listener {
     semaphore: Arc<Semaphore>,
 }
 
-pub async fn listen_for_new_connections(
+pub(crate) async fn listen_for_new_connections(
     config: Arc<Config>,
     cancellation_token: CancellationToken,
     client_task_tracker: TaskTracker,
@@ -56,7 +56,7 @@ pub async fn listen_for_new_connections(
 }
 
 impl Listener {
-    pub async fn bind(
+    pub(crate) async fn bind(
         config: Arc<Config>,
         client_task_tracker: TaskTracker,
         client_context: ClientContext,
@@ -73,7 +73,7 @@ impl Listener {
         })
     }
 
-    pub async fn accept(&self) -> Result<(), eyre::Report> {
+    pub(crate) async fn accept(&self) -> Result<(), eyre::Report> {
         let accept = self.tcp_listener.accept().await;
 
         match accept {

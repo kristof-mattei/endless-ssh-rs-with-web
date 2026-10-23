@@ -9,7 +9,6 @@ use sqlx::PgPool;
 use tokio::sync::broadcast;
 
 use crate::events::{ActiveConnectionInfo, ConnectionFrame};
-use crate::geoip::GeoIpReader;
 use crate::states::config::Config;
 
 /// This is to be able to do:
@@ -27,26 +26,23 @@ impl FromRef<ApplicationState> for Arc<Config> {
 }
 
 #[derive(Clone)]
-pub struct ApplicationState {
+pub(crate) struct ApplicationState {
     pub config: Arc<Config>,
     pub db_pool: PgPool,
-    pub geo_ip_reader: Arc<GeoIpReader>,
     pub ws_broadcast: broadcast::Sender<ConnectionFrame>,
     pub active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
 }
 
 impl ApplicationState {
-    pub fn new(
+    pub(crate) fn new(
         config: Config,
         db_pool: PgPool,
-        geo_ip_reader: Arc<GeoIpReader>,
         ws_broadcast: broadcast::Sender<ConnectionFrame>,
         active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
     ) -> Self {
         ApplicationState {
             config: Arc::new(config),
             db_pool,
-            geo_ip_reader,
             ws_broadcast,
             active_connections,
         }

@@ -1,5 +1,5 @@
 mod conversions;
-pub mod types;
+pub(crate) mod types;
 
 use std::cmp::Ordering;
 use std::net::IpAddr;
@@ -16,14 +16,14 @@ use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, Db
 use crate::geoip::{Coordinates, Country, GeoInfo};
 use crate::utils::serde::{Elapsed, Timestamp};
 
-pub async fn create_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
+pub(crate) async fn create_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
     PgPoolOptions::new()
         .max_connections(10)
         .connect(database_url)
         .await
 }
 
-pub async fn run_migrations(pool: &PgPool) -> Result<(), MigrateError> {
+pub(crate) async fn run_migrations(pool: &PgPool) -> Result<(), MigrateError> {
     sqlx::migrate!().run(pool).await
 }
 
@@ -43,13 +43,13 @@ struct NewConnection {
 }
 
 #[expect(clippy::too_many_arguments, reason = "One argument per column")]
-pub async fn insert_connection(
+pub(crate) async fn insert_connection(
     pool: &PgPool,
     ip_address: IpAddr,
     port: u16,
     connected_at: OffsetDateTime,
     disconnected_at: OffsetDateTime,
-    time_spent: time::SignedDuration,
+    time_spent: SignedDuration,
     bytes_sent: usize,
     geo: Option<&GeoInfo>,
 ) -> Result<i64, sqlx::Error> {
@@ -213,7 +213,7 @@ async fn add_to_totals(
 }
 
 /// Return up to `limit` of the most recent connection records, ordered by ascending id.
-pub async fn get_recent_connections<'e, E>(
+pub(crate) async fn get_recent_connections<'e, E>(
     executor: E,
     limit: u16,
 ) -> Result<Vec<ConnectionRecord>, sqlx::Error>
@@ -291,7 +291,7 @@ where
     Ok(records)
 }
 
-pub async fn get_totals<'e, E>(executor: E) -> Result<AllTimeTotals, sqlx::Error>
+pub(crate) async fn get_totals<'e, E>(executor: E) -> Result<AllTimeTotals, sqlx::Error>
 where
     E: PgExecutor<'e>,
 {
@@ -322,7 +322,7 @@ where
 /// Aggregated stats returned by the `/api/stats` endpoint.
 #[derive(Debug, Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
-pub struct StatsRow {
+pub(crate) struct StatsRow {
     pub bucket: Timestamp,
     pub country: Option<Country>,
     pub connects: i64,
@@ -418,7 +418,7 @@ const TIERS: [Tier; 4] = [
 /// Stats rows plus the bucket width they were aggregated at.
 #[derive(Debug, Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
-pub struct StatsResponse {
+pub(crate) struct StatsResponse {
     pub bucket_seconds: u32,
     pub rows: Vec<StatsRow>,
 }
@@ -549,7 +549,7 @@ async fn get_stats_all(pool: &PgPool) -> Result<StatsResponse, sqlx::Error> {
 }
 
 /// Aggregated rows for [from, to), or the whole 1day tier when no range is given.
-pub async fn get_stats(
+pub(crate) async fn get_stats(
     pool: &PgPool,
     from_to: Option<(OffsetDateTime, OffsetDateTime)>,
 ) -> Result<StatsResponse, sqlx::Error> {
@@ -560,6 +560,6 @@ pub async fn get_stats(
 }
 
 #[track_caller]
-pub fn log_db_error(error: &sqlx::Error) {
+pub(crate) fn log_db_error(error: &sqlx::Error) {
     event!(Level::ERROR, ?error, "Database error");
 }

@@ -192,7 +192,7 @@ async fn start_tasks(config: Config) -> Shutdown {
         },
     };
 
-    let maxmind_license_key = std::env::var("MAXMIND_LICENSE_KEY")
+    let maxmind_license_key = env::var("MAXMIND_LICENSE_KEY")
         .ok()
         .filter(|key| !key.is_empty());
 
@@ -261,7 +261,6 @@ async fn start_tasks(config: Config) -> Shutdown {
     let application_state = ApplicationState::new(
         states::config::Config {},
         db_pool.clone(),
-        Arc::clone(&geo_ip),
         ws_broadcast_tx.clone(),
         Arc::clone(&active_connections),
     );

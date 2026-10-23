@@ -16,11 +16,11 @@ use crate::utils::serde::{Elapsed, Timestamp};
 /// The client's watchdog assumes a multiple of this before declaring the connection half-dead.
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 
-pub async fn ws_handler(
+pub(super) async fn ws_handler(
     ws: WebSocketUpgrade,
     State(state): State<ApplicationState>,
 ) -> impl IntoResponse {
-    ws.on_upgrade(move |socket| async move {
+    ws.on_upgrade(async move |socket| {
         // this resolves when the client is gone
         let _r = handle_socket(socket, state).await;
     })
@@ -179,7 +179,7 @@ async fn handle_socket(mut socket: WebSocket, state: ApplicationState) -> Result
 
 async fn handle_broadcast(
     socket: &mut WebSocket,
-    recv: Result<ConnectionFrame, tokio::sync::broadcast::error::RecvError>,
+    recv: Result<ConnectionFrame, broadcast::error::RecvError>,
 ) -> Result<(), ()> {
     match recv {
         Ok(frame) => {
