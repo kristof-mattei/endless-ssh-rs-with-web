@@ -2,12 +2,13 @@ use ::rand::distr::uniform::{SampleRange, SampleUniform};
 use rand::RngExt as _;
 use rand::rngs::ThreadRng;
 
+#[expect(clippy::inline_modules, reason = "Abstraction for mocking")]
 #[cfg_attr(test, expect(clippy::disallowed_types, reason = "Macro"))]
 mod get_random {
     use ::rand::distr::uniform::{SampleRange, SampleUniform};
 
     #[cfg_attr(test, mockall::automock)]
-    pub trait GetRandom {
+    pub(super) trait GetRandom {
         fn gen_range<T, R>(&mut self, range: R) -> T
         where
             T: SampleUniform + 'static,
@@ -31,7 +32,7 @@ impl GetRandom for GenRange<ThreadRng> {
     }
 }
 
-pub fn randline(maxlen: usize) -> Vec<u8> {
+pub(crate) fn randline(maxlen: usize) -> Vec<u8> {
     randline_from(GenRange { rng: ::rand::rng() }, maxlen)
 }
 

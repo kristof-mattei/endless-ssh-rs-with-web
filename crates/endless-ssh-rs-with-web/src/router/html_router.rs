@@ -7,7 +7,7 @@ use tower_http::services::{ServeDir, ServeFile};
 use tower_http::set_header::SetResponseHeaderLayer;
 use tracing::{Level, event};
 
-pub fn build_html_router() -> Router {
+pub(super) fn build_html_router() -> Router {
     if let Ok(front_end_proxy) = std::env::var("FRONT_END_PROXY").as_deref() {
         event!(Level::INFO, "Serving website via proxy");
 
@@ -16,7 +16,7 @@ pub fn build_html_router() -> Router {
         let svc: tower_proxy::ReusedService<
             tower_proxy::Identity,
             tower_proxy::client::HttpConnector,
-            axum::body::Body,
+            Body,
         > = vite_proxy_service_builder.build(tower_proxy::rewrite::Identity {});
 
         Router::new().fallback_service(svc)

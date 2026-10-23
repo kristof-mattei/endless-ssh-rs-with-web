@@ -4,9 +4,9 @@ use tracing::{Level, event};
 
 use crate::line::randline;
 
-pub async fn sendline<T>(target: &mut T, max_length: usize) -> Result<usize, ()>
+pub(crate) async fn sendline<T>(target: &mut T, max_length: usize) -> Result<usize, ()>
 where
-    T: tokio::io::AsyncWriteExt + std::marker::Unpin + std::fmt::Debug,
+    T: tokio::io::AsyncWriteExt + Unpin + std::fmt::Debug,
 {
     let bytes = randline(max_length);
 

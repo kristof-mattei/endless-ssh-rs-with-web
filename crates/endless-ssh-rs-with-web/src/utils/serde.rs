@@ -6,7 +6,7 @@ use time::{OffsetDateTime, SignedDuration};
 /// Wire timestamp, `{"$instant": "<RFC 3339>"}`. The front-end reviver turns the wrapper into a `Temporal.Instant`.
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
-pub struct Timestamp(
+pub(crate) struct Timestamp(
     #[cfg_attr(test, ts(type = "import(\"temporal-polyfill\").Temporal.Instant"))]
     pub  OffsetDateTime,
 );
@@ -32,7 +32,7 @@ impl Serialize for Timestamp {
 /// Wire duration, `{"$duration": "<ISO 8601>"}` in whole seconds. The front-end reviver turns the wrapper into a `Temporal.Duration`.
 #[derive(Clone, Debug)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
-pub struct Elapsed(
+pub(crate) struct Elapsed(
     #[cfg_attr(test, ts(type = "import(\"temporal-polyfill\").Temporal.Duration"))]
     pub  SignedDuration,
 );

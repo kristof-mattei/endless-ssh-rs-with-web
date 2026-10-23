@@ -11,7 +11,7 @@ use crate::db;
 use crate::geoip::{Coordinates, Country, GeoIpReader};
 use crate::utils::serde::{Elapsed, Timestamp};
 
-pub struct ClosedConnection {
+pub(crate) struct ClosedConnection {
     pub addr: SocketAddr,
     pub connected_at: OffsetDateTime,
     pub disconnected_at: OffsetDateTime,
@@ -23,7 +23,7 @@ pub struct ClosedConnection {
 #[derive(Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
 #[serde(tag = "type", rename_all = "snake_case")]
-pub enum WsEvent {
+pub(crate) enum WsEvent {
     Init {
         /// The build this server came from. A bundle from another build reloads to fetch its match.
         build_id: &'static str,
@@ -44,7 +44,7 @@ pub enum WsEvent {
 #[derive(Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
 #[serde(tag = "type", rename_all = "snake_case")]
-pub enum ConnectionEvent {
+pub(crate) enum ConnectionEvent {
     Connected {
         ip: IpAddr,
         port: u16,
@@ -74,10 +74,10 @@ pub enum ConnectionEvent {
 
 /// A `ConnectionEvent` serialized once for every subscriber.
 #[derive(Clone)]
-pub struct ConnectionFrame(Utf8Bytes);
+pub(crate) struct ConnectionFrame(Utf8Bytes);
 
 impl ConnectionFrame {
-    pub fn new(connection_event: ConnectionEvent) -> Result<Self, serde_json::Error> {
+    pub(crate) fn new(connection_event: ConnectionEvent) -> Result<Self, serde_json::Error> {
         let json = serde_json::to_string(&WsEvent::Connection(connection_event))?;
 
         Ok(Self(json.into()))
@@ -95,7 +95,7 @@ impl From<ConnectionFrame> for Message {
 /// We might merge this with the actual Client.
 #[derive(Clone, Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
-pub struct ActiveConnectionInfo {
+pub(crate) struct ActiveConnectionInfo {
     pub ip: IpAddr,
     pub port: u16,
     pub connected_at: Timestamp,
@@ -106,7 +106,7 @@ pub struct ActiveConnectionInfo {
 }
 
 /// Stores closed connections one at a time. Concurrent inserts can commit out of id order, and `last_counted_id` assumes every id up to it is committed. Ends when the last sender is dropped, so the disconnects of clients stopped by a shutdown are still stored.
-pub async fn database_listen_forever(
+pub(crate) async fn database_listen_forever(
     db_pool: sqlx::PgPool,
     geo_ip_reader: Arc<GeoIpReader>,
     mut closed_connections_rx: tokio::sync::mpsc::Receiver<ClosedConnection>,
@@ -174,7 +174,7 @@ async fn store_closed_connection(
     }
 }
 
-pub fn broadcast_connection_event(
+pub(crate) fn broadcast_connection_event(
     ws_broadcast_tx: &broadcast::Sender<ConnectionFrame>,
     connection_event: ConnectionEvent,
 ) {
