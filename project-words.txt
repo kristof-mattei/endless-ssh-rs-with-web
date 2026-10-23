@@ -104,6 +104,7 @@ socklen
 startswith
 striptags
 subsec
+supertrait
 syscall
 syscalls
 taiki
