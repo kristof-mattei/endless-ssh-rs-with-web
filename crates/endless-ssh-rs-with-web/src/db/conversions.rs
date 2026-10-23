@@ -37,6 +37,5 @@ pub(super) fn to_interval(duration: SignedDuration) -> PgInterval {
 pub(super) fn to_duration(interval: PgInterval) -> SignedDuration {
     let total_days = (i64::from(interval.months) * 30) + i64::from(interval.days);
 
-    SignedDuration::days(total_days)
-        + SignedDuration::microseconds(interval.microseconds)
+    SignedDuration::days(total_days) + SignedDuration::microseconds(interval.microseconds)
 }
