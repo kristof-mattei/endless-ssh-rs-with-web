@@ -12,7 +12,7 @@ use crate::db;
 use crate::router::ws_router::ws_handler;
 use crate::state::ApplicationState;
 
-pub fn build_api_router(state: ApplicationState) -> Router {
+pub(super) fn build_api_router(state: ApplicationState) -> Router {
     Router::new()
         .route("/ws", get(ws_handler))
         .route("/stats", get(stats_handler))
@@ -20,7 +20,7 @@ pub fn build_api_router(state: ApplicationState) -> Router {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct StatsQueryParams {
+pub(super) struct StatsQueryParams {
     from: Option<String>,
     to: Option<String>,
 }

@@ -4,16 +4,16 @@ use std::time::Duration;
 
 use tracing::{Level, event};
 
-pub const DEFAULT_DELAY: Duration = Duration::from_secs(10);
-pub const DEFAULT_MAX_LINE_LENGTH: NonZeroU8 = NonZeroU8::new(32).unwrap();
-pub const DEFAULT_MAX_CLIENTS: NonZeroU8 = NonZeroU8::new(64).unwrap();
-pub const DEFAULT_SSH_LISTEN_ADDRESS: SocketAddr =
+pub(crate) const DEFAULT_DELAY: Duration = Duration::from_secs(10);
+pub(crate) const DEFAULT_MAX_LINE_LENGTH: NonZeroU8 = NonZeroU8::new(32).unwrap();
+pub(crate) const DEFAULT_MAX_CLIENTS: NonZeroU8 = NonZeroU8::new(64).unwrap();
+pub(crate) const DEFAULT_SSH_LISTEN_ADDRESS: SocketAddr =
     SocketAddr::new(IpAddr::V6(Ipv6Addr::UNSPECIFIED), 2223);
-pub const DEFAULT_HTTP_LISTEN_ADDRESS: SocketAddr =
+pub(crate) const DEFAULT_HTTP_LISTEN_ADDRESS: SocketAddr =
     SocketAddr::new(IpAddr::V4(Ipv4Addr::LOCALHOST), 3000);
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct Config {
+pub(crate) struct Config {
     pub delay: Duration,
     pub http_listen_address: SocketAddr,
     pub max_clients: NonZeroU8,
@@ -28,7 +28,7 @@ impl Default for Config {
 }
 
 impl Config {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             delay: DEFAULT_DELAY,
             max_line_length: DEFAULT_MAX_LINE_LENGTH,
@@ -38,7 +38,7 @@ impl Config {
         }
     }
 
-    pub fn log(&self) {
+    pub(crate) fn log(&self) {
         event!(
             Level::INFO,
             "Delay: {}",

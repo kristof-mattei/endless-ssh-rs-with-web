@@ -12,7 +12,7 @@ use crate::db::conversions::{to_duration, to_inet, to_interval};
 use crate::geoip::{Coordinates, Country};
 
 #[derive(Debug, Clone)]
-pub struct DbIpAddr(pub IpAddr);
+pub(crate) struct DbIpAddr(pub IpAddr);
 
 impl Type<Postgres> for DbIpAddr {
     fn type_info() -> PgTypeInfo {
@@ -44,7 +44,7 @@ impl From<DbIpAddr> for IpAddr {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct DbPort(pub u16);
+pub(crate) struct DbPort(pub u16);
 
 impl Type<Postgres> for DbPort {
     fn type_info() -> PgTypeInfo {
@@ -69,7 +69,7 @@ impl From<DbPort> for u16 {
 }
 
 #[derive(Debug, Clone)]
-pub struct DbDuration(pub SignedDuration);
+pub(crate) struct DbDuration(pub SignedDuration);
 
 impl Type<Postgres> for DbDuration {
     fn type_info() -> PgTypeInfo {
@@ -99,7 +99,7 @@ impl From<DbDuration> for SignedDuration {
 }
 
 /// Raw connection record.
-pub struct ConnectionRecord {
+pub(crate) struct ConnectionRecord {
     pub id: i64,
     pub ip_address: DbIpAddr,
     pub port: DbPort,
@@ -113,7 +113,7 @@ pub struct ConnectionRecord {
 }
 
 /// All-time aggregate totals for the WebSocket init payload.
-pub struct AllTimeTotals {
+pub(crate) struct AllTimeTotals {
     pub total_connections: i64,
     pub total_bytes_sent: i64,
     pub total_time_spent: DbDuration,

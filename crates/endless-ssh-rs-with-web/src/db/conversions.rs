@@ -6,14 +6,14 @@ use time::SignedDuration;
 
 /// Convert `IpAddr` to `IpNetwork` for `PostgreSQL` INET binding.
 /// Inserting an `IpAddr` works equally as well, but then we're not explicit.
-pub fn to_inet(ip: IpAddr) -> IpNet {
+pub(super) fn to_inet(ip: IpAddr) -> IpNet {
     match ip {
         IpAddr::V4(v4) => IpNet::V4(Ipv4Net::new(v4, 32).expect("32 is a valid IPv4 prefix")),
         IpAddr::V6(v6) => IpNet::V6(Ipv6Net::new(v6, 128).expect("128 is a valid IPv6 prefix")),
     }
 }
 
-pub fn to_interval(duration: SignedDuration) -> PgInterval {
+pub(super) fn to_interval(duration: SignedDuration) -> PgInterval {
     // let's talk about this conversion for a moment:
     // our duration is always positive (we should encode this into the typesystem though!)
     // now, let's talk about what it means for `whole_microseconds()` to exceed `i64::MAX`:
@@ -34,9 +34,8 @@ pub fn to_interval(duration: SignedDuration) -> PgInterval {
     }
 }
 
-pub fn to_duration(interval: PgInterval) -> time::SignedDuration {
+pub(super) fn to_duration(interval: PgInterval) -> SignedDuration {
     let total_days = (i64::from(interval.months) * 30) + i64::from(interval.days);
 
-    time::SignedDuration::days(total_days)
-        + time::SignedDuration::microseconds(interval.microseconds)
+    SignedDuration::days(total_days) + SignedDuration::microseconds(interval.microseconds)
 }

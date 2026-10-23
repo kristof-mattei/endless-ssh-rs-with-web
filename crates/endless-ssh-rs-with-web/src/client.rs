@@ -25,7 +25,7 @@ use crate::utils::serde::Timestamp;
 const INTERESTED_EVENTS: u32 = (libc::EPOLLRDHUP | libc::EPOLLERR | libc::EPOLLHUP).cast_unsigned();
 
 #[derive(Clone)]
-pub struct ClientContext {
+pub(crate) struct ClientContext {
     pub cancellation_token: CancellationToken,
     pub geo_ip_reader: Arc<GeoIpReader>,
     pub active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
@@ -223,7 +223,7 @@ async fn listen_forever(
     }
 }
 
-pub async fn handle_client(
+pub(crate) async fn handle_client(
     stream: TcpStream,
     addr: SocketAddr,
     connected_at: OffsetDateTime,
