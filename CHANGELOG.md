@@ -1,4 +1,29 @@
 <!-- header goes here -->
+## [1.0.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.3..v1.0.4) - 2026-10-26
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate tokio to v1.54.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`859eef5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/859eef572c79ff1e34abbb9406c690036ac6104a))
+- *(deps)* Update rust crate memmap2 to v0.9.12 by [@renovate[bot]](https://github.com/renovate[bot]) ([`8882207`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/88822074f10a5baa87fb099f0a9ead8602feb384))
+- *(deps)* Update rust crate uuid to v1.29.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`a99218f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a99218f7f454ebb9f8d5fba499b9f25381a073d6))
+- *(deps)* Update ip-address (npm) to v10.7.5 by [@renovate[bot]](https://github.com/renovate[bot]) ([`d3e5de6`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d3e5de6716d33eeebbad6a2049b6525777379924))
+- *(deps)* Update maplibre-gl (npm) to v6.16.0 by [@renovate[bot]](https://github.com/renovate[bot]) ([`7689f5d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7689f5d1f1ceb868b42820643154fddf63100e00))
+
+### 📚 Documentation
+
+- Correct the `SAFETY` comment on the GeoLite2 `mmap` by [@kristof-mattei](https://github.com/kristof-mattei) ([`69d1bef`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/69d1bef315d60dbb5c11c0e092812b8a8ac17980))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(lint)* Address new lints by [@kristof-mattei](https://github.com/kristof-mattei) ([`c34853a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c34853a42f065a1e90aa8f3ee9fea78b867a839d))
+- *(lint)* Address new lints by [@kristof-mattei](https://github.com/kristof-mattei) ([`060248d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/060248d2a55f35dd72f74d63c840f4643194a2f1))
+- *(release)* Render the breaking change description as a paragraph, not a list item by [@kristof-mattei](https://github.com/kristof-mattei) ([`639bae2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/639bae2d5d5fbeec2a97b950b044af86bbbe8ff6))
+- Deny allow-by-default `rustc` lints without a `clippy` equivalent by [@kristof-mattei](https://github.com/kristof-mattei) ([`94b0f18`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/94b0f1828518c3aa3d64b75dded6c80c0d505f2e))
+- Track Clippy 1.97 and 1.99 restriction lints, deny `inline_modules` by [@kristof-mattei](https://github.com/kristof-mattei) ([`c06adf7`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/c06adf7d6eb1c68e64c9de790e50c159c562e3f2))
+- Move the next-version calculation into `calculate-next-version` by [@kristof-mattei](https://github.com/kristof-mattei) ([`2afb59c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2afb59c01fdbb35748fdab8de0715c3e40b27001))
+- Check the public API against the latest release with `cargo semver-checks` by [@kristof-mattei](https://github.com/kristof-mattei) ([`b72d110`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b72d1106cf6c65384f63a6277ffc2c2eecb63af3))
+- Stop denying `unused_results`, too noisy by [@kristof-mattei](https://github.com/kristof-mattei) ([`ea0ba8d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ea0ba8d39e52203f388338255ebc1e2f52c582c6))
+- Set up sccache before installing `cargo-edit` by [@kristof-mattei](https://github.com/kristof-mattei) ([`f6bdb23`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f6bdb23a4d4a441d85d77c70e5450461fd129415))
 ## [1.0.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.2..v1.0.3) - 2026-10-21
 
 ### ⚙️ Miscellaneous Tasks
@@ -322,7 +347,8 @@
 ### ⚠️ Breaking Changes
 
 - Replace the migration history with one clean-sheet schema by [@kristof-mattei](https://github.com/kristof-mattei) ([`17513e2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/17513e2713f484d5daf7d2f3123bc24dd508f2b3))
-  - This changes the scheme
+
+  This changes the scheme
 
 ### 🚀 Features
 
@@ -367,7 +393,8 @@
 ### ⚠️ Breaking Changes
 
 - Rebucket the rollup chain on `disconnected_at` by [@kristof-mattei](https://github.com/kristof-mattei) ([`e1e620f`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e1e620f9ef594bd6b418072ec34dbda1c7d5b45a))
-  - A connection counts in the bucket where it ended, not where it began, with all its `time_spent` attributed there.
+
+  A connection counts in the bucket where it ended, not where it began, with all its `time_spent` attributed there.
 
 ### 🚀 Features
 
