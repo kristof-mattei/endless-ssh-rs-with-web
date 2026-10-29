@@ -82,6 +82,7 @@ fn serve_dist(dist: &Path) -> Router {
 
 #[cfg(test)]
 mod tests {
+    use std::io::ErrorKind;
     use std::path::{Path, PathBuf};
 
     use axum::body::Body;
@@ -219,6 +220,18 @@ mod tests {
         let dist = dist();
 
         assert_eq!(&*FrontEnd::Dist(dist.clone()).build_id().unwrap(), "dev");
+
+        std::fs::remove_dir_all(dist).unwrap();
+    }
+
+    #[test]
+    fn an_unreadable_build_id_is_an_error() {
+        let dist = dist();
+        std::fs::create_dir_all(dist.join("build-id")).unwrap();
+
+        let error = FrontEnd::Dist(dist.clone()).build_id().unwrap_err();
+
+        assert_eq!(error.kind(), ErrorKind::IsADirectory);
 
         std::fs::remove_dir_all(dist).unwrap();
     }
