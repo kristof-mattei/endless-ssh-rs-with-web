@@ -6,7 +6,6 @@ use axum::response::IntoResponse;
 use tokio::sync::broadcast;
 use tracing::{Level, event};
 
-use crate::build_env::COMPILE_TIME_BUILD_ID;
 use crate::db;
 use crate::db::types::{AllTimeTotals, ConnectionRecord};
 use crate::events::{ActiveConnectionInfo, ConnectionEvent, ConnectionFrame, WsEvent};
@@ -28,11 +27,12 @@ pub(super) async fn ws_handler(
 
 async fn send_init_payload(
     socket: &mut WebSocket,
+    build_id: &str,
     active_connections: Vec<ActiveConnectionInfo>,
     totals: AllTimeTotals,
 ) -> Result<(), ()> {
     let init_payload = match serde_json::to_string(&WsEvent::Init {
-        build_id: COMPILE_TIME_BUILD_ID,
+        build_id,
         active_connections,
         total_connections: totals.total_connections,
         total_bytes_sent: totals.total_bytes_sent,
@@ -123,7 +123,7 @@ async fn handle_socket(mut socket: WebSocket, state: ApplicationState) -> Result
         },
     };
 
-    send_init_payload(&mut socket, active, totals).await?;
+    send_init_payload(&mut socket, &state.build_id, active, totals).await?;
 
     // replay history, the most recent connections
     match db::get_recent_connections(&state.db_pool, 100).await {

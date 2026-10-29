@@ -1,7 +1,7 @@
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import type { UserConfig } from "vite";
+import type { Plugin, UserConfig } from "vite";
 import { loadEnv } from "vite";
 import { checker } from "vite-plugin-checker";
 import svgr from "vite-plugin-svgr";
@@ -18,16 +18,25 @@ function resolvePort(environmentValue: string | undefined, fallback: number): nu
     return Number.isSafeInteger(parsed) && parsed > 0 && parsed <= 65_535 ? parsed : fallback;
 }
 
-const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
+function emitBuildId(buildId: string): Plugin {
+    return {
+        name: "emit-build-id",
+        generateBundle() {
+            this.emitFile({ type: "asset", fileName: "build-id", source: buildId });
+        },
+    };
+}
+
+const configFunction: ViteUserConfigFn = defineConfig(({ command, mode }) => {
     const environment = loadEnv(mode, process.cwd(), "");
     const port = resolvePort(environment["VITE_PORT"], 4000);
+    const buildId = command === "build" ? (environment["BUILD_ID"] ?? "dev") : "dev";
 
     const config: UserConfig = {
         appType: "spa",
         cacheDir: "../../node_modules/.cache/",
         define: {
-            // The git sha in CI, "dev" locally. The server reports the same value in its `init` frame.
-            "import.meta.env.BUILD_ID": JSON.stringify(environment["BUILD_ID"] ?? "dev"),
+            "import.meta.env.BUILD_ID": JSON.stringify(buildId),
         },
         build: {
             minify: false,
@@ -57,6 +66,7 @@ const configFunction: ViteUserConfigFn = defineConfig(({ mode }) => {
                 },
                 telemetry: false,
             }),
+            emitBuildId(buildId),
         ],
         optimizeDeps: {
             noDiscovery: true,

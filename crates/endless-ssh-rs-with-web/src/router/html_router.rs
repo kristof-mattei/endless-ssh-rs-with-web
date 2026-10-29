@@ -1,4 +1,6 @@
+use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use axum::Router;
 use axum::body::Body;
@@ -22,6 +24,18 @@ impl FrontEnd {
                 authority.into_encoded_bytes(),
             )?)),
             None => Ok(FrontEnd::Dist(PathBuf::from("dist"))),
+        }
+    }
+
+    pub(crate) fn build_id(&self) -> Result<Arc<str>, std::io::Error> {
+        match *self {
+            // the Vite dev server bundle is always "dev"
+            FrontEnd::Proxy(_) => Ok(Arc::from("dev")),
+            FrontEnd::Dist(ref dist) => match std::fs::read_to_string(dist.join("build-id")) {
+                Ok(build_id) => Ok(Arc::from(build_id)),
+                Err(error) if error.kind() == ErrorKind::NotFound => Ok(Arc::from("dev")),
+                Err(error) => Err(error),
+            },
         }
     }
 
@@ -75,7 +89,7 @@ mod tests {
     use pretty_assertions::assert_eq;
     use tower::ServiceExt as _;
 
-    use super::serve_dist;
+    use super::{FrontEnd, serve_dist};
 
     fn dist() -> PathBuf {
         let dir =
@@ -188,5 +202,31 @@ mod tests {
         assert_eq!(cache_control(&response), Some("no-cache"));
 
         std::fs::remove_dir_all(dist).unwrap();
+    }
+
+    #[test]
+    fn the_build_id_is_read_from_dist() {
+        let dist = dist();
+        std::fs::write(dist.join("build-id"), "abc123").unwrap();
+
+        assert_eq!(&*FrontEnd::Dist(dist.clone()).build_id().unwrap(), "abc123");
+
+        std::fs::remove_dir_all(dist).unwrap();
+    }
+
+    #[test]
+    fn a_dist_without_a_build_id_reports_dev() {
+        let dist = dist();
+
+        assert_eq!(&*FrontEnd::Dist(dist.clone()).build_id().unwrap(), "dev");
+
+        std::fs::remove_dir_all(dist).unwrap();
+    }
+
+    #[test]
+    fn a_proxied_front_end_reports_dev() {
+        let front_end = FrontEnd::Proxy(tower_proxy::builder_http("127.0.0.1:4000").unwrap());
+
+        assert_eq!(&*front_end.build_id().unwrap(), "dev");
     }
 }
