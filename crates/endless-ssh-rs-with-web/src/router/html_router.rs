@@ -1,29 +1,46 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use axum::Router;
 use axum::body::Body;
-use axum::http::{HeaderValue, Response, StatusCode, header};
+use axum::http::{self, HeaderValue, Response, StatusCode, header};
 use tower_http::services::{ServeDir, ServeFile};
 use tower_http::set_header::SetResponseHeaderLayer;
+use tower_proxy::ReusedServiceBuilder;
+use tower_proxy::client::HttpConnector;
 use tracing::{Level, event};
 
-pub(super) fn build_html_router() -> Router {
-    if let Ok(front_end_proxy) = std::env::var("FRONT_END_PROXY").as_deref() {
-        event!(Level::INFO, "Serving website via proxy");
+pub(crate) enum FrontEnd {
+    /// A Vite dev server.
+    Proxy(ReusedServiceBuilder<HttpConnector, Body>),
+    Dist(PathBuf),
+}
 
-        let vite_proxy_service_builder = tower_proxy::builder_http(front_end_proxy).unwrap();
+impl FrontEnd {
+    pub(crate) fn from_env() -> Result<Self, http::Error> {
+        match std::env::var_os("FRONT_END_PROXY") {
+            Some(authority) => Ok(FrontEnd::Proxy(tower_proxy::builder_http(
+                authority.into_encoded_bytes(),
+            )?)),
+            None => Ok(FrontEnd::Dist(PathBuf::from("dist"))),
+        }
+    }
 
-        let svc: tower_proxy::ReusedService<
-            tower_proxy::Identity,
-            tower_proxy::client::HttpConnector,
-            Body,
-        > = vite_proxy_service_builder.build(tower_proxy::rewrite::Identity {});
+    pub(super) fn router(&self) -> Router {
+        match *self {
+            FrontEnd::Proxy(ref vite_proxy_service_builder) => {
+                event!(Level::INFO, "Serving website via proxy");
 
-        Router::new().fallback_service(svc)
-    } else {
-        event!(Level::INFO, "Serving website from dist");
+                let svc: tower_proxy::ReusedService<tower_proxy::Identity, HttpConnector, Body> =
+                    vite_proxy_service_builder.build(tower_proxy::rewrite::Identity {});
 
-        serve_dist(Path::new("dist"))
+                Router::new().fallback_service(svc)
+            },
+            FrontEnd::Dist(ref dist) => {
+                event!(Level::INFO, "Serving website from dist");
+
+                serve_dist(dist)
+            },
+        }
     }
 }
 

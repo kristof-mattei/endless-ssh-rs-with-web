@@ -13,7 +13,7 @@ use tower_http::trace::{DefaultOnFailure, DefaultOnRequest, DefaultOnResponse, T
 use tracing::Level;
 
 use crate::router::api_router::build_api_router;
-use crate::router::html_router::build_html_router;
+pub(crate) use crate::router::html_router::FrontEnd;
 use crate::span::MakeSpanWithUuid;
 use crate::state::ApplicationState;
 
@@ -25,9 +25,9 @@ async fn healthz() -> impl IntoResponse {
     (StatusCode::OK, "Hello, world!")
 }
 
-pub(crate) fn build_router(state: ApplicationState) -> Router {
+pub(crate) fn build_router(state: ApplicationState, front_end: &FrontEnd) -> Router {
     let api_router = build_api_router(state);
-    let html_router = build_html_router();
+    let html_router = front_end.router();
 
     // we can move the `/healthz` layer beneath the `TraceLayer` to prevent it from being logged
 
