@@ -29,6 +29,7 @@ const options: IConfiguration = {
                     "[.]d[.]ts$", // TypeScript declaration files
                     "(^|/)tsconfig[.]json$", // TypeScript config
                     "(^|/)(?:babel|webpack)[.]config[.](?:js|cjs|mjs|ts|cts|mts|json)$", // other configs
+                    "^front-end/src/generated/BuildIdFile[.]ts$", // imported by `vite.config.ts`, outside the cruised tree
                 ],
             },
             to: {},

@@ -8,6 +8,8 @@ import svgr from "vite-plugin-svgr";
 import type { ViteUserConfigFn } from "vitest/config";
 import { defineConfig } from "vitest/config";
 
+import { BUILD_ID_FILE } from "./front-end/src/generated/BuildIdFile";
+
 function resolvePort(environmentValue: string | undefined, fallback: number): number {
     if (environmentValue === undefined || environmentValue.trim() === "") {
         return fallback;
@@ -22,7 +24,7 @@ function emitBuildId(buildId: string): Plugin {
     return {
         name: "emit-build-id",
         generateBundle() {
-            this.emitFile({ type: "asset", fileName: "build-id", source: buildId });
+            this.emitFile({ type: "asset", fileName: BUILD_ID_FILE, source: buildId });
         },
     };
 }
