@@ -55,7 +55,7 @@ use crate::events::{
 };
 use crate::geoip::GeoIpReader;
 use crate::listener::listen_for_new_connections;
-use crate::router::build_router;
+use crate::router::{FrontEnd, build_router};
 use crate::server::setup_server;
 use crate::shutdown::Shutdown;
 use crate::signal_handlers::{Signal, SignalListeners};
@@ -196,6 +196,17 @@ async fn start_tasks(config: Config) -> Shutdown {
         .ok()
         .filter(|key| !key.is_empty());
 
+    let front_end = match FrontEnd::from_env() {
+        Ok(front_end) => front_end,
+        Err(error) => {
+            return Shutdown::from(wrap_and_report!(
+                Level::ERROR,
+                error,
+                "Failed to parse `FRONT_END_PROXY`"
+            ));
+        },
+    };
+
     let startup = async {
         let db_pool = match db::create_pool(&database_url).await {
             Ok(pool) => pool,
@@ -271,7 +282,7 @@ async fn start_tasks(config: Config) -> Shutdown {
         "server",
         setup_server(
             config.http_listen_address,
-            build_router(application_state),
+            build_router(application_state, &front_end),
             cancellation_token.clone(),
         ),
     ));
