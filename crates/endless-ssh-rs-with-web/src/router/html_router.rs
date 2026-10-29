@@ -58,9 +58,7 @@ impl FrontEnd {
     }
 }
 
-/// `index.html` names the hashed asset files. Without a cache policy a browser may reuse a cached copy on a fresh
-/// navigation and run the previous bundle against the new server, so it is revalidated on every request (a 304 when
-/// unchanged). The assets never change under their names and are cached for a year.
+/// `index.html` references the hashed asset files. Without a cache policy a browser may reuse a cached copy on a fresh navigation and run the previous bundle against the new server, so `index.html` is revalidated on every request (a 304 when unchanged). The hashed assets never change and are cached for a year.
 fn serve_dist(dist: &Path) -> Router {
     fn immutable(response: &Response<Body>) -> Option<HeaderValue> {
         (response.status() == StatusCode::OK)

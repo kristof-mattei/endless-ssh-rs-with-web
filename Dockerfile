@@ -142,7 +142,7 @@ RUN pnpm install --frozen-lockfile
 # now we copy in the rest
 COPY front-end ./front-end/
 
-# the build identity the bundle compares against the server's, see `vite.config.ts`
+# the build identity, see `vite.config.ts`
 ARG BUILD_ID
 
 RUN pnpm run build
