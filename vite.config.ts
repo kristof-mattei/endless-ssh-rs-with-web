@@ -22,6 +22,7 @@ function emitBuildId(buildId: string): Plugin {
     return {
         name: "emit-build-id",
         generateBundle() {
+            // must match `BUILD_ID_FILE` in `crates/endless-ssh-rs-with-web/src/router/html_router.rs`
             this.emitFile({ type: "asset", fileName: "build-id", source: buildId });
         },
     };

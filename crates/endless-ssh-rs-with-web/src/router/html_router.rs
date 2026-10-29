@@ -11,6 +11,9 @@ use tower_proxy::ReusedServiceBuilder;
 use tower_proxy::client::HttpConnector;
 use tracing::{Level, event};
 
+// must match the `fileName` in `vite.config.ts`
+const BUILD_ID_FILE: &str = "build-id";
+
 pub(crate) enum FrontEnd {
     /// A Vite dev server.
     Proxy(ReusedServiceBuilder<HttpConnector, Body>),
@@ -31,7 +34,7 @@ impl FrontEnd {
         match *self {
             // the Vite dev server bundle is always "dev"
             FrontEnd::Proxy(_) => Ok(Arc::from("dev")),
-            FrontEnd::Dist(ref dist) => match std::fs::read_to_string(dist.join("build-id")) {
+            FrontEnd::Dist(ref dist) => match std::fs::read_to_string(dist.join(BUILD_ID_FILE)) {
                 Ok(build_id) => Ok(Arc::from(build_id)),
                 Err(error) if error.kind() == ErrorKind::NotFound => Ok(Arc::from("dev")),
                 Err(error) => Err(error),
@@ -88,7 +91,7 @@ mod tests {
     use pretty_assertions::assert_eq;
     use tower::ServiceExt as _;
 
-    use super::{FrontEnd, serve_dist};
+    use super::{BUILD_ID_FILE, FrontEnd, serve_dist};
 
     fn dist() -> PathBuf {
         let dir =
@@ -206,7 +209,7 @@ mod tests {
     #[test]
     fn the_build_id_is_read_from_dist() {
         let dist = dist();
-        std::fs::write(dist.join("build-id"), "abc123").unwrap();
+        std::fs::write(dist.join(BUILD_ID_FILE), "abc123").unwrap();
 
         assert_eq!(&*FrontEnd::Dist(dist.clone()).build_id().unwrap(), "abc123");
 
@@ -225,7 +228,7 @@ mod tests {
     #[test]
     fn an_unreadable_build_id_is_an_error() {
         let dist = dist();
-        std::fs::create_dir_all(dist.join("build-id")).unwrap();
+        std::fs::create_dir_all(dist.join(BUILD_ID_FILE)).unwrap();
 
         let error = FrontEnd::Dist(dist.clone()).build_id().unwrap_err();
 
