@@ -135,7 +135,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn a_missing_asset_is_not_cached_as_immutable() {
+    async fn missing_asset_is_not_cached_as_immutable() {
         let dist = dist();
 
         let response = get(&dist, "/assets/index-old.js").await;
@@ -160,7 +160,7 @@ mod tests {
 
     // `no-cache` keeps the copy and asks before reusing it. The ETag turns that ask into a 304 without a body.
     #[tokio::test]
-    async fn an_unchanged_index_html_revalidates_to_304() {
+    async fn unchanged_index_html_revalidates_to_304() {
         let dist = dist();
 
         let first = get(&dist, "/").await;
@@ -207,7 +207,7 @@ mod tests {
     }
 
     #[test]
-    fn the_build_id_is_read_from_dist() {
+    fn build_id_is_read_from_dist() {
         let dist = dist();
         std::fs::write(dist.join(BUILD_ID_FILE), "abc123").unwrap();
 
@@ -217,7 +217,7 @@ mod tests {
     }
 
     #[test]
-    fn a_dist_without_a_build_id_reports_dev() {
+    fn dist_without_build_id_reports_dev() {
         let dist = dist();
 
         assert_eq!(&*FrontEnd::Dist(dist.clone()).build_id().unwrap(), "dev");
@@ -226,7 +226,7 @@ mod tests {
     }
 
     #[test]
-    fn an_unreadable_build_id_is_an_error() {
+    fn unreadable_build_id_is_an_error() {
         let dist = dist();
         std::fs::create_dir_all(dist.join(BUILD_ID_FILE)).unwrap();
 
@@ -238,7 +238,7 @@ mod tests {
     }
 
     #[test]
-    fn a_proxied_front_end_reports_dev() {
+    fn proxied_front_end_reports_dev() {
         let front_end = FrontEnd::Proxy(tower_proxy::builder_http("127.0.0.1:4000").unwrap());
 
         assert_eq!(&*front_end.build_id().unwrap(), "dev");
