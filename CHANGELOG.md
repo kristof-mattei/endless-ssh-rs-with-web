@@ -1,5 +1,24 @@
 <!-- header goes here -->
-## [1.0.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.3..v1.0.4) - 2026-10-26
+## [1.0.5](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.4..v1.0.5) - 2026-10-29
+
+### 🐛 Bug Fixes
+
+- Replace misspelled `rerun-if-changed-env` build script directives by [@kristof-mattei](https://github.com/kristof-mattei) ([`297ddb5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/297ddb539600eed52d903a7ce424255ee12e71c4))
+- Replace misspelled `rerun-if-changed-env` build script directives by [@kristof-mattei](https://github.com/kristof-mattei) ([`e23e057`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e23e057297597154b6281adcc4e399ac428df530))
+- Fail startup on a malformed `FRONT_END_PROXY` by [@kristof-mattei](https://github.com/kristof-mattei) ([`2d2f638`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2d2f6388e5473617257c629daa8b0189c17a74c0))
+
+### ⚡ Performance
+
+- Read the build id from the bundle instead of compiling it in by [@kristof-mattei](https://github.com/kristof-mattei) ([`e94220c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e94220c0c17eb0a87425e61f4de693ec0e24233a))
+
+### 🚜 Refactor
+
+- Return `Result<Infallible, Shutdown>` from `start_tasks` so startup failures propagate with `?` by [@kristof-mattei](https://github.com/kristof-mattei) ([`01cb593`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/01cb593846fb9630e952043f001755aa828fced8))
+
+### 🧪 Testing
+
+- Cover an unreadable `dist/build-id` by [@kristof-mattei](https://github.com/kristof-mattei) ([`0a58934`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/0a589340ca924ae8f83f0f3e17e4c449e432cbbe))
+## [1.0.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.3..v1.0.4) - 2026-10-27
 
 ### 🐛 Bug Fixes
 
