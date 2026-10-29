@@ -28,6 +28,7 @@ impl FromRef<ApplicationState> for Arc<Config> {
 #[derive(Clone)]
 pub(crate) struct ApplicationState {
     pub config: Arc<Config>,
+    pub build_id: Arc<str>,
     pub db_pool: PgPool,
     pub ws_broadcast: broadcast::Sender<ConnectionFrame>,
     pub active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
@@ -36,12 +37,14 @@ pub(crate) struct ApplicationState {
 impl ApplicationState {
     pub(crate) fn new(
         config: Config,
+        build_id: Arc<str>,
         db_pool: PgPool,
         ws_broadcast: broadcast::Sender<ConnectionFrame>,
         active_connections: Arc<DashMap<SocketAddr, ActiveConnectionInfo>>,
     ) -> Self {
         ApplicationState {
             config: Arc::new(config),
+            build_id,
             db_pool,
             ws_broadcast,
             active_connections,

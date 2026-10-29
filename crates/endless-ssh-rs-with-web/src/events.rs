@@ -23,10 +23,10 @@ pub(crate) struct ClosedConnection {
 #[derive(Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
 #[serde(tag = "type", rename_all = "snake_case")]
-pub(crate) enum WsEvent {
+pub(crate) enum WsEvent<'a> {
     Init {
-        /// The build this server came from. A bundle from another build reloads to fetch its match.
-        build_id: &'static str,
+        /// The build of the served bundle.
+        build_id: &'a str,
         active_connections: Vec<ActiveConnectionInfo>,
         total_connections: i64,
         total_bytes_sent: i64,

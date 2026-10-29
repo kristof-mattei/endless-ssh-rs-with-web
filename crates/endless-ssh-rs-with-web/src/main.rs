@@ -207,6 +207,17 @@ async fn start_tasks(config: Config) -> Shutdown {
         },
     };
 
+    let build_id = match front_end.build_id() {
+        Ok(build_id) => build_id,
+        Err(error) => {
+            return Shutdown::from(wrap_and_report!(
+                Level::ERROR,
+                error,
+                "Failed to read the front-end build id"
+            ));
+        },
+    };
+
     let startup = async {
         let db_pool = match db::create_pool(&database_url).await {
             Ok(pool) => pool,
@@ -271,6 +282,7 @@ async fn start_tasks(config: Config) -> Shutdown {
 
     let application_state = ApplicationState::new(
         states::config::Config {},
+        build_id,
         db_pool.clone(),
         ws_broadcast_tx.clone(),
         Arc::clone(&active_connections),

@@ -10,7 +10,7 @@ export type WsEvent =
   | {
     "type": "init";
     /**
-     * The build this server came from. A bundle from another build reloads to fetch its match.
+     * The build of the served bundle.
      */
     build_id: string;
     active_connections: Array<ActiveConnectionInfo>;
