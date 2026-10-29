@@ -23,11 +23,8 @@ fn main() {
         &env::var("BUILD_ID").unwrap_or_else(|_| "dev".to_owned()),
     );
 
-    println!("cargo:rerun-if-changed-env=HOST");
-    println!("cargo:rerun-if-changed-env=TARGET");
-    println!("cargo:rerun-if-changed-env=CARGO_ENCODED_RUSTFLAGS");
-    println!("cargo:rerun-if-changed-env=BUILD_ID");
-    println!("cargo:rerun-if-changed=migrations");
+    println!("cargo::rerun-if-env-changed=BUILD_ID");
+    println!("cargo::rerun-if-changed=migrations");
 }
 
 fn extract_target_cpu_from_rustflags(rustflags: &OsStr) -> Option<String> {
@@ -49,5 +46,5 @@ fn extract_target_cpu_from_rustflags(rustflags: &OsStr) -> Option<String> {
 }
 
 fn export_var(name: &str, value: &str) {
-    println!("cargo:rustc-env={}={}", name, value);
+    println!("cargo::rustc-env={}={}", name, value);
 }
