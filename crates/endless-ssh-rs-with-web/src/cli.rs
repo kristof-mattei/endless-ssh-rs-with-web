@@ -17,7 +17,7 @@ use crate::config::{
 #[derive(Debug, Parser)]
 #[command(about, version)]
 pub(crate) struct Cli {
-    #[clap(
+    #[arg(
         short = 'd',
         long,
         env,
@@ -27,7 +27,7 @@ pub(crate) struct Cli {
     )]
     delay: Duration,
 
-    #[clap(
+    #[arg(
         short = 'l',
         long,
         env,
@@ -37,7 +37,7 @@ pub(crate) struct Cli {
     )]
     max_line_length: NonZeroU8,
 
-    #[clap(
+    #[arg(
         short = 'm',
         long,
         env,
@@ -46,7 +46,7 @@ pub(crate) struct Cli {
     )]
     max_clients: NonZeroU8,
 
-    #[clap(
+    #[arg(
         long,
         env,
         default_value_t = DEFAULT_SSH_LISTEN_ADDRESS,
@@ -54,7 +54,7 @@ pub(crate) struct Cli {
     )]
     ssh_listen_address: SocketAddr,
 
-    #[clap(
+    #[arg(
         long,
         env,
         default_value_t = DEFAULT_HTTP_LISTEN_ADDRESS,
