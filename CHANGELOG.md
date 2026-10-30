@@ -1,4 +1,21 @@
 <!-- header goes here -->
+## [1.0.6](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.5..v1.0.6) - 2026-10-30
+
+### 📚 Documentation
+
+- Reword the `BUILD_ID` and `serve_dist` comments by [@kristof-mattei](https://github.com/kristof-mattei) ([`39bce2c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/39bce2c20e830a6e09012369daff0c2e34cf21a8))
+
+### ⚡ Performance
+
+- Remove the redundant workspace build from `Dockerfile` by [@kristof-mattei](https://github.com/kristof-mattei) ([`23c6dc3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/23c6dc32e5e06e82e0129b22eb99221233fd73cb))
+
+### 🚜 Refactor
+
+- Extract the build id file name into `BUILD_ID_FILE` by [@kristof-mattei](https://github.com/kristof-mattei) ([`aa3dd4d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/aa3dd4dc17a86c8132d98be770cb1d72c75be4ee))
+
+### 🧪 Testing
+
+- Drop the leading articles from the `html_router` test names by [@kristof-mattei](https://github.com/kristof-mattei) ([`9c5601b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9c5601bf066da77f03e48d9704a8393c5d94a2dd))
 ## [1.0.5](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.4..v1.0.5) - 2026-10-29
 
 ### 🐛 Bug Fixes
