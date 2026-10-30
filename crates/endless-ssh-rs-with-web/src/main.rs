@@ -50,7 +50,7 @@ use tracing_subscriber::{EnvFilter, Layer as _};
 use crate::build_env::get_build_env;
 use crate::cli::Cli;
 use crate::client::ClientContext;
-use crate::config::Config;
+use crate::config::{Config, Services};
 use crate::events::{
     ActiveConnectionInfo, ClosedConnection, ConnectionFrame, database_listen_forever,
 };
@@ -132,7 +132,7 @@ fn main() -> Shutdown {
 
     print_header();
 
-    let config = Config::from(cli);
+    let (config, services): (Config, Services) = cli.into();
 
     config.log();
 
@@ -145,7 +145,7 @@ fn main() -> Shutdown {
         .block_on(async {
             // explicitly launch everything in a spawned task
             // see https://docs.rs/tokio/latest/tokio/attr.main.html#non-worker-async-function
-            let handle = spawn_with_name("main task runner", start_tasks(config));
+            let handle = spawn_with_name("main task runner", start_tasks(config, services));
 
             handle.await?
         });
@@ -172,21 +172,20 @@ fn print_header() {
 /// starts all the tasks, such as the web server, the key refresh, ...
 /// ensures all tasks are gracefully shutdown in case of error, `CTRL+c` or `SIGTERM`.
 #[expect(clippy::too_many_lines, reason = "Entrypoint")]
-async fn start_tasks(config: Config) -> Result<Infallible, Shutdown> {
+async fn start_tasks(config: Config, services: Services) -> Result<Infallible, Shutdown> {
     // when running as PID 1, a signal before this registration is discarded
     let mut signal_listeners = SignalListeners::register()?;
 
     let config = Arc::new(config);
 
-    let database_url = env::var("DATABASE_URL")
-        .map_err(|error| wrap_and_report!(Level::ERROR, error, "Failed to read `DATABASE_URL`"))?;
+    let Services {
+        database,
+        maxmind_license_key,
+        front_end_proxy,
+    } = services;
 
-    let maxmind_license_key = env::var("MAXMIND_LICENSE_KEY")
-        .ok()
-        .filter(|key| !key.is_empty());
-
-    let front_end = FrontEnd::from_env().map_err(|error| {
-        wrap_and_report!(Level::ERROR, error, "Failed to parse `FRONT_END_PROXY`")
+    let front_end = FrontEnd::new(front_end_proxy).map_err(|error| {
+        wrap_and_report!(Level::ERROR, error, "Failed to build the front-end proxy")
     })?;
 
     let build_id = front_end.build_id().map_err(|error| {
@@ -194,7 +193,7 @@ async fn start_tasks(config: Config) -> Result<Infallible, Shutdown> {
     })?;
 
     let startup = async {
-        let db_pool = db::create_pool(&database_url).await.map_err(|error| {
+        let db_pool = db::create_pool(database).await.map_err(|error| {
             wrap_and_report!(Level::ERROR, error, "Failed to connect to database")
         })?;
 

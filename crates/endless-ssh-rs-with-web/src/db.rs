@@ -7,7 +7,7 @@ use std::net::IpAddr;
 use futures::TryStreamExt as _;
 use serde::Serialize;
 use sqlx::migrate::MigrateError;
-use sqlx::postgres::{PgPoolOptions, PgRow};
+use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgRow};
 use sqlx::{AssertSqlSafe, PgExecutor, PgPool, Row as _};
 use time::{OffsetDateTime, SignedDuration};
 use tracing::{Level, event};
@@ -16,10 +16,10 @@ use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, Db
 use crate::geoip::{Coordinates, Country, GeoInfo};
 use crate::utils::serde::{Elapsed, Timestamp};
 
-pub(crate) async fn create_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
+pub(crate) async fn create_pool(options: PgConnectOptions) -> Result<PgPool, sqlx::Error> {
     PgPoolOptions::new()
         .max_connections(10)
-        .connect(database_url)
+        .connect_with(options)
         .await
 }
 

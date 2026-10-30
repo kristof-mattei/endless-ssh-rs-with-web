@@ -53,16 +53,17 @@ The web dashboard is served on `127.0.0.1:3000` by default. The SSH honeypot lis
 
 A flag overrides its environment variable.
 
-| Flag                      | Environment variable  | Default                              | Description                                      |
-| ------------------------- | --------------------- | ------------------------------------ | ------------------------------------------------ |
-| `-d`, `--delay`           | `DELAY`               | `10s`                                | Delay between messages (`10s`, `500ms`)          |
-| `-l`, `--max-line-length` | `MAX_LINE_LENGTH`     | `32`                                 | Max banner line length (3–255 bytes)             |
-| `-m`, `--max-clients`     | `MAX_CLIENTS`         | `64`                                 | Max concurrent connections                       |
-| `--ssh-listen-address`    | `SSH_LISTEN_ADDRESS`  | `[::]:2223`                          | SSH honeypot listen address                      |
-| `--http-listen-address`   | `HTTP_LISTEN_ADDRESS` | `127.0.0.1:3000`                     | HTTP listen address (dashboard and API)          |
-|                           | `DATABASE_URL`        |                                      | PostgreSQL connection string                     |
-|                           | `MAXMIND_LICENSE_KEY` |                                      | MaxMind license key for GeoIP lookups (optional) |
-|                           | `RUST_LOG`            | `INFO,endless_ssh_rs_with_web=TRACE` | Log filter                                       |
+| Flag                      | Environment variable  | Default                              | Description                                                          |
+| ------------------------- | --------------------- | ------------------------------------ | -------------------------------------------------------------------- |
+| `-d`, `--delay`           | `DELAY`               | `10s`                                | Delay between messages (`10s`, `500ms`)                              |
+| `-l`, `--max-line-length` | `MAX_LINE_LENGTH`     | `32`                                 | Max banner line length (3–255 bytes)                                 |
+| `-m`, `--max-clients`     | `MAX_CLIENTS`         | `64`                                 | Max concurrent connections                                           |
+| `--ssh-listen-address`    | `SSH_LISTEN_ADDRESS`  | `[::]:2223`                          | SSH honeypot listen address                                          |
+| `--http-listen-address`   | `HTTP_LISTEN_ADDRESS` | `127.0.0.1:3000`                     | HTTP listen address (dashboard and API)                              |
+| `--database-url`          | `DATABASE_URL`        |                                      | PostgreSQL connection string                                         |
+| `--maxmind-license-key`   | `MAXMIND_LICENSE_KEY` |                                      | MaxMind license key for GeoIP lookups (optional)                     |
+| `--front-end-proxy`       | `FRONT_END_PROXY`     |                                      | Vite dev server to proxy the front end to, instead of serving `dist` |
+|                           | `RUST_LOG`            | `INFO,endless_ssh_rs_with_web=TRACE` | Log filter                                                           |
 
 ## Docker
 

@@ -2,6 +2,8 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
 use std::num::NonZeroU8;
 use std::time::Duration;
 
+use http::uri::Authority;
+use sqlx::postgres::PgConnectOptions;
 use tracing::{Level, event};
 
 pub(crate) const DEFAULT_DELAY: Duration = Duration::from_secs(10);
@@ -19,6 +21,12 @@ pub(crate) struct Config {
     pub max_clients: NonZeroU8,
     pub max_line_length: NonZeroU8,
     pub ssh_listen_address: SocketAddr,
+}
+
+pub(crate) struct Services {
+    pub database: PgConnectOptions,
+    pub maxmind_license_key: Option<String>,
+    pub front_end_proxy: Option<Authority>,
 }
 
 impl Default for Config {
