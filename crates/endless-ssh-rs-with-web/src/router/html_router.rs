@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use axum::Router;
 use axum::body::Body;
+use axum::http::uri::Authority;
 use axum::http::{self, HeaderValue, Response, StatusCode, header};
 use tower_http::services::{ServeDir, ServeFile};
 use tower_http::set_header::SetResponseHeaderLayer;
@@ -21,11 +22,9 @@ pub(crate) enum FrontEnd {
 }
 
 impl FrontEnd {
-    pub(crate) fn from_env() -> Result<Self, http::Error> {
-        match std::env::var_os("FRONT_END_PROXY") {
-            Some(authority) => Ok(FrontEnd::Proxy(tower_proxy::builder_http(
-                authority.into_encoded_bytes(),
-            )?)),
+    pub(crate) fn new(proxy: Option<Authority>) -> Result<Self, http::Error> {
+        match proxy {
+            Some(authority) => Ok(FrontEnd::Proxy(tower_proxy::builder_http(authority)?)),
             None => Ok(FrontEnd::Dist(PathBuf::from("dist"))),
         }
     }

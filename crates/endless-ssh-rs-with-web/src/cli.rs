@@ -8,10 +8,12 @@ use clap::builder::TypedValueParser as _;
 use clap::{Parser, value_parser};
 #[cfg(test)]
 use color_eyre::eyre;
+use http::uri::Authority;
+use sqlx::postgres::PgConnectOptions;
 
 use crate::config::{
     Config, DEFAULT_DELAY, DEFAULT_HTTP_LISTEN_ADDRESS, DEFAULT_MAX_CLIENTS,
-    DEFAULT_MAX_LINE_LENGTH, DEFAULT_SSH_LISTEN_ADDRESS,
+    DEFAULT_MAX_LINE_LENGTH, DEFAULT_SSH_LISTEN_ADDRESS, Services,
 };
 
 #[derive(Debug, Parser)]
@@ -61,17 +63,48 @@ pub(crate) struct Cli {
         help = "HTTP listen address"
     )]
     http_listen_address: SocketAddr,
+
+    #[arg(
+        long,
+        env,
+        hide_env_values = true,
+        help = "PostgreSQL connection string"
+    )]
+    database_url: PgConnectOptions,
+
+    #[arg(
+        long,
+        env,
+        hide_env_values = true,
+        help = "MaxMind license key for GeoIP lookups"
+    )]
+    maxmind_license_key: Option<String>,
+
+    #[arg(
+        long,
+        env,
+        help = "Vite dev server to proxy the front end to, instead of serving `dist`"
+    )]
+    front_end_proxy: Option<Authority>,
 }
 
-impl From<Cli> for Config {
+impl From<Cli> for (Config, Services) {
     fn from(matches: Cli) -> Self {
-        Config {
+        let config = Config {
             delay: matches.delay,
             http_listen_address: matches.http_listen_address,
             max_clients: matches.max_clients,
             max_line_length: matches.max_line_length,
             ssh_listen_address: matches.ssh_listen_address,
-        }
+        };
+
+        let services = Services {
+            database: matches.database_url,
+            maxmind_license_key: matches.maxmind_license_key.filter(|key| !key.is_empty()),
+            front_end_proxy: matches.front_end_proxy,
+        };
+
+        (config, services)
     }
 }
 
@@ -81,7 +114,9 @@ where
     I: IntoIterator<Item = T>,
     T: Into<OsString> + Clone,
 {
-    Ok(Cli::try_parse_from(from)?.into())
+    let (config, _services): (Config, Services) = Cli::try_parse_from(from)?.into();
+
+    Ok(config)
 }
 
 #[cfg(test)]
@@ -89,16 +124,20 @@ mod tests {
     use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
     use std::num::NonZeroU8;
 
-    use clap::CommandFactory as _;
+    use clap::{CommandFactory as _, Parser as _};
     use color_eyre::eyre;
+    use http::uri::Authority;
     use pretty_assertions::{assert_eq, assert_matches};
 
     use super::{Cli, parse_cli_from};
-    use crate::config::Config;
+    use crate::config::{Config, Services};
 
     fn parse_factory(input: &'static str) -> Result<Config, eyre::Report> {
-        // fake input
-        let command_line = input.split_whitespace().collect::<Vec<&str>>();
+        // fake input, with the required `--database-url`
+        let command_line = input
+            .split_whitespace()
+            .chain(["--database-url", "postgres://localhost"])
+            .collect::<Vec<&str>>();
 
         parse_cli_from(command_line)
     }
@@ -245,7 +284,10 @@ mod tests {
                 "MAX_LINE_LENGTH",
                 "MAX_CLIENTS",
                 "SSH_LISTEN_ADDRESS",
-                "HTTP_LISTEN_ADDRESS"
+                "HTTP_LISTEN_ADDRESS",
+                "DATABASE_URL",
+                "MAXMIND_LICENSE_KEY",
+                "FRONT_END_PROXY"
             ]
         );
     }
@@ -253,6 +295,55 @@ mod tests {
     #[test]
     fn rejects_listen_address_without_port() {
         let result = parse_factory("endless-ssh-rs --http-listen-address 127.0.0.1");
+
+        assert_matches!(result, Err(_));
+    }
+
+    #[test]
+    fn rejects_invalid_database_url() {
+        let result = parse_cli_from(["endless-ssh-rs", "--database-url", "not a url"]);
+
+        assert_matches!(result, Err(_));
+    }
+
+    #[test]
+    fn ignores_empty_maxmind_license_key() {
+        let cli = Cli::try_parse_from([
+            "endless-ssh-rs",
+            "--database-url",
+            "postgres://localhost",
+            "--maxmind-license-key",
+            "",
+        ])
+        .unwrap();
+
+        let (_, services): (Config, Services) = cli.into();
+
+        assert_eq!(services.maxmind_license_key, None);
+    }
+
+    #[test]
+    fn parses_front_end_proxy() {
+        let cli = Cli::try_parse_from([
+            "endless-ssh-rs",
+            "--database-url",
+            "postgres://localhost",
+            "--front-end-proxy",
+            "127.0.0.1:4000",
+        ])
+        .unwrap();
+
+        let (_, services): (Config, Services) = cli.into();
+
+        assert_eq!(
+            services.front_end_proxy,
+            Some(Authority::from_static("127.0.0.1:4000"))
+        );
+    }
+
+    #[test]
+    fn rejects_front_end_proxy_with_scheme() {
+        let result = parse_factory("endless-ssh-rs --front-end-proxy http://127.0.0.1:4000");
 
         assert_matches!(result, Err(_));
     }
