@@ -34,6 +34,7 @@
         "temporal-polyfill": "1.0.6"
     },
     "devDependencies": {
+        "@codecov/bundle-analyzer": "2.0.1",
         "@codecov/vite-plugin": "2.0.1",
         "@recharts/devtools": "0.0.19",
         "@tailwindcss/vite": "4.3.3",
@@ -59,6 +60,7 @@
         "oxlint": "1.90.0",
         "oxlint-tsgolint": "7.0.2005",
         "tailwindcss": "4.3.3",
+        "tar": "7.5.22",
         "typescript": "6.0.3",
         "vite": "catalog:default",
         "vite-plugin-checker": "0.14.5",
