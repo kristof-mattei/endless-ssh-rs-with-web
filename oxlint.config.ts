@@ -59,6 +59,8 @@ const config: OxlintConfig = defineConfig({
         ".local/",
         ".pnpm-store/",
         "front-end/src/generated/",
+        // maintained in rust-seed and merged in by `update-from-upstream.sh`
+        ".github/actions/report-container-size/report-container-size.js",
     ],
     rules: {
         "arrow-body-style": ["error", "always"],
