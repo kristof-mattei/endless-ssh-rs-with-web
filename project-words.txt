@@ -125,8 +125,6 @@ typesystem
 uninit
 uninlined
 uninspectable
-unovis
-unovis's
 unseparated
 unstub
 uppercases
