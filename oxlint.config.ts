@@ -157,7 +157,7 @@ const config: OxlintConfig = defineConfig({
         "import/no-default-export": "error",
         "import/no-named-export": "off",
         "import/no-relative-parent-imports": "off",
-        "import/no-unassigned-import": ["error", { allow: ["**/*.css", "temporal-polyfill/global"] }],
+        "import/no-unassigned-import": ["error", { allow: ["**/*.css"] }],
         "import/prefer-default-export": "off",
         "import/unambiguous": "off",
 
