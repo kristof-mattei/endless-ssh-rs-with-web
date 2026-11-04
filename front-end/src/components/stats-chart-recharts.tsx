@@ -1,7 +1,6 @@
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useEffect, useState } from "react";
 import { Bar, CartesianGrid, createHorizontalChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Temporal } from "temporal-polyfill";
 
 import { getBucketLabelOptions, getTickFormatter, getTickValues } from "../lib/chart-ticks";
 import type { Metric } from "../lib/metrics";

@@ -1,5 +1,4 @@
 import { act, renderHook } from "@testing-library/react";
-import { Temporal } from "temporal-polyfill";
 import type { Mock } from "vitest";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -17,7 +16,7 @@ vi.mock("../lib/reload", () => {
 // RFC 6455 close code 1000, Normal Closure, the code the hook sends
 const NORMAL_CLOSURE_CODE = 1000;
 
-// the fake timers do not reach the polyfill's clock, so cooldown fixtures are relative to it and leave margin
+// the fake timers do not mock `Temporal.Now`, so cooldown fixtures are relative to it and leave margin
 function millisecondsAgo(milliseconds: number): string {
     return (Temporal.Now.instant().epochMilliseconds - milliseconds).toString();
 }

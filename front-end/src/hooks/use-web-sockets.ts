@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { Temporal } from "temporal-polyfill";
 
 import type { WsEvent } from "../generated/WsEvent";
 import { reload } from "../lib/reload";

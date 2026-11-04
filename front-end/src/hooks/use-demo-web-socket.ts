@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Temporal } from "temporal-polyfill";
 
 import type { Country } from "../generated/Country";
 import type { WsEvent } from "../generated/WsEvent";

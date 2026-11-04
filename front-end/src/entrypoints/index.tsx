@@ -1,3 +1,4 @@
+import "temporal-polyfill/global";
 import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
 import countryFlagsFontUrl from "country-flag-emoji-polyfill/dist/TwemojiCountryFlags.woff2";
 import { setWorkerUrl } from "maplibre-gl";

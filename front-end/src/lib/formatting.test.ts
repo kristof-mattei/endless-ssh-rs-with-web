@@ -1,4 +1,3 @@
-import { Temporal } from "temporal-polyfill";
 import { describe, expect, it, vi } from "vitest";
 
 import { formatDuration, formatIp } from "./formatting";

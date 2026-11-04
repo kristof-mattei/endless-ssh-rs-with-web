@@ -98,12 +98,19 @@ const config: OxlintConfig = defineConfig({
         "no-restricted-globals": [
             "error",
             {
-                message: "Use Temporal from temporal-polyfill instead.",
+                message: "Use Temporal instead.",
                 name: "Date",
             },
+        ],
+        "no-restricted-imports": [
+            "error",
             {
-                message: "Import Temporal from temporal-polyfill instead.",
-                name: "Temporal",
+                paths: [
+                    {
+                        message: "Use the global Temporal instead.",
+                        name: "temporal-polyfill",
+                    },
+                ],
             },
         ],
         "no-shadow": "error",
@@ -150,7 +157,7 @@ const config: OxlintConfig = defineConfig({
         "import/no-default-export": "error",
         "import/no-named-export": "off",
         "import/no-relative-parent-imports": "off",
-        "import/no-unassigned-import": ["error", { allow: ["**/*.css"] }],
+        "import/no-unassigned-import": ["error", { allow: ["**/*.css", "temporal-polyfill/global"] }],
         "import/prefer-default-export": "off",
         "import/unambiguous": "off",
 

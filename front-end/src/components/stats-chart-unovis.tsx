@@ -1,5 +1,4 @@
 import { VisAxis, VisCrosshair, VisStackedBar, VisTooltip, VisXYContainer } from "@unovis/react";
-import { Temporal } from "temporal-polyfill";
 
 import { getBucketLabelOptions, getTickFormatter, getTickValues } from "../lib/chart-ticks";
 import type { Metric } from "../lib/metrics";

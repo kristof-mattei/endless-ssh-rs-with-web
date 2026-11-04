@@ -1,6 +1,5 @@
 import { Address4, Address6 } from "ip-address";
 import prettyBytes from "pretty-bytes";
-import type { Temporal } from "temporal-polyfill";
 
 export function formatBytes(bytes: number): string {
     return prettyBytes(bytes);
