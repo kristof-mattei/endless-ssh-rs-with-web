@@ -3,4 +3,4 @@
 /**
  * Wire timestamp, `{"$instant": "<RFC 3339>"}`. The front-end reviver turns the wrapper into a `Temporal.Instant`.
  */
-export type Timestamp = import("temporal-polyfill").Temporal.Instant;
+export type Timestamp = Temporal.Instant;

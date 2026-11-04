@@ -1,6 +1,5 @@
 import type { Options, SingleParser } from "nuqs";
 import { createParser, parseAsStringLiteral } from "nuqs";
-import type { Temporal } from "temporal-polyfill";
 
 import type { Metric } from "./metrics";
 import { METRIC_KEYS } from "./metrics";

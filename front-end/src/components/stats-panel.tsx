@@ -1,5 +1,4 @@
 import type React from "react";
-import type { Temporal } from "temporal-polyfill";
 
 import { formatBytes, formatDuration } from "../lib/formatting";
 import { Stat } from "./stat";

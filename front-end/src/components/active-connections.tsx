@@ -1,6 +1,5 @@
 import type React from "react";
 import { useEffect, useState } from "react";
-import { Temporal } from "temporal-polyfill";
 
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
 import { ConnectionRow } from "./connection-row";

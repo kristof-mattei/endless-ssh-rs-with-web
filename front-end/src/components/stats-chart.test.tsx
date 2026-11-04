@@ -1,7 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { NuqsTestingAdapter } from "nuqs/adapters/testing";
 import type React from "react";
-import { Temporal } from "temporal-polyfill";
 import { describe, expect, it, vi } from "vitest";
 
 import type { StatsRow } from "../generated/StatsRow";

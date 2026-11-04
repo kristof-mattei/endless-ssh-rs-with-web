@@ -1,5 +1,3 @@
-import { Temporal } from "temporal-polyfill";
-
 import type { StatsResponse } from "../generated/StatsResponse";
 import type { WsEvent } from "../generated/WsEvent";
 
@@ -28,8 +26,6 @@ function reviveTagged(_key: string, value: unknown): unknown {
     return value;
 }
 
-// The two places wire JSON becomes objects; the casts are the trust in our own back-end. A wrapper the polyfill
-// rejects fails the parse, which the callers already treat as a malformed message.
 export function parseWsEvent(text: string): WsEvent {
     // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- our own back-end, shaped by the ts-rs bindings
     return JSON.parse(text, reviveTagged) as WsEvent;

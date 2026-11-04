@@ -1,5 +1,3 @@
-import { Temporal } from "temporal-polyfill";
-
 import type { BucketGrid } from "./stats-buckets";
 import { snapUpToBucket } from "./stats-buckets";
 

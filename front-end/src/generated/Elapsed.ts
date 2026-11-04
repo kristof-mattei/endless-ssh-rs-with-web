@@ -3,4 +3,4 @@
 /**
  * Wire duration, `{"$duration": "<ISO 8601>"}` in whole seconds. The front-end reviver turns the wrapper into a `Temporal.Duration`.
  */
-export type Elapsed = import("temporal-polyfill").Temporal.Duration;
+export type Elapsed = Temporal.Duration;

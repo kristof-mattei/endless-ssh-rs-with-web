@@ -1,5 +1,3 @@
-import { Temporal } from "temporal-polyfill";
-
 import { formatBytes, formatDuration } from "./formatting";
 
 // the chart's metrics, in display order

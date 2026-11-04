@@ -1,5 +1,4 @@
 import type React from "react";
-import { Temporal } from "temporal-polyfill";
 
 import type { ActiveConnectionInfo } from "../generated/ActiveConnectionInfo";
 import { formatBytes, formatDuration, formatIp } from "../lib/formatting";

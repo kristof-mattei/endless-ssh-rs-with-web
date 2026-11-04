@@ -1,4 +1,3 @@
-import { Temporal } from "temporal-polyfill";
 import { describe, expect, it, vi } from "vitest";
 
 import { parseStatsResponse, parseWsEvent } from "./wire";

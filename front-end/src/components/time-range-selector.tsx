@@ -1,7 +1,6 @@
 import { useQueryState } from "nuqs";
 import type React from "react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import { Temporal } from "temporal-polyfill";
 
 import type { StatsRow } from "../generated/StatsRow";
 import type { Range } from "../lib/dashboard-params";

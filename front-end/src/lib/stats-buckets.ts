@@ -1,5 +1,3 @@
-import { Temporal } from "temporal-polyfill";
-
 import type { Country } from "../generated/Country";
 import type { StatsRow } from "../generated/StatsRow";
 import type { Metric } from "./metrics";
