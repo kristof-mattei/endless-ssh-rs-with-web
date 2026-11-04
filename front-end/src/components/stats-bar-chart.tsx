@@ -50,7 +50,7 @@ interface Properties {
     selectedMetric: Metric;
 }
 
-export const RechartsStatsChart: React.FC<Properties> = ({ grid, points, selectedMetric }) => {
+export const StatsBarChart: React.FC<Properties> = ({ grid, points, selectedMetric }) => {
     const developmentTools = useRechartsDevtools();
 
     const spanHours = grid.range.from.until(grid.range.to).total("hours");

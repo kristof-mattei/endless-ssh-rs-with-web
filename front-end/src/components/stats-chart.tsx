@@ -4,7 +4,7 @@ import { DASHBOARD_PARAMS } from "../lib/dashboard-params";
 import { METRIC_KEYS, METRICS } from "../lib/metrics";
 import type { StatsData } from "../lib/stats-buckets";
 import { aggregate } from "../lib/stats-buckets";
-import { RechartsStatsChart } from "./stats-chart-recharts";
+import { StatsBarChart } from "./stats-bar-chart";
 
 export const StatsChart: React.FC<StatsData> = ({ grid, rows }) => {
     const [selectedMetric, setSelectedMetric] = useQueryState("metric", DASHBOARD_PARAMS.metric);
@@ -38,7 +38,7 @@ export const StatsChart: React.FC<StatsData> = ({ grid, rows }) => {
             {points.length === 0 ? (
                 <p className="py-8 text-center text-gray-500">No data for selected range</p>
             ) : (
-                <RechartsStatsChart grid={grid} points={points} selectedMetric={selectedMetric} />
+                <StatsBarChart grid={grid} points={points} selectedMetric={selectedMetric} />
             )}
         </div>
     );
