@@ -40,7 +40,7 @@ const configFunction: ViteUserConfigFn = defineConfig(({ command, mode }) => {
             "import.meta.env.BUILD_ID": JSON.stringify(buildId),
         },
         build: {
-            minify: false,
+            minify: true,
             target: "esnext",
             emptyOutDir: true,
             sourcemap: true,
