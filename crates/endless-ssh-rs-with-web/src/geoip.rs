@@ -242,9 +242,7 @@ impl GeoIpDbWrapper {
             }
         }
 
-        // do we have a file?
         if should_download_database(license_key, &geo_ip_path).await {
-            // We don't, try and download
             if let Err(error) = download_database(license_key, geo_ip_path.clone()).await {
                 event!(Level::ERROR, ?error, "Failed to download GeoLite2 database");
 
@@ -258,7 +256,6 @@ impl GeoIpDbWrapper {
     }
 
     fn load(geo_ip_path: &Path) -> Option<GeoIpDbWrapper> {
-        // we now have file, let's try and memory map it
         let mmap = match try_mmap_file(geo_ip_path) {
             Ok(mapped_file) => mapped_file,
             Err(error) => {
@@ -268,7 +265,6 @@ impl GeoIpDbWrapper {
             },
         };
 
-        // let's try to read our memory mapped file
         match maxminddb::Reader::from_source(mmap) {
             Ok(reader) => {
                 event!(Level::INFO, geoip_path = %geo_ip_path.display(), "Loaded GeoLite2 database");
@@ -288,6 +284,7 @@ impl GeoIpDbWrapper {
     }
 }
 
+/// True when the database file is missing, its `ETag` file is unreadable, or the server's `ETag` differs. False when the `ETag` request fails, so the current file stays in use.
 async fn should_download_database(license_key: &str, geo_ip_path: &Path) -> bool {
     let exists = std::fs::exists(geo_ip_path).is_ok_and(|verified_to_exist| verified_to_exist);
 
@@ -297,7 +294,6 @@ async fn should_download_database(license_key: &str, geo_ip_path: &Path) -> bool
 
     let etag_file = geo_ip_path.with_extension("etag");
 
-    // file exists, verify existence of etag file
     let etag = match std::fs::read_to_string(&etag_file) {
         Ok(contents) => contents,
         Err(error) => {
@@ -315,7 +311,7 @@ async fn should_download_database(license_key: &str, geo_ip_path: &Path) -> bool
 
     match get_database_etag(license_key).await {
         Ok(server_etag) => {
-            // if they're different, yes, download the file
+            // a different ETag means the remote database was updated, so download it
             server_etag != etag
         },
         Err(_error) => false,

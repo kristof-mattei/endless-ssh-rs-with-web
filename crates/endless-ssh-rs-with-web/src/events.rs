@@ -91,8 +91,7 @@ impl From<ConnectionFrame> for Message {
 }
 
 /// In-memory representation of currently connected clients.
-/// # Considerations
-/// We might merge this with the actual Client.
+// TODO: consider merging with the per-client state in `client::listen_forever`
 #[derive(Clone, Serialize)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
 pub(crate) struct ActiveConnectionInfo {
@@ -105,7 +104,7 @@ pub(crate) struct ActiveConnectionInfo {
     pub city: Option<String>,
 }
 
-/// Stores closed connections one at a time. Concurrent inserts can commit out of id order, and `last_counted_id` assumes every id up to it is committed. Ends when the last sender is dropped, so the disconnects of clients stopped by a shutdown are still stored.
+/// Stores closed connections one at a time. Concurrent inserts can commit out of id order, and `last_counted_id` is only correct when every id up to it is committed. Ends when the last sender is dropped, so the disconnects of clients stopped by a shutdown are still stored.
 pub(crate) async fn database_listen_forever(
     db_pool: sqlx::PgPool,
     geo_ip_reader: Arc<GeoIpReader>,

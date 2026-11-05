@@ -18,9 +18,7 @@ const WATCHDOG_TIMEOUT_MS = 90_000;
 // RFC 6455 close code 1000, Normal Closure
 const NORMAL_CLOSURE_CODE = 1000;
 
-// A bundle and the server it talks to come from one build. A server reporting another build in `init` speaks a wire
-// this bundle may not read, so the page reloads to fetch its match. The time of that reload is kept, so a mismatch
-// soon after it (a rolling deploy answering with alternating builds) stops as outdated instead of looping.
+// A bundle and its server come from one build. An `init` with another build can use a wire format this bundle cannot parse, so the page reloads to fetch the matching bundle. The reload time is stored, so a second mismatch within the cooldown (a rolling deploy serving alternating builds) sets the status to outdated instead of reloading again.
 const RELOADED_AT_KEY = "reloaded-for-build-at";
 const RELOAD_COOLDOWN_MS = 60_000;
 

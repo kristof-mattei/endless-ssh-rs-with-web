@@ -8,13 +8,11 @@ pub(crate) fn set_receive_buffer_size(
     tcp_stream: &TcpStream,
     size_in_bytes: usize,
 ) -> Result<(), Error> {
-    // Set the smallest possible receive buffer. This reduces local
-    // resource usage and slows down the remote end.
     let value: i32 = i32::try_from(size_in_bytes).expect("Byte buffer didn't fit in an i32");
 
     let size: socklen_t = u32::try_from(size_of_val(&value)).unwrap();
 
-    // SAFETY: external call
+    // SAFETY: the fd stays open while `tcp_stream` is borrowed, and `value` is readable for `size` bytes
     let r: c_int = unsafe {
         setsockopt(
             tcp_stream.as_raw_fd(),

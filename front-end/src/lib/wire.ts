@@ -1,10 +1,7 @@
 import type { StatsResponse } from "../generated/StatsResponse";
 import type { WsEvent } from "../generated/WsEvent";
 
-// The back-end writes every timestamp as `{ "$instant": "<RFC 3339>" }` and every duration as
-// `{ "$duration": "<ISO 8601>" }`, the way MongoDB's Extended JSON tags values JSON cannot represent. `JSON.parse` hands
-// the reviver a property's value after its children are done, so a wrapper is seen whole at its holder's key and
-// replaced there; the bindings' `Temporal.Instant` and `Temporal.Duration` hold at any depth.
+// The back-end writes every timestamp as `{ "$instant": "<RFC 3339>" }` and every duration as `{ "$duration": "<ISO 8601>" }`, the way MongoDB's Extended JSON tags values JSON cannot represent. `JSON.parse` passes the reviver a property's value after its children are done, so a wrapper is seen whole at its holder's key and replaced there; the bindings' `Temporal.Instant` and `Temporal.Duration` hold at any depth.
 
 function isInstant(value: unknown): value is { $instant: string } {
     return typeof value === "object" && value !== null && "$instant" in value && typeof value.$instant === "string";

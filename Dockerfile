@@ -123,10 +123,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN npm uninstall --global corepack && npm install --global corepack
 
-# The following block
-# creates an empty app, and we copy in package.json and package-lock.json as they represent our dependencies
-# This allows us to copy in the source in a different layer which in turn allows us to leverage Docker's layer caching
-# That means that if our dependencies don't change rebuilding is much faster
+# installing the dependencies before copying `front-end` puts them in their own layer, which Docker's layer cache reuses while they do not change
 WORKDIR /build
 COPY package.json pnpm-lock.yaml vite.config.ts tsconfig.json pnpm-workspace.yaml ./
 

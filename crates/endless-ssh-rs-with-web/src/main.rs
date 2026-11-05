@@ -169,7 +169,7 @@ fn print_header() {
     );
 }
 
-/// starts all the tasks, such as the web server, the key refresh, ...
+/// starts all the tasks, such as the web server, the geoip refresh, ...
 /// ensures all tasks are gracefully shutdown in case of error, `CTRL+c` or `SIGTERM`.
 #[expect(clippy::too_many_lines, reason = "Entrypoint")]
 async fn start_tasks(config: Config, services: Services) -> Result<Infallible, Shutdown> {
@@ -354,7 +354,7 @@ async fn start_tasks(config: Config, services: Services) -> Result<Infallible, S
         },
     };
 
-    // a shutdown that already reports a failure is returned unchanged
+    // the drain timeout only overrides `Success` and `Signal`, a failure reason is returned unchanged
     if !stopped_in_time && matches!(shutdown_reason, Shutdown::Success | Shutdown::Signal(_)) {
         return Err(Shutdown::OperationalFailure {
             code: ExitCode::FAILURE,

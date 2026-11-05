@@ -15,16 +15,15 @@ pub(super) fn to_inet(ip: IpAddr) -> IpNet {
 
 pub(super) fn to_interval(duration: SignedDuration) -> PgInterval {
     // let's talk about this conversion for a moment:
-    // our duration is always positive (we should encode this into the typesystem though!)
+    // our duration is never negative (we should encode this into the type system though!)
     // now, let's talk about what it means for `whole_microseconds()` to exceed `i64::MAX`:
     // that is 106_751_991 days, or 292_471 years.
-    // What are the changes that someone is connected that long considering we'd have at least one
+    // What are the chances that someone is connected that long, considering we'd have at least one
     // * power outage
     // * internet outage
-    // * thermonuclear war
-    // any, I watched Terminator 2 at least 10 times, and played a lot of Fallout
-    // (not to mention I rewatched the show 3 times), so I'm prepared for all possibilities.
-    // and in the case I'm wrong, we'll cap the value to `i64::MAX`, which is good enough for now
+    // * thermonuclear war?
+    // Anyway, I watched Terminator 2 at least 10 times, and played a lot of Fallout (not to mention I rewatched the show 3 times), so I'm prepared for all possibilities.
+    // And in case I'm wrong, we'll cap the value at `i64::MAX`, which is good enough for now.
     let microseconds = duration.whole_microseconds().try_into().unwrap_or(i64::MAX);
 
     PgInterval {

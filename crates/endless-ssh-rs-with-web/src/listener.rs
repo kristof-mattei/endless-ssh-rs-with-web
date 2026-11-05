@@ -86,8 +86,7 @@ impl Listener {
                         "Failed to set the tcp stream's receive buffer",
                     );
                 } else {
-                    // we do try_acquire because either we can add the client or we cannot
-                    // no in-between, no sense in waiting
+                    // at capacity the connection is dropped instead of queued
                     match Arc::clone(&self.semaphore).try_acquire_owned() {
                         Ok(permit) => {
                             let connected_at = OffsetDateTime::now_utc();
@@ -127,9 +126,7 @@ impl Listener {
             },
             Err(error) => match error.raw_os_error() {
                 Some(libc::EMFILE) => {
-                    // libc::EMFILE is raised when we've reached our per-process
-                    // open handles, so we're setting the limit to the current connected clients
-                    // config.max_clients = clients.len().try_into()?;
+                    // libc::EMFILE: this process has too many open handles
                     event!(Level::WARN, ?error, "Unable to accept new connection");
                 },
                 Some(
