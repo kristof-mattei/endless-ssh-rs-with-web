@@ -1,8 +1,10 @@
+import { fileURLToPath } from "node:url";
+
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import type { Plugin, UserConfig } from "vite";
-import { loadEnv } from "vite";
+import { build, loadEnv } from "vite";
 import { checker } from "vite-plugin-checker";
 import svgr from "vite-plugin-svgr";
 import type { ViteUserConfigFn } from "vitest/config";
@@ -24,6 +26,36 @@ function emitBuildId(buildId: string): Plugin {
         generateBundle() {
             // must match `BUILD_ID_FILE` in `crates/endless-ssh-rs-with-web/src/router/html_router.rs`
             this.emitFile({ type: "asset", fileName: "build-id", source: buildId });
+        },
+    };
+}
+
+// a classic inline script at the start of <head> runs before the first paint, a module script does not
+function inlineHeadScript(entry: string): Plugin {
+    return {
+        name: "inline-head-script",
+        async transformIndexHtml() {
+            const result = await build({
+                configFile: false,
+                logLevel: "warn",
+                build: {
+                    lib: { entry, formats: ["iife"], name: "headScript" },
+                    minify: true,
+                    target: "esnext",
+                    write: false,
+                },
+            });
+
+            // lib mode returns one output per format
+            const [output] = Array.isArray(result) ? result : [];
+
+            if (output === undefined) {
+                throw new TypeError("Expected the IIFE build to return its output");
+            }
+
+            const [chunk] = output.output;
+
+            return [{ tag: "script", children: chunk.code, injectTo: "head-prepend" }];
         },
     };
 }
@@ -68,6 +100,7 @@ const configFunction: ViteUserConfigFn = defineConfig(({ command, mode }) => {
                 telemetry: false,
             }),
             emitBuildId(buildId),
+            inlineHeadScript(fileURLToPath(new URL("front-end/src/entrypoints/theme.ts", import.meta.url))),
         ],
         optimizeDeps: {
             noDiscovery: true,

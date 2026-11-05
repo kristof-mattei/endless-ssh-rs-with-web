@@ -12,7 +12,7 @@ export const StatsChart: React.FC<StatsData> = ({ grid, rows }) => {
     const points = aggregate(rows, grid);
 
     return (
-        <div className="rounded-lg bg-gray-800 p-4">
+        <div className="rounded-lg bg-panel p-4">
             <div className="mbe-3 flex items-center gap-2">
                 {METRIC_KEYS.map((metric) => {
                     return (
@@ -21,7 +21,7 @@ export const StatsChart: React.FC<StatsData> = ({ grid, rows }) => {
                             className={`rounded-sm px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
                                 selectedMetric === metric
                                     ? "bg-blue-600 text-white"
-                                    : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                                    : "bg-control text-fg-soft hover:bg-control-hover"
                             }`}
                             key={metric}
                             onClick={() => {
@@ -36,7 +36,7 @@ export const StatsChart: React.FC<StatsData> = ({ grid, rows }) => {
             </div>
 
             {points.length === 0 ? (
-                <p className="py-8 text-center text-gray-500">No data for selected range</p>
+                <p className="py-8 text-center text-fg-subtle">No data for selected range</p>
             ) : (
                 <StatsBarChart grid={grid} points={points} selectedMetric={selectedMetric} />
             )}

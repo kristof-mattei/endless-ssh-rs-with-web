@@ -28,7 +28,7 @@ export const CountryFlag: React.FC<Properties> = ({ country }) => {
     return (
         <span className="cursor-default" title={country?.name}>
             <span className="flags-font text-lg">{country === null ? null : countryFlag(country.code)}</span>
-            {country !== null && <span className="ms-1.5 text-gray-400">{country.name}</span>}
+            {country !== null && <span className="ms-1.5 text-fg-muted">{country.name}</span>}
         </span>
     );
 };

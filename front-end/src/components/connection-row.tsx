@@ -17,16 +17,16 @@ export const ConnectionRow: React.FC<{ connection: ActiveConnectionInfo; now: Te
     const ip = formatIp(connection.ip);
 
     return (
-        <div className="col-span-full grid grid-cols-subgrid items-center rounded-sm bg-gray-800 px-3 py-2 text-sm">
+        <div className="col-span-full grid grid-cols-subgrid items-center rounded-sm bg-panel px-3 py-2 text-sm">
             <CountryFlag country={connection.country} />
-            <span className="truncate text-gray-400">{connection.city ?? "Unknown"}</span>
-            <span className="truncate font-mono text-gray-300" title={ip}>
+            <span className="truncate text-fg-muted">{connection.city ?? "Unknown"}</span>
+            <span className="truncate font-mono text-fg-soft" title={ip}>
                 {ip}
             </span>
-            <span className="text-end text-green-400">
+            <span className="text-end text-green-fg">
                 {formatDuration(timeConnected(connection.connected_at, now))}
             </span>
-            <span className="text-end text-gray-500">{formatBytes(connection.bytes_sent)}</span>
+            <span className="text-end text-fg-subtle">{formatBytes(connection.bytes_sent)}</span>
         </div>
     );
 };

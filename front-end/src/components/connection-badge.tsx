@@ -3,11 +3,11 @@ import type React from "react";
 import type { EventSourceStatus } from "../hooks/use-event-source";
 
 const CONNECTION_STATUS_STYLES: Record<EventSourceStatus, { dot: string; text: string }> = {
-    connecting: { dot: "bg-gray-500", text: "text-gray-400" },
-    demo: { dot: "bg-purple-500", text: "text-purple-400" },
-    live: { dot: "bg-green-500", text: "text-green-400" },
-    outdated: { dot: "bg-red-500", text: "text-red-400" },
-    reconnecting: { dot: "bg-amber-500", text: "text-amber-400" },
+    connecting: { dot: "bg-gray-500", text: "text-fg-muted" },
+    demo: { dot: "bg-purple-500", text: "text-purple-fg" },
+    live: { dot: "bg-green-500", text: "text-green-fg" },
+    outdated: { dot: "bg-red-500", text: "text-red-fg" },
+    reconnecting: { dot: "bg-amber-500", text: "text-amber-fg" },
 };
 
 export const ConnectionBadge: React.FC<{ status: EventSourceStatus }> = ({ status }) => {

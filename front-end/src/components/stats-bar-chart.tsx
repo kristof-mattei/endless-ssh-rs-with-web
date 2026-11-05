@@ -66,15 +66,15 @@ export const StatsBarChart: React.FC<Properties> = ({ grid, points, selectedMetr
                     data={points}
                     margin={{ bottom: 8, left: 8, right: 16, top: 8 }}
                 >
-                    <CartesianGrid stroke="#374151" strokeDasharray="3 3" vertical={false} />
+                    <CartesianGrid stroke="var(--color-line)" strokeDasharray="3 3" vertical={false} />
                     <Typed.XAxis
-                        axisLine={{ stroke: "#4b5563" }}
+                        axisLine={{ stroke: "var(--color-line-strong)" }}
                         dataKey={(bp: BucketPoint) => {
                             return bp.bucket.epochMilliseconds;
                         }}
                         height="auto"
                         interval={0}
-                        tick={{ fill: "#6b7280", fontSize: 10 }}
+                        tick={{ fill: "var(--color-fg-subtle)", fontSize: 10 }}
                         tickFormatter={(ms: number) => {
                             return formatTickLabel(Temporal.Instant.fromEpochMilliseconds(ms));
                         }}
@@ -83,7 +83,7 @@ export const StatsBarChart: React.FC<Properties> = ({ grid, points, selectedMetr
                     />
                     <Typed.YAxis
                         axisLine={false}
-                        tick={{ fill: "#9ca3af", fontSize: 11 }}
+                        tick={{ fill: "var(--color-fg-muted)", fontSize: 11 }}
                         tickFormatter={(value: number) => {
                             return formatMetricValue(selectedMetric, value);
                         }}
@@ -93,21 +93,21 @@ export const StatsBarChart: React.FC<Properties> = ({ grid, points, selectedMetr
                     <Typed.Tooltip
                         content={StatsTooltip}
                         contentStyle={{
-                            background: "#1f2937",
-                            border: "1px solid #374151",
+                            background: "var(--color-panel)",
+                            border: "1px solid var(--color-line)",
                             borderRadius: "6px",
-                            color: "#e5e7eb",
+                            color: "var(--color-fg)",
                             fontSize: "12px",
                         }}
-                        cursor={{ fill: "rgba(255,255,255,0.04)" }}
-                        itemStyle={{ color: "#9ca3af" }}
+                        cursor={{ fill: "var(--color-highlight)" }}
+                        itemStyle={{ color: "var(--color-fg-muted)" }}
                         // oxlint-disable-next-line typescript/promise-function-async -- ReactNode includes Promise
                         labelFormatter={(label: ReactNode) => {
                             return typeof label === "number"
                                 ? Temporal.Instant.fromEpochMilliseconds(label).toLocaleString([], bucketLabelOptions)
                                 : label;
                         }}
-                        labelStyle={{ fontWeight: 600, color: "#e5e7eb", marginBottom: "4px" }}
+                        labelStyle={{ fontWeight: 600, color: "var(--color-fg)", marginBottom: "4px" }}
                     />
                     {METRIC_KEYS.map((metric) => {
                         return (
@@ -115,7 +115,7 @@ export const StatsBarChart: React.FC<Properties> = ({ grid, points, selectedMetr
                                 dataKey={(point: BucketPoint) => {
                                     return point[metric];
                                 }}
-                                fill="#2563eb"
+                                fill="var(--color-blue-600)"
                                 hide={metric !== selectedMetric}
                                 key={metric}
                                 name={METRICS[metric].label}

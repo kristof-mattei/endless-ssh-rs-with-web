@@ -42,9 +42,15 @@ class InertWebSocket {
     }
 }
 
+// jsdom does not implement matchMedia
+function inertMatchMedia(): { matches: boolean } & EventTarget {
+    return Object.assign(new EventTarget(), { matches: true });
+}
+
 describe("App", () => {
     it("renders", () => {
         vi.stubGlobal("WebSocket", InertWebSocket);
+        vi.stubGlobal("matchMedia", inertMatchMedia);
         // a forever-pending stats fetch, the test only covers first paint
         vi.stubGlobal(
             "fetch",
@@ -61,6 +67,7 @@ describe("App", () => {
 
     it("keeps the other sections when one fails to render, and retries it", () => {
         vi.stubGlobal("WebSocket", InertWebSocket);
+        vi.stubGlobal("matchMedia", inertMatchMedia);
         vi.stubGlobal(
             "fetch",
             vi.fn(async () => {
