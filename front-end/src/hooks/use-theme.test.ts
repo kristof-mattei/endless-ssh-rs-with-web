@@ -55,6 +55,39 @@ describe("use-theme", () => {
 
             expect(result.current).toBe("auto");
         });
+
+        it("follows a preference stored by another tab", async () => {
+            expect.hasAssertions();
+
+            const { useThemePreference } = await import("./use-theme");
+            const { result } = renderHook(useThemePreference);
+
+            act(() => {
+                localStorage.setItem("theme", "dark");
+                globalThis.dispatchEvent(new StorageEvent("storage", { key: "theme", newValue: "dark" }));
+            });
+
+            expect(result.current).toBe("dark");
+            expect(document.documentElement.dataset["theme"]).toBe("dark");
+        });
+
+        it("resets to auto when another tab clears storage", async () => {
+            expect.hasAssertions();
+
+            localStorage.setItem("theme", "light");
+            document.documentElement.dataset["theme"] = "light";
+
+            const { useThemePreference } = await import("./use-theme");
+            const { result } = renderHook(useThemePreference);
+
+            act(() => {
+                localStorage.clear();
+                globalThis.dispatchEvent(new StorageEvent("storage", { key: null }));
+            });
+
+            expect(result.current).toBe("auto");
+            expect(document.documentElement.dataset["theme"]).toBeUndefined();
+        });
     });
 
     describe("useColorScheme", () => {
