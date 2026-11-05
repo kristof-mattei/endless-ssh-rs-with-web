@@ -8,9 +8,7 @@ import { formatMetricValue, METRIC_KEYS, METRICS } from "../lib/metrics";
 import type { BucketGrid, BucketPoint } from "../lib/stats-buckets";
 import { StatsTooltip } from "./stats-tooltip";
 
-// recharts hands axis values to d3, which coerces object keys via `valueOf()`.
-// `Temporal.Instant.prototype.valueOf` throws by design, so the axis carries
-// epoch milliseconds and formatters convert back to `Temporal.Instant`.
+// the axis scale coerces its values and `Temporal.Instant.prototype.valueOf` throws by design, so the axis uses epoch milliseconds and formatters convert back to `Temporal.Instant`
 const Typed = createHorizontalChart<BucketPoint, number>()({
     XAxis,
     YAxis,

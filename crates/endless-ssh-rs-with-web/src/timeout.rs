@@ -19,10 +19,7 @@ impl std::fmt::Debug for Timeout {
 
 impl Timeout {
     pub(crate) fn as_c_timeout(&self) -> i32 {
-        // note the + 1
-        // Duration stores data as seconds and nanoseconds internally.
-        // if the nanoseconds < 1 milliseconds it gets lost
-        // so we add one to make sure we always wait until the duration has passed
+        // `whole_milliseconds` truncates, the + 1 keeps the timeout from ending before the duration has passed
         match *self {
             Timeout::Infinite => -1,
             Timeout::Duration(m) => i32::try_from(m.whole_milliseconds() + 1).unwrap_or(i32::MAX),

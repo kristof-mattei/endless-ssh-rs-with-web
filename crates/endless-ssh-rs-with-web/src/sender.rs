@@ -33,7 +33,6 @@ where
             Ok(0)
         },
         Err(error) => {
-            // something went wrong sending the data. It happens.
             if matches!(
                 error.kind(),
                 ErrorKind::ConnectionReset | ErrorKind::TimedOut | ErrorKind::BrokenPipe

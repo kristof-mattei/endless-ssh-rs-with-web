@@ -12,7 +12,7 @@ use crate::events::{ActiveConnectionInfo, ConnectionEvent, ConnectionFrame, WsEv
 use crate::state::ApplicationState;
 use crate::utils::serde::{Elapsed, Timestamp};
 
-/// The client's watchdog assumes a multiple of this before declaring the connection half-dead.
+/// The front-end watchdog closes a connection after a multiple of this without a frame.
 const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(30);
 
 pub(super) async fn ws_handler(

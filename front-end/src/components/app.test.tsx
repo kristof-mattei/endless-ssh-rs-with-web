@@ -74,7 +74,7 @@ describe("App", () => {
                 await Promise.race([]);
             }),
         );
-        // React reports every caught render error on the console
+        // React logs every caught render error to the console
         vi.spyOn(console, "error").mockReturnValue();
 
         map.fails = true;

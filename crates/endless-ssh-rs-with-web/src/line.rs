@@ -38,9 +38,10 @@ pub(crate) fn randline(maxlen: usize) -> Vec<u8> {
 
 fn randline_from(mut rng: impl GetRandom, maxlen: usize) -> Vec<u8> {
     // original did 3 + rand(s) % (maxlen - 2)
-    // so if rand(2) was 47, maxlen 50, the outcome is 3 + (47 % 48)
+    // so if rand(s) was 47, maxlen 50, the outcome is 3 + (47 % 48)
     // we have a length of 50
     // with a range we don't need to do - 2
+    // at least one printable byte before the CRLF
     let len = rng.gen_range(3..=maxlen);
 
     let mut buffer = vec![0_u8; len];
@@ -74,8 +75,6 @@ mod tests {
 
     #[test]
     fn randline() {
-        // given
-        // mock rng
         let mut mock_rng = MockGetRandom::new();
 
         // set random length to requested maximum length
@@ -91,18 +90,13 @@ mod tests {
         let max_len = 50;
         let randline = randline_from(mock_rng, max_len);
 
-        // then
-        // did we get a line our length?
         assert_eq!(randline.len(), max_len);
 
-        // since we mocked the Rng, we can make sure that the line is as we expect it is
         assert_eq!(randline[..(max_len - 2)], vec![b'a'; max_len - 2]);
     }
 
     #[test]
     fn randline_carriage_return_line_feed() {
-        // given
-        // mock rng
         let mut ctx = MockGetRandom::new();
 
         // set random length to requested maximum length
@@ -112,22 +106,16 @@ mod tests {
         ctx.expect_gen_range::<u8, RangeInclusive<u8>>()
             .return_const(b'a');
 
-        // when
         let max_len = 50;
         let randline = randline_from(ctx, max_len);
 
-        // then
-        // did we get a line our length?
         assert_eq!(randline.len(), max_len);
 
-        // do we end in a CRLF linebreak?
         assert_eq!(randline[(max_len - 2)..], [b'\r', b'\n']);
     }
 
     #[test]
     fn randline_no_ssh_prefix() {
-        // given
-        // mock rng
         let mut ctx = MockGetRandom::new();
 
         // set random length to requested maximum length

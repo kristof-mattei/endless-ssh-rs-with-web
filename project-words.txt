@@ -122,7 +122,6 @@ trixie
 trunc
 tsgolint
 twemoji
-typesystem
 uninit
 uninlined
 uninspectable

@@ -79,10 +79,10 @@ const config: OxlintConfig = defineConfig({
         "no-console": ["error", { allow: ["error", "warn"] }],
         "no-duplicate-imports": ["error", { allowSeparateTypeImports: true }],
         "no-inline-comments": "off",
-        // tsc reports redeclarations (ts2451); this rule also flags a type and a value sharing a name, which TypeScript allows
+        // tsc errors on redeclarations (ts2451); this rule also flags a type and a value sharing a name, which TypeScript allows
         "no-redeclare": "off",
         "no-ternary": "off",
-        // tsc reports undefined identifiers
+        // tsc errors on undefined identifiers
         "no-undef": "off",
         "no-undefined": "off",
         "no-unreachable-loop": "error",
@@ -172,7 +172,7 @@ const config: OxlintConfig = defineConfig({
 
         "promise/no-return-in-finally": "error",
 
-        // tsc's noImplicitReturns covers this and understands exhaustive switches
+        // tsc's noImplicitReturns covers this and accepts exhaustive switches
         "typescript/consistent-return": "off",
         "typescript/consistent-type-imports": [
             "error",

@@ -83,9 +83,7 @@ export function getBucketLabelOptions(bucketWidthMs: number): Intl.DateTimeForma
     return { day: "numeric", month: "short", year: "numeric" };
 }
 
-// One bar per bucket, so ticks derived from the domain width would land on arbitrary buckets.
-// Tick values are computed on local calendar boundaries instead, then snapped up to the bucket grid because
-// a boundary is only a bucket when the UTC offset divides the bucket width.
+// One bar per bucket, so ticks derived from the domain width would land on arbitrary buckets. Tick values are computed on local calendar boundaries instead, then snapped up to the bucket grid because a boundary is only a bucket when the bucket width divides the UTC offset.
 export function getTickValues({ bucketWidthMs, range }: BucketGrid): number[] {
     const spanHours = range.from.until(range.to).total("hours");
     const start = range.from.toZonedDateTimeISO(Temporal.Now.timeZoneId());

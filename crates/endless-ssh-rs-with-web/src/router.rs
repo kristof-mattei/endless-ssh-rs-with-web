@@ -29,8 +29,7 @@ pub(crate) fn build_router(state: ApplicationState, front_end: &FrontEnd) -> Rou
     let api_router = build_api_router(state);
     let html_router = front_end.router();
 
-    // we can move the `/healthz` layer beneath the `TraceLayer` to prevent it from being logged
-
+    // TODO: consider moving `/healthz` below the `TraceLayer` call, routes added after it are not traced, so health checks would stop being logged
     html_router
         .nest(
             "/api",

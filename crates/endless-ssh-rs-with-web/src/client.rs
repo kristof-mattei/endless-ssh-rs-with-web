@@ -36,7 +36,7 @@ pub(crate) struct ClientContext {
 /// Creates an epoll fd that monitors `socket_fd` for `EPOLLRDHUP | EPOLLERR | EPOLLHUP`, but NOT `EPOLLIN`, and registers it with the tokio reactor.
 /// This allows us to detect the client closing the connection or shutting down its writing half, without reading what it sends.
 fn make_disconnect_epoll(socket_fd: i32) -> Result<AsyncFd<OwnedFd>, std::io::Error> {
-    // SAFETY: syscall
+    // SAFETY: `epoll_create1(2)` has no preconditions
     let epfd = unsafe { libc::epoll_create1(libc::EPOLL_CLOEXEC) };
 
     if epfd < 0 {
@@ -168,8 +168,7 @@ async fn listen_forever(
                     return (time_spent, bytes_sent);
                 }
 
-                // if n == 0 (no events yet) or n > 0 with no matching flags
-                // means spurious wakeup, so we just retry
+                // n == 0 (no events yet) or n > 0 with no matching flags means a spurious wakeup, so retry
                 continue;
             }
         }

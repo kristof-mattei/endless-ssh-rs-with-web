@@ -171,7 +171,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
         // re-anchor the auto-refresh countdown to this fetch
         startIntervalTimer();
 
-        // doFetch reports failures through the error state and never throws
+        // doFetch writes failures to the error state and never throws
         await doFetch(selected);
 
         setIsRefreshing(false);

@@ -5,8 +5,6 @@ import type { Timestamp } from "./Timestamp";
 
 /**
  * In-memory representation of currently connected clients.
- * # Considerations
- * We might merge this with the actual Client.
  */
 export type ActiveConnectionInfo = {
   ip: string;
