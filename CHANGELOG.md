@@ -1,4 +1,44 @@
 <!-- header goes here -->
+## [1.2.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.1.0..v1.2.0) - 2026-11-05
+
+### 🚀 Features
+
+- Add `SECURITY.md` to explain our policy by [@kristof-mattei](https://github.com/kristof-mattei) ([`05baa4a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/05baa4a867f647116f87b1587089e55444da644d))
+- Add a light theme with an auto, light and dark toggle by [@kristof-mattei](https://github.com/kristof-mattei) ([`ec1f41a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ec1f41a537ecda7427abe2cf5a01e358d616aad9))
+- Sync the theme preference across tabs by [@kristof-mattei](https://github.com/kristof-mattei) ([`bbde347`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bbde34703c95b8be8265238488408e5bf6cf8d0c))
+
+### 🐛 Bug Fixes
+
+- *(ci)* Re-enable zizmore ref-pin, now that zizmor supports actions-lock by [@kristof-mattei](https://github.com/kristof-mattei) ([`471d815`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/471d815fe58c37310aabf030769ccbbb4a48d631))
+- *(deps)* Update ip-address (npm) to v10.7.6 by [@renovate[bot]](https://github.com/renovate[bot]) ([`5b02ef1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5b02ef1661917efbd8576ed723d19ca8c3c350cf))
+- *(deps)* Update temporal-polyfill (npm) to v1.0.8 by [@renovate[bot]](https://github.com/renovate[bot]) ([`9cf566b`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/9cf566bfaebe82f55540ca4785054d97e5916e92))
+
+### 📚 Documentation
+
+- Correct stale comments and remove narrating ones by [@kristof-mattei](https://github.com/kristof-mattei) ([`a8ab91d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a8ab91d33f2c7d5d60a42f37bf21980e547d363d))
+- Correct the tick snapping condition and the build mismatch wording by [@kristof-mattei](https://github.com/kristof-mattei) ([`324fa50`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/324fa50f4c98dd0931625a89871bc2ab7ecb6718))
+
+### ⚡ Performance
+
+- Download `temporal-polyfill` only in browsers without `Temporal` by [@kristof-mattei](https://github.com/kristof-mattei) ([`d08de96`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d08de961828dfe84a940d6442ef294eb6ae925a3))
+- Minify the front-end bundle by [@kristof-mattei](https://github.com/kristof-mattei) ([`97c227d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/97c227ddb4f0e25395103745504acff012c814fb))
+
+### 🚜 Refactor
+
+- Use the global `Temporal`, polyfilled by `temporal-polyfill/global` by [@kristof-mattei](https://github.com/kristof-mattei) ([`79dc2a0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/79dc2a0f884c6765c634d7c9b1da66fa0e894e8b))
+- Remove the unovis chart and its library switch by [@kristof-mattei](https://github.com/kristof-mattei) ([`4f6703c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4f6703c202bb14f619323798df1b61701a0bbd03))
+- Rename `RechartsStatsChart` to `StatsBarChart` by [@kristof-mattei](https://github.com/kristof-mattei) ([`f338c66`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f338c6666aaad085598b044a3dfd8b4158adf79f))
+
+### 🎨 Styling
+
+- Unwrap hard-wrapped comments by [@kristof-mattei](https://github.com/kristof-mattei) ([`3921e21`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/3921e2147adf1b6df4b0d93965f4554dab7607db))
+
+### ⚙️ Miscellaneous Tasks
+
+- Report container layer sizes to Codecov bundle analysis by [@kristof-mattei](https://github.com/kristof-mattei) ([`dd9a929`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/dd9a929b110c40a34242f2e12b6c54ae49fd9782))
+- Make `report-container-size.js` pass oxlint by [@kristof-mattei](https://github.com/kristof-mattei) ([`f704727`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f704727f63c6ac16ed7cff7dfa8ba91af1440549))
+- Exclude `report-container-size.js` from oxlint by [@kristof-mattei](https://github.com/kristof-mattei) ([`b9b6ef8`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/b9b6ef861420aca65ef1ccec551d872e6a7add9c))
+- Drop duplicate fork checks from `docker-attest` and rewrite job condition comments by [@kristof-mattei](https://github.com/kristof-mattei) ([`8e57c97`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/8e57c97652f7409476f84c885c6ab52b074d064e))
 ## [1.1.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.0.5..v1.1.0) - 2026-10-30
 
 ### 🚀 Features
