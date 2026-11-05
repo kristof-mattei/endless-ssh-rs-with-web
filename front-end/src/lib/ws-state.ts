@@ -89,8 +89,7 @@ export function wsReducer(state: WsState, event: WsEvent): WsState {
             };
         }
         case "disconnected": {
-            // the sequence is monotonic and delivery is in-order, so anything at
-            // or below the high-water mark is a replay duplicate
+            // the sequence is monotonic and delivery is in-order, so anything at or below the high-water mark is a replay duplicate
             if (event.sequence <= state.maxSeenSequence) {
                 return state;
             }

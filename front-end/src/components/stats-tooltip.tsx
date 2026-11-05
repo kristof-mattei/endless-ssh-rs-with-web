@@ -8,9 +8,7 @@ function isBucketPoint(value: unknown): value is BucketPoint {
     return typeof value === "object" && value !== null && "bucket" in value;
 }
 
-// recharts' `DefaultTooltipContent` is declared without generics, so rendering the
-// content ourselves is the only way to keep the chart's narrowed types. Markup and
-// base styles mirror theirs.
+// recharts' `DefaultTooltipContent` is declared without generics, so rendering the content ourselves is the only way to keep the chart's narrowed types. Markup and base styles mirror theirs.
 export const StatsTooltip: (properties: TooltipContentProps<number, keyof BucketPoint>) => null | React.JSX.Element = ({
     contentStyle,
     itemStyle,

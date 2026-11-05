@@ -101,8 +101,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
         void doFetch(selected);
     }, [doFetch, selected]);
 
-    // the range resolves to absolute instants at fetch time, so a fetch is stale after any
-    // gap: refetch when the socket recovers and when the tab becomes visible again
+    // the range resolves to absolute instants at fetch time, so a fetch is stale after any gap: refetch when the socket recovers and when the tab becomes visible again
     const wasLiveReference = useRef(isLive);
 
     useEffect(() => {

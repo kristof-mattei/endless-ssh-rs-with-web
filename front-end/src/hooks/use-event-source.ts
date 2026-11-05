@@ -9,8 +9,7 @@ export interface EventSourceOptions {
     onEvent: (event: WsEvent) => void;
 }
 
-// ?demo replaces the live WebSocket with locally generated random traffic. The choice is made once per page load,
-// so a component calls one statically known hook.
+// ?demo replaces the live WebSocket with locally generated random traffic. The choice is made once per page load, so a component calls one statically known hook.
 export const useEventSource: (options: EventSourceOptions) => { status: EventSourceStatus } = new URLSearchParams(
     globalThis.location.search,
 ).has("demo")

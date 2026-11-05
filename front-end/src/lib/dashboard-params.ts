@@ -4,8 +4,7 @@ import { createParser, parseAsStringLiteral } from "nuqs";
 import type { Metric } from "./metrics";
 import { METRIC_KEYS } from "./metrics";
 
-// The dashboard's URL contract. Every selectable value has a slug here, and the components read
-// state only through these parsers.
+// The dashboard's URL contract. Every selectable value has a slug here, and the components read state only through these parsers.
 
 // `Metric` indexes `BucketPoint`, so the URL needs its own vocabulary rather than the column names.
 const METRIC_SLUGS = {

@@ -43,16 +43,14 @@ fn make_disconnect_epoll(socket_fd: i32) -> Result<AsyncFd<OwnedFd>, std::io::Er
         return Err(std::io::Error::last_os_error());
     }
 
-    // SAFETY: epfd is a valid fd we now own; wrap it immediately so it is closed
-    // on any subsequent error path
+    // SAFETY: epfd is a valid fd we now own; wrap it immediately so it is closed on any subsequent error path
     let owned_epfd = unsafe { OwnedFd::from_raw_fd(epfd) };
 
     // SAFETY: epoll_event is a C struct, zero is a valid bit pattern for it
     let mut ev: libc::epoll_event = unsafe { std::mem::zeroed() };
     ev.events = INTERESTED_EVENTS;
 
-    // SAFETY: owned_epfd holds a valid epoll fd; socket_fd is a valid fd owned
-    // by the caller; ev is fully initialized
+    // SAFETY: owned_epfd holds a valid epoll fd; socket_fd is a valid fd owned by the caller; ev is fully initialized
     let ret = unsafe {
         libc::epoll_ctl(
             owned_epfd.as_raw_fd(),
@@ -103,8 +101,7 @@ async fn listen_forever(
     let mut time_spent = SignedDuration::ZERO;
     let mut bytes_sent = 0_usize;
 
-    // register the stream for disconnect events only, failures are non-fatal and
-    // disable disconnect detection for this client (i.e. falls back to send-based detection)
+    // register the stream for disconnect events only, failures are non-fatal and disable disconnect detection for this client (i.e. falls back to send-based detection)
     let async_epfd = make_disconnect_epoll(stream.as_raw_fd())
         .inspect_err(|error| {
             event!(Level::WARN, %addr, ?error, "epoll setup failed, disconnect detection disabled");
@@ -208,10 +205,7 @@ async fn listen_forever(
 
             send_next = Instant::now() + config.delay;
         } else {
-            // Send failed, ergo client is gone. If epoll was active it would have
-            // fired during the wait had the client disconnected then, so we
-            // can credit the full delay. Without epoll we have no proof the
-            // client was alive through the wait, so we don't count it.
+            // Send failed, ergo client is gone. If epoll was active it would have fired during the wait had the client disconnected then, so we can credit the full delay. Without epoll we have no proof the client was alive through the wait, so we don't count it.
             if async_epfd.is_some() {
                 time_spent += config.delay;
             }
