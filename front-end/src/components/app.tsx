@@ -13,6 +13,7 @@ import { EventFeed } from "./event-feed";
 import { SectionError } from "./section-error";
 import { StatsChart } from "./stats-chart";
 import { StatsPanel } from "./stats-panel";
+import { ThemeToggle } from "./theme-toggle";
 import { TimeRangeSelector } from "./time-range-selector";
 import { TopCountries } from "./top-countries";
 import { WorldMap } from "./world-map";
@@ -29,14 +30,15 @@ export const App: React.FC = () => {
     const { status } = useEventSource({ onEvent: dispatch });
 
     return (
-        <div className="bg-gray-950 p-4 text-white min-block-screen">
+        <div className="bg-canvas p-4 text-fg-strong min-block-screen">
             <header>
                 <h1 className="text-2xl font-bold">endless-ssh-rs, an ssh honeypot</h1>
+                <ThemeToggle />
             </header>
 
             <section className="mbe-6 space-y-2">
                 <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-semibold text-gray-300">Live attack map</h2>
+                    <h2 className="text-lg font-semibold text-fg-soft">Live attack map</h2>
                     <ConnectionBadge status={status} />
                 </div>
 
@@ -62,7 +64,7 @@ export const App: React.FC = () => {
             </section>
 
             <section className="mbe-6 space-y-2">
-                <h2 className="text-lg font-semibold text-gray-300">Stats</h2>
+                <h2 className="text-lg font-semibold text-fg-soft">Stats</h2>
 
                 <ErrorBoundary FallbackComponent={SectionError}>
                     <TimeRangeSelector isLive={status === "live"} onData={setStatsData} />

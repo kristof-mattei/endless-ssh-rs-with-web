@@ -180,7 +180,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
 
     return (
         <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-400">Time range:</span>
+            <span className="text-sm text-fg-muted">Time range:</span>
             {RANGE_SLUGS.map((range) => {
                 return (
                     <button
@@ -188,7 +188,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                         className={`rounded-sm px-3 py-1 text-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
                             selected === range
                                 ? "bg-blue-600 text-white"
-                                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                                : "bg-control text-fg-soft hover:bg-control-hover"
                         }`}
                         key={range}
                         onClick={() => {
@@ -202,7 +202,7 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
             })}
             <button
                 aria-label="Refresh"
-                className="ms-2 rounded-sm bg-gray-700 px-3 py-1 text-sm text-gray-300 transition-colors hover:bg-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                className="ms-2 rounded-sm bg-control px-3 py-1 text-sm text-fg-soft transition-colors hover:bg-control-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                 disabled={isRefreshing}
                 onClick={() => {
                     void refresh();
@@ -214,11 +214,11 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                     ↻
                 </span>
             </button>
-            <label className="text-sm text-gray-400" htmlFor={autoRefreshId}>
+            <label className="text-sm text-fg-muted" htmlFor={autoRefreshId}>
                 Auto-refresh:
             </label>
             <select
-                className="rounded-sm bg-gray-700 px-2 py-1 text-sm text-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                className="rounded-sm bg-control px-2 py-1 text-sm text-fg-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                 id={autoRefreshId}
                 onChange={(event) => {
                     const chosen = DASHBOARD_PARAMS.refresh.parse(event.target.value);
@@ -239,9 +239,9 @@ export const TimeRangeSelector: React.FC<Properties> = ({ isLive, onData }) => {
                     );
                 })}
             </select>
-            {isLoading && <span className="ms-2 text-xs text-gray-500">Loading...</span>}
+            {isLoading && <span className="ms-2 text-xs text-fg-subtle">Loading...</span>}
             {hasError && !isLoading && (
-                <span className="ms-2 text-xs text-red-400">
+                <span className="ms-2 text-xs text-red-fg">
                     Failed to load stats.{" "}
                     <button
                         className="underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"

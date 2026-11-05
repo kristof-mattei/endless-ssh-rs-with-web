@@ -1,8 +1,50 @@
 @import "tailwindcss";
 
-/* the dashboard is dark for everyone, tell the browser so native controls and light-dark() follow */
+/* native controls and light-dark() follow the OS preference unless data-theme holds an explicit one */
 :root {
-    color-scheme: dark;
+    color-scheme: light dark;
+
+    &[data-theme="light"] {
+        color-scheme: light;
+    }
+
+    &[data-theme="dark"] {
+        color-scheme: dark;
+    }
+}
+
+@custom-variant dark {
+    :root[data-theme="dark"] & {
+        @slot;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) & {
+            @slot;
+        }
+    }
+}
+
+@theme {
+    --color-canvas: light-dark(var(--color-gray-100), var(--color-gray-950));
+    --color-panel: light-dark(var(--color-white), var(--color-gray-800));
+    --color-inset: light-dark(var(--color-gray-50), var(--color-gray-900));
+    --color-control: light-dark(var(--color-gray-200), var(--color-gray-700));
+    --color-control-hover: light-dark(var(--color-gray-300), var(--color-gray-600));
+    --color-line: light-dark(var(--color-gray-200), var(--color-gray-700));
+    --color-line-strong: light-dark(var(--color-gray-300), var(--color-gray-600));
+    --color-highlight: light-dark(rgb(0 0 0 / 4%), rgb(255 255 255 / 4%));
+
+    --color-fg-strong: light-dark(var(--color-gray-950), var(--color-white));
+    --color-fg: light-dark(var(--color-gray-800), var(--color-gray-200));
+    --color-fg-soft: light-dark(var(--color-gray-700), var(--color-gray-300));
+    --color-fg-muted: light-dark(var(--color-gray-600), var(--color-gray-400));
+    --color-fg-subtle: var(--color-gray-500);
+
+    --color-green-fg: light-dark(var(--color-green-700), var(--color-green-400));
+    --color-red-fg: light-dark(var(--color-red-700), var(--color-red-400));
+    --color-amber-fg: light-dark(var(--color-amber-700), var(--color-amber-400));
+    --color-purple-fg: light-dark(var(--color-purple-700), var(--color-purple-400));
 }
 
 @utility flags-font {

@@ -3,6 +3,7 @@ appgroup
 appuser
 archi
 artipacked
+basemap
 bkeepers
 bpchar
 buildcache

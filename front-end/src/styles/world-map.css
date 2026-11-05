@@ -7,20 +7,20 @@
 .maplibregl-map .maplibregl-ctrl-attrib {
     &,
     &.maplibregl-compact {
-        @apply bg-white/50 text-black/75 dark:bg-gray-800/80 dark:text-gray-400;
+        @apply bg-panel/80 text-fg-muted;
     }
 
     & a {
-        @apply text-black/75 dark:text-gray-400;
+        @apply text-fg-muted;
 
         &:hover {
-            @apply text-black dark:text-gray-200;
+            @apply text-fg;
         }
     }
 
     /* the toggle glyph is a dark inline SVG, inverting is the only way to recolor it */
     &.maplibregl-compact .maplibregl-ctrl-attrib-button,
     &.maplibregl-compact:after {
-        @apply bg-transparent opacity-70 invert;
+        @apply bg-transparent opacity-70 dark:invert;
     }
 }
