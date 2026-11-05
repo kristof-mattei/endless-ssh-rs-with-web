@@ -78,8 +78,7 @@ impl Listener {
 
         match accept {
             Ok((socket, addr)) => {
-                // Set the smallest possible receive buffer. This reduces local
-                // resource usage and slows down the remote end.
+                // Set the smallest possible receive buffer. This reduces local resource usage and slows down the remote end.
                 if let Err(error) = set_receive_buffer_size(&socket, SIZE_IN_BYTES) {
                     event!(
                         Level::ERROR,
