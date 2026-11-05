@@ -1,7 +1,12 @@
 import { useSyncExternalStore } from "react";
 
 import type { ColorScheme, ThemePreference } from "../lib/theme-preference";
-import { applyThemePreference, loadThemePreference, storeThemePreference } from "../lib/theme-preference";
+import {
+    applyThemePreference,
+    loadThemePreference,
+    storeThemePreference,
+    subscribeStoredThemePreference,
+} from "../lib/theme-preference";
 
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 
@@ -35,8 +40,7 @@ function getSystemScheme(): ColorScheme {
     return globalThis.matchMedia(DARK_QUERY).matches ? "dark" : "light";
 }
 
-export function setThemePreference(preference: ThemePreference): void {
-    storeThemePreference(preference);
+function updatePreference(preference: ThemePreference): void {
     applyThemePreference(preference);
 
     currentPreference = preference;
@@ -44,6 +48,13 @@ export function setThemePreference(preference: ThemePreference): void {
     for (const listener of preferenceListeners) {
         listener();
     }
+}
+
+subscribeStoredThemePreference(updatePreference);
+
+export function setThemePreference(preference: ThemePreference): void {
+    storeThemePreference(preference);
+    updatePreference(preference);
 }
 
 export function useThemePreference(): ThemePreference {

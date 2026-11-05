@@ -27,6 +27,21 @@ export function storeThemePreference(preference: ThemePreference): void {
     }
 }
 
+export function subscribeStoredThemePreference(onChange: (preference: ThemePreference) => void): () => void {
+    function onStorage(event: StorageEvent): void {
+        // `localStorage.clear()` fires with a `null` key
+        if (event.key === STORAGE_KEY || event.key === null) {
+            onChange(loadThemePreference());
+        }
+    }
+
+    globalThis.addEventListener("storage", onStorage);
+
+    return (): void => {
+        globalThis.removeEventListener("storage", onStorage);
+    };
+}
+
 export function applyThemePreference(preference: ThemePreference): void {
     if (preference === "auto") {
         delete document.documentElement.dataset["theme"];
