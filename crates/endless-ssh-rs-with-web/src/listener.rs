@@ -30,7 +30,6 @@ pub(crate) async fn listen_for_new_connections(
     client_context: ClientContext,
     semaphore: Arc<Semaphore>,
 ) -> Result<(), eyre::Report> {
-    // listen forever, accept new clients
     let listener = Listener::bind(
         Arc::clone(&config),
         client_task_tracker,
@@ -42,6 +41,7 @@ pub(crate) async fn listen_for_new_connections(
 
     event!(Level::INFO, listener = ?listener.tcp_listener, "Bound and listening!");
 
+    // listen forever, accept new clients
     loop {
         tokio::select! {
             biased;
