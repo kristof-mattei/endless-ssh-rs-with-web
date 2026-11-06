@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [1.2.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.0..v1.2.1) - 2026-11-06
+
+### 📚 Documentation
+
+- Move the listener loop comment and remove narrating decode comments by [@kristof-mattei](https://github.com/kristof-mattei) ([`ef39439`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ef3943942c85f0aba72409dcba4eefaf7276e4c3))
 ## [1.2.0](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.1.0..v1.2.0) - 2026-11-05
 
 ### 🚀 Features
