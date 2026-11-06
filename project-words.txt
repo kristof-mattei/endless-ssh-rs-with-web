@@ -82,6 +82,7 @@ rawfile
 rcvbuf
 retag
 retagging
+retags
 rewatched
 rfold
 rhysd
