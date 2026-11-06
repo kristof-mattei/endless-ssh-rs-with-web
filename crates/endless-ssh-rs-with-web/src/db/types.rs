@@ -24,9 +24,8 @@ impl<'r> Decode<'r, Postgres> for DbIpAddr {
     fn decode(
         value: PgValueRef<'r>,
     ) -> Result<Self, Box<dyn std::error::Error + 'static + Send + Sync>> {
-        // Decode into the native sqlx type first
         let ip_net = <IpNet as Decode<'r, Postgres>>::decode(value)?;
-        // Convert and wrap
+
         Ok(DbIpAddr(ip_net.addr()))
     }
 }
@@ -82,6 +81,7 @@ impl<'r> Decode<'r, Postgres> for DbDuration {
         value: PgValueRef<'r>,
     ) -> Result<Self, Box<dyn std::error::Error + 'static + Send + Sync>> {
         let interval = <PgInterval as Decode<'r, Postgres>>::decode(value)?;
+
         Ok(DbDuration(to_duration(interval)))
     }
 }
