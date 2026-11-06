@@ -56,7 +56,7 @@
         "oxc-transform-react": "0.156.0",
         "oxfmt": "0.76.0",
         "oxlint": "1.90.0",
-        "oxlint-tsgolint": "7.0.2005",
+        "oxlint-tsgolint": "7.0.2006",
         "tailwindcss": "4.3.4",
         "tar": "7.5.22",
         "typescript": "6.0.3",
