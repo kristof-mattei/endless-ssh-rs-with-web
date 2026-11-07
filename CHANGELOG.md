@@ -1,4 +1,42 @@
 <!-- header goes here -->
+## [1.2.2](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.1..v1.2.2) - 2026-11-07
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate flate2 to v1.1.11 by [@renovate[bot]](https://github.com/renovate[bot]) ([`9156082`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/915608241b0fe923752bb0d4c7c48171cbe822e2))
+- *(deps)* Update rust crate arc-swap to v1.9.4 by [@renovate[bot]](https://github.com/renovate[bot]) ([`e245959`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e245959db58f7627d87c41ba311f97836553527f))
+- *(deps)* Update rust crate uuid to v1.29.1 by [@renovate[bot]](https://github.com/renovate[bot]) ([`7348f5e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/7348f5ea0f9eaf2066f690fb278fec48627981bc))
+- *(docker)* Restore `docker-clean` and clear the apt lists in build stages by [@kristof-mattei](https://github.com/kristof-mattei) ([`ef0a0a4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ef0a0a42bb7090fe532f65183fe115ee0ba00a1f))
+- Satisfy `unreachable_pub` in Miri and Windows signal handlers by [@kristof-mattei](https://github.com/kristof-mattei) ([`bb7ed75`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bb7ed75877fc17a401f3dc20fb133f4c58b7fd73))
+- Add context to GeoLite2 download, connection insert, and bind errors by [@kristof-mattei](https://github.com/kristof-mattei) ([`ff5c9f0`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ff5c9f0b5196898d422235c3d691c9424f2ff229))
+- Strip the URL holding the MaxMind license key from reqwest errors by [@kristof-mattei](https://github.com/kristof-mattei) ([`1f20077`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/1f200773807a71c15102ff8be6115dc524540e49))
+- Log the failed GeoLite2 ETag check by [@kristof-mattei](https://github.com/kristof-mattei) ([`26eb485`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/26eb485dd3059ca3a85e72124a4b32a5e004503b))
+
+### 📚 Documentation
+
+- Rewrite narrating and hard-wrapped comments by [@kristof-mattei](https://github.com/kristof-mattei) ([`4c4488c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4c4488c9bd01ee491a771f582c493fcae855204b))
+
+### 🚜 Refactor
+
+- Build `libc::epoll_event` with struct literals instead of `std::mem::zeroed` by [@kristof-mattei](https://github.com/kristof-mattei) ([`e0bb112`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e0bb11277b5d11a46fdbaae744e1612488c776ac))
+- Check `sigemptyset` for `0` to match the `assume_init` safety comment by [@kristof-mattei](https://github.com/kristof-mattei) ([`511440d`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/511440d4336d8a70a5497a4c8c99c58ebb65d3a7))
+
+### 🎨 Styling
+
+- *(docker)* Quote `${TARGET}` and `${APPLICATION_NAME}` in `RUN` instructions by [@kristof-mattei](https://github.com/kristof-mattei) ([`11eab77`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/11eab77be3ab09c087d326f937540367eb751748))
+
+### 🧪 Testing
+
+- Cover `make_disconnect_epoll` event mask by [@kristof-mattei](https://github.com/kristof-mattei) ([`4920097`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4920097949bf947f41fbe36089c0aedae0c9e81e))
+
+### ⚙️ Miscellaneous Tasks
+
+- Use the shared Qlty source from `qlty-config` by [@kristof-mattei](https://github.com/kristof-mattei) ([`222c681`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/222c68110b2e908f821d3b40b76b88c3d050e643))
+- Record nightly-only `implicit_provenance_casts` lint by [@kristof-mattei](https://github.com/kristof-mattei) ([`a051591`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a051591df2161a987760a081cbc77254f341ad2c))
+
+### 💼 Other
+
+- *(docker)* Declare `ARG TARGET` in `rust-cargo-build` by [@kristof-mattei](https://github.com/kristof-mattei) ([`39704b1`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/39704b141237d7c46d5270cdf9c07594ed8b97e1))
 ## [1.2.1](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.0..v1.2.1) - 2026-11-06
 
 ### 📚 Documentation
