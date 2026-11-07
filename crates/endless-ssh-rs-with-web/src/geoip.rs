@@ -315,7 +315,15 @@ async fn should_download_database(license_key: &str, geo_ip_path: &Path) -> bool
             // a different ETag means the remote database was updated, so download it
             server_etag != etag
         },
-        Err(_error) => false,
+        Err(error) => {
+            event!(
+                Level::WARN,
+                ?error,
+                "Failed to check the GeoLite2-City ETag, keeping the current database"
+            );
+
+            false
+        },
     }
 }
 
@@ -361,6 +369,7 @@ async fn get_database_etag(license_key: &str) -> Result<String, eyre::Report> {
         .head(url)
         .send()
         .await
+        .map_err(reqwest::Error::without_url)
         .wrap_err("Failed to request the GeoLite2-City ETag")?;
 
     if !response.status().is_success() {
@@ -384,6 +393,7 @@ async fn download_database(license_key: &str, output: PathBuf) -> Result<(), eyr
         .get(url)
         .send()
         .await
+        .map_err(reqwest::Error::without_url)
         .wrap_err("Failed to request the GeoLite2-City database")?;
 
     if !response.status().is_success() {
@@ -400,6 +410,7 @@ async fn download_database(license_key: &str, output: PathBuf) -> Result<(), eyr
     let bytes = response
         .bytes()
         .await
+        .map_err(reqwest::Error::without_url)
         .wrap_err("Failed to receive the GeoLite2-City database")?;
 
     // decompress the gz, walk through the tar until we find the entry, and write it to the output file
