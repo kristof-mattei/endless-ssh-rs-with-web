@@ -46,9 +46,10 @@ fn make_disconnect_epoll(socket_fd: i32) -> Result<AsyncFd<OwnedFd>, std::io::Er
     // SAFETY: epfd is a valid fd we now own; wrap it immediately so it is closed on any subsequent error path
     let owned_epfd = unsafe { OwnedFd::from_raw_fd(epfd) };
 
-    // SAFETY: epoll_event is a C struct, zero is a valid bit pattern for it
-    let mut ev: libc::epoll_event = unsafe { std::mem::zeroed() };
-    ev.events = INTERESTED_EVENTS;
+    let mut ev = libc::epoll_event {
+        events: INTERESTED_EVENTS,
+        u64: 0,
+    };
 
     // SAFETY: owned_epfd holds a valid epoll fd; socket_fd is a valid fd owned by the caller; ev is fully initialized
     let ret = unsafe {
@@ -130,8 +131,7 @@ async fn listen_forever(
             };
 
             if let Some(mut guard) = guard {
-                // SAFETY: all zeroes are valid for epoll_event
-                let mut ev: libc::epoll_event = unsafe { std::mem::zeroed() };
+                let mut ev = libc::epoll_event { events: 0, u64: 0 };
 
                 // SAFETY: async_epfd holds a valid epoll fd, ev is a valid output buffer
                 let n = unsafe {
