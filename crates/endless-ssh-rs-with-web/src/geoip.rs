@@ -315,7 +315,15 @@ async fn should_download_database(license_key: &str, geo_ip_path: &Path) -> bool
             // a different ETag means the remote database was updated, so download it
             server_etag != etag
         },
-        Err(_error) => false,
+        Err(error) => {
+            event!(
+                Level::WARN,
+                ?error,
+                "Failed to check the GeoLite2-City ETag, keeping the current database"
+            );
+
+            false
+        },
     }
 }
 
