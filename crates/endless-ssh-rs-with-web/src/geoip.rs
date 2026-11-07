@@ -4,6 +4,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use arc_swap::ArcSwapOption;
+use color_eyre::eyre::{self, Context as _};
 use http::HeaderMap;
 use http::header::ETAG;
 use maxminddb::{Mmap, geoip2};
@@ -318,7 +319,7 @@ async fn should_download_database(license_key: &str, geo_ip_path: &Path) -> bool
     }
 }
 
-fn get_etag(headers: &HeaderMap) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+fn get_etag(headers: &HeaderMap) -> Result<String, eyre::Report> {
     let etag = headers
         .get(ETAG)
         .map(|etag| etag.to_str().map(ToOwned::to_owned));
@@ -326,7 +327,7 @@ fn get_etag(headers: &HeaderMap) -> Result<String, Box<dyn std::error::Error + S
     let Some(etag) = etag else {
         event!(Level::ERROR, "No ETAG present on request");
 
-        return Err("No ETAG present on response".into());
+        return Err(eyre::eyre!("No ETAG present on response"));
     };
 
     match etag {
@@ -334,7 +335,7 @@ fn get_etag(headers: &HeaderMap) -> Result<String, Box<dyn std::error::Error + S
         Err(ref error) => {
             event!(Level::ERROR, ?error, etag = ?etag, "ETAG on response not valid ASCII");
 
-            Err("ETAG on response not valid ASCII".into())
+            Err(eyre::eyre!("ETAG on response not valid ASCII"))
         },
     }
 }
@@ -351,17 +352,22 @@ fn build_url(license_key: &str) -> url::Url {
     url
 }
 
-async fn get_database_etag(
-    license_key: &str,
-) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+async fn get_database_etag(license_key: &str) -> Result<String, eyre::Report> {
     let url = build_url(license_key);
 
     event!(Level::INFO, "Checking GeoLite2-City's latest ETAG...");
 
-    let response = reqwest::Client::new().head(url).send().await?;
+    let response = reqwest::Client::new()
+        .head(url)
+        .send()
+        .await
+        .wrap_err("Failed to request the GeoLite2-City ETag")?;
 
     if !response.status().is_success() {
-        return Err(format!("HTTP {}", response.status()).into());
+        return Err(eyre::eyre!(
+            "The GeoLite2-City ETag request returned {}",
+            response.status()
+        ));
     }
 
     let headers = response.headers();
@@ -369,25 +375,32 @@ async fn get_database_etag(
     get_etag(headers)
 }
 
-async fn download_database(
-    license_key: &str,
-    output: PathBuf,
-) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+async fn download_database(license_key: &str, output: PathBuf) -> Result<(), eyre::Report> {
     let url = build_url(license_key);
 
     event!(Level::INFO, "Downloading GeoLite2-City database...");
 
-    let response = reqwest::Client::new().get(url).send().await?;
+    let response = reqwest::Client::new()
+        .get(url)
+        .send()
+        .await
+        .wrap_err("Failed to request the GeoLite2-City database")?;
 
     if !response.status().is_success() {
-        return Err(format!("HTTP {}", response.status()).into());
+        return Err(eyre::eyre!(
+            "The GeoLite2-City download returned {}",
+            response.status()
+        ));
     }
 
     let etag = get_etag(response.headers())?;
     let etag_path = output.with_extension("etag");
     let download_path = output.with_extension("mmdb.part");
 
-    let bytes = response.bytes().await?;
+    let bytes = response
+        .bytes()
+        .await
+        .wrap_err("Failed to receive the GeoLite2-City database")?;
 
     // decompress the gz, walk through the tar until we find the entry, and write it to the output file
     tokio::task::spawn_blocking(move || {
@@ -396,25 +409,47 @@ async fn download_database(
         let decoder = GzDecoder::new(bytes.as_ref());
         let mut archive = tar::Archive::new(decoder);
 
-        for entry in archive.entries()? {
-            let mut entry = entry?;
-            let path = entry.path()?.into_owned();
+        for entry in archive
+            .entries()
+            .wrap_err("Failed to read the GeoLite2-City archive")?
+        {
+            let mut entry = entry.wrap_err("Failed to read a GeoLite2-City archive entry")?;
+            let path = entry
+                .path()
+                .wrap_err("Failed to read a GeoLite2-City archive entry's path")?
+                .into_owned();
             if path.extension().is_some_and(|ext| ext == "mmdb") {
-                let _r = entry.unpack(&download_path)?;
+                let _r = entry.unpack(&download_path).wrap_err_with(|| {
+                    format!(
+                        "Failed to unpack `{}` to `{}`",
+                        path.display(),
+                        download_path.display()
+                    )
+                })?;
 
                 // the rename leaves the old mapping on its own inode, because a reader may still be using it
-                std::fs::rename(&download_path, &output)?;
+                std::fs::rename(&download_path, &output).wrap_err_with(|| {
+                    format!(
+                        "Failed to rename `{}` to `{}`",
+                        download_path.display(),
+                        output.display()
+                    )
+                })?;
 
-                return Result::<(), Box<dyn std::error::Error + Send + Sync>>::Ok(());
+                return Result::<(), eyre::Report>::Ok(());
             }
         }
 
-        Err("GeoLite2-City.mmdb not found in downloaded archive".into())
+        Err(eyre::eyre!(
+            "GeoLite2-City.mmdb not found in downloaded archive"
+        ))
     })
-    .await??;
+    .await
+    .wrap_err("The GeoLite2-City unpack task failed")??;
 
     // the ETag must only exist once its database is on disk
-    std::fs::write(etag_path, etag)?;
+    std::fs::write(&etag_path, etag)
+        .wrap_err_with(|| format!("Failed to write `{}`", etag_path.display()))?;
 
     Ok(())
 }

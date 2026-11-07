@@ -168,7 +168,7 @@ async fn store_closed_connection(
             broadcast_connection_event(ws_broadcast_tx, connection_event);
         },
         Err(error) => {
-            db::log_db_error(&error);
+            event!(Level::ERROR, ?error, %addr, "Failed to store the closed connection");
         },
     }
 }
