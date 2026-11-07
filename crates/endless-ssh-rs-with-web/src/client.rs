@@ -301,3 +301,57 @@ fn register_active_connection(
 
     broadcast_connection_event(&context.ws_broadcast_tx, connection_event);
 }
+
+#[cfg(test)]
+mod tests {
+    use std::io::Write as _;
+    use std::net::Shutdown;
+    use std::os::fd::AsRawFd as _;
+    use std::os::unix::net::UnixStream;
+    use std::time::Duration;
+
+    use tokio::time::timeout;
+
+    use super::make_disconnect_epoll;
+
+    #[tokio::test]
+    async fn make_disconnect_epoll_ignores_received_data() {
+        let (local, mut peer) = UnixStream::pair().unwrap();
+
+        let async_epfd = make_disconnect_epoll(local.as_raw_fd()).unwrap();
+
+        peer.write_all(b"SSH-2.0-client\r\n").unwrap();
+
+        timeout(Duration::from_millis(100), async_epfd.readable())
+            .await
+            .expect_err("received data made the disconnect epoll fd readable");
+    }
+
+    #[tokio::test]
+    async fn make_disconnect_epoll_wakes_on_peer_close() {
+        let (local, peer) = UnixStream::pair().unwrap();
+
+        let async_epfd = make_disconnect_epoll(local.as_raw_fd()).unwrap();
+
+        drop(peer);
+
+        let _guard = timeout(Duration::from_secs(5), async_epfd.readable())
+            .await
+            .expect("peer close did not make the disconnect epoll fd readable")
+            .unwrap();
+    }
+
+    #[tokio::test]
+    async fn make_disconnect_epoll_wakes_on_peer_write_shutdown() {
+        let (local, peer) = UnixStream::pair().unwrap();
+
+        let async_epfd = make_disconnect_epoll(local.as_raw_fd()).unwrap();
+
+        peer.shutdown(Shutdown::Write).unwrap();
+
+        let _guard = timeout(Duration::from_secs(5), async_epfd.readable())
+            .await
+            .expect("peer write shutdown did not make the disconnect epoll fd readable")
+            .unwrap();
+    }
+}
