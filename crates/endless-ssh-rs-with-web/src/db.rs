@@ -4,6 +4,7 @@ pub(crate) mod types;
 use std::cmp::Ordering;
 use std::net::IpAddr;
 
+use color_eyre::eyre::{self, Context as _};
 use futures::TryStreamExt as _;
 use serde::Serialize;
 use sqlx::migrate::MigrateError;
@@ -52,7 +53,7 @@ pub(crate) async fn insert_connection(
     time_spent: SignedDuration,
     bytes_sent: usize,
     geo: Option<&GeoInfo>,
-) -> Result<i64, sqlx::Error> {
+) -> Result<i64, eyre::Report> {
     let bytes_sent = i64::try_from(bytes_sent)
         .inspect_err(|_| {
             event!(
@@ -81,13 +82,26 @@ pub(crate) async fn insert_connection(
         longitude: coordinates.map(|coordinates| coordinates.longitude),
     };
 
-    let mut tx = pool.begin().await?;
+    let mut tx = pool
+        .begin()
+        .await
+        .wrap_err("Failed to begin the transaction")?;
 
-    let id = insert_feed_row(&mut *tx, &row).await?;
-    insert_log_row(&mut *tx, &row).await?;
-    add_to_totals(&mut *tx, &row).await?;
+    let id = insert_feed_row(&mut *tx, &row)
+        .await
+        .wrap_err("Failed to insert into `connections`")?;
 
-    tx.commit().await?;
+    insert_log_row(&mut *tx, &row)
+        .await
+        .wrap_err("Failed to insert into `connection_log`")?;
+
+    add_to_totals(&mut *tx, &row)
+        .await
+        .wrap_err("Failed to update `totals`")?;
+
+    tx.commit()
+        .await
+        .wrap_err("Failed to commit the transaction")?;
 
     Ok(id)
 }
@@ -557,9 +571,4 @@ pub(crate) async fn get_stats(
         Some(from_to) => get_stats_ranged(pool, from_to).await,
         None => get_stats_all(pool).await,
     }
-}
-
-#[track_caller]
-pub(crate) fn log_db_error(error: &sqlx::Error) {
-    event!(Level::ERROR, ?error, "Database error");
 }

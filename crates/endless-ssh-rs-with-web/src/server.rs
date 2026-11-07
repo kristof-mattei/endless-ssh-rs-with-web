@@ -19,7 +19,7 @@ pub(crate) async fn setup_server(
 
     let listener = tokio::net::TcpListener::bind(bind_to)
         .await
-        .wrap_err("Failed to bind Webserver to port")?;
+        .wrap_err_with(|| format!("Failed to bind the webserver to {}", bind_to))?;
 
     event!(Level::INFO, ?bind_to, "Webserver bound successfully");
 

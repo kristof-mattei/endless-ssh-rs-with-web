@@ -37,7 +37,12 @@ pub(crate) async fn listen_for_new_connections(
         semaphore,
     )
     .await
-    .wrap_err("Failed to bind the SSH listener")?;
+    .wrap_err_with(|| {
+        format!(
+            "Failed to bind the SSH listener to {}",
+            config.ssh_listen_address
+        )
+    })?;
 
     event!(Level::INFO, listener = ?listener.tcp_listener, "Bound and listening!");
 
