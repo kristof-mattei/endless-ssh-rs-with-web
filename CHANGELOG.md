@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [1.2.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.3..v1.2.4) - 2026-11-08
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate tower-proxy to v0.11.0 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`a132c8c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/a132c8ce712e61de0704cb478fe850490d8ef5f7))
 ## [1.2.3](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.2..v1.2.3) - 2026-11-08
 
 ### ⚙️ Miscellaneous Tasks
