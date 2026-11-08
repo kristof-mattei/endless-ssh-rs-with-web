@@ -1,4 +1,9 @@
 <!-- header goes here -->
+## [1.2.5](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.4..v1.2.5) - 2026-11-08
+
+### 🐛 Bug Fixes
+
+- Use a comma instead of a dash in the startup header by [Kristof Mattei](https://github.com/kristof-mattei) ([`f762952`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f762952fdafa00f0a09d3e4f27b954da439436c0))
 ## [1.2.4](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.3..v1.2.4) - 2026-11-08
 
 ### 🐛 Bug Fixes
