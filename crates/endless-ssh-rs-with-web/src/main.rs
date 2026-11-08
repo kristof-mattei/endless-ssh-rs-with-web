@@ -161,7 +161,7 @@ fn print_header() {
 
     event!(
         Level::INFO,
-        "{} v{} - built for {} ({})",
+        "{} v{}, built for {} ({})",
         NAME,
         VERSION,
         build_env.get_target(),
