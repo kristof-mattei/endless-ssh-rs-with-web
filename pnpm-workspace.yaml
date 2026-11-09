@@ -5,8 +5,11 @@ catalogs:
     vite: "8.3.6"
 overrides:
   "@codecov/vite-plugin>vite": "catalog:default"
+# these packages, or their dependencies, import the TypeScript JS API, which TypeScript 7 does not ship
 packageExtensions:
-  # dependency-cruiser parses with the TypeScript JS API, which TypeScript 7 does not ship
   dependency-cruiser:
+    dependencies:
+      typescript: "npm:@typescript/typescript6@6.0.2"
+  eslint-plugin-perfectionist:
     dependencies:
       typescript: "npm:@typescript/typescript6@6.0.2"
