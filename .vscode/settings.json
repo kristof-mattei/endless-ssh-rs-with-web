@@ -47,6 +47,7 @@
     "files.associations": {
         "*.css": "tailwindcss"
     },
+    "js/ts.experimental.useTsgo": true,
     "js/ts.preferences.importModuleSpecifier": "relative",
     "js/ts.preferences.importModuleSpecifierEnding": "minimal",
     "js/ts.tsdk.path": "node_modules/typescript/lib",

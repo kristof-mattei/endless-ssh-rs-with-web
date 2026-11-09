@@ -125,6 +125,7 @@ trixie
 trunc
 tsgolint
 twemoji
+typescriptteam
 uninit
 uninlined
 uninspectable
