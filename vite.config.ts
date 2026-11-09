@@ -89,7 +89,8 @@ const configFunction: ViteUserConfigFn = defineConfig(({ command, mode }) => {
         plugins: [
             svgr(),
             react({ compiler: { panicThreshold: "all_errors" } }),
-            checker({ typescript: true }),
+            // `tsconfig.json` is in the repository root, outside Vite's `root`
+            checker({ typescript: { root: import.meta.dirname } }),
             tailwindcss(),
             codecovVitePlugin({
                 enableBundleAnalysis: environment["GITHUB_ACTIONS"] === "true",
