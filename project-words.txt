@@ -78,6 +78,7 @@ profraw
 psql
 pyflakes
 qlty
+qltysh
 randline
 rawfile
 rcvbuf
