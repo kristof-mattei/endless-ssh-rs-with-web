@@ -72,6 +72,8 @@ const SIZE_IN_BYTES: usize = 1;
 // under `docker stop`'s 10 second default grace period
 const DRAIN_BUDGET: Duration = Duration::from_secs(8);
 
+type TaskResult = Result<(), eyre::Report>;
+
 fn build_filter() -> (EnvFilter, Option<FromEnvError>) {
     fn build_default_filter() -> EnvFilter {
         EnvFilter::builder()
@@ -367,8 +369,6 @@ async fn start_tasks(config: Config, services: Services) -> Result<Infallible, S
 
     Err(shutdown_reason)
 }
-
-type TaskResult = Result<(), eyre::Report>;
 
 fn spawn_task<F>(name: &'static str, task: F) -> BoxFuture<'static, (&'static str, TaskResult)>
 where
