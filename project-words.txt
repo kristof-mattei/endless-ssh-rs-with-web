@@ -45,6 +45,7 @@ healthz
 hypertable
 idents
 jsons
+kjanat
 kristof
 lcovonly
 lintian
