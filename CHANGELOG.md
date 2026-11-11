@@ -1,4 +1,13 @@
 <!-- header goes here -->
+## [1.2.6](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.5..v1.2.6) - 2026-11-11
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update maplibre-gl (npm) to v6.17.0 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`4c5cfb3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/4c5cfb32ce140ac2a1ba8a34b1adb2412672a22d))
+
+### 🚜 Refactor
+
+- Move `TaskResult` to the top of `main.rs` by [Kristof Mattei](https://github.com/kristof-mattei) ([`01046e4`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/01046e4d6e1de32e203627929ee02894abaf002d))
 ## [1.2.5](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.4..v1.2.5) - 2026-11-08
 
 ### 🐛 Bug Fixes
