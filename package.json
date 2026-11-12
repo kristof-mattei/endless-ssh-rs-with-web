@@ -58,7 +58,7 @@
         "oxlint": "1.93.0",
         "oxlint-tsgolint": "7.0.2006",
         "tailwindcss": "4.3.5",
-        "tar": "7.5.22",
+        "tar": "7.5.23",
         "typescript": "6.0.3",
         "vite": "catalog:default",
         "vite-plugin-checker": "1.0.0",
