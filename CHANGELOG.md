@@ -1,4 +1,10 @@
 <!-- header goes here -->
+## [1.2.7](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.6..v1.2.7) - 2026-11-13
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update maplibre-gl (npm) to v6.18.0 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`6096954`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/60969540afd5461747f835bdc5f54a2b60d5ff15))
+- *(deps)* Update rust crate maxminddb to v0.33.0 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`bdf6da3`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/bdf6da38defa0045cb05a53dd93576bdb3a9198a))
 ## [1.2.6](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.5..v1.2.6) - 2026-11-11
 
 ### 🐛 Bug Fixes
