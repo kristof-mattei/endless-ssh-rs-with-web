@@ -1,4 +1,16 @@
 <!-- header goes here -->
+## [1.2.8](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.7..v1.2.8) - 2026-11-17
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate rand to v0.10.4 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`5536a1e`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/5536a1e2abdf3ae9c1d48e1afe2f3089569b7af1))
+- *(deps)* Update rust crate clap to v4.6.8 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`10f4d84`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/10f4d846dea9c6c5e643bf5f3b24fc90834f1523))
+- *(deps)* Update rust crate uuid to v1.29.3 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`e98ec22`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/e98ec220f792002da14e9bb972d818660adc5b91))
+
+### ⚙️ Miscellaneous Tasks
+
+- Drop unused `time` feature of `tracing-subscriber` by [Kristof Mattei](https://github.com/kristof-mattei) ([`ce93832`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ce93832bac053d5bb3cb0aa3baecd2f66252e1cb))
+- Replace `time` with `jiff` by [Kristof Mattei](https://github.com/kristof-mattei) ([`ea1f4f2`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ea1f4f29b0f2f721f53228f5d3a37645e647d404))
 ## [1.2.7](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.6..v1.2.7) - 2026-11-13
 
 ### 🐛 Bug Fixes
