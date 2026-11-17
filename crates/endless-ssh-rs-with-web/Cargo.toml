@@ -77,7 +77,6 @@ tracing = "=0.1.44"
 tracing-error = "=0.2.1"
 tracing-subscriber = { version = "=0.3.23", features = [
     "env-filter",
-    "time",
     "tracing-log",
 ] }
 url = { version = "=2.5.8", features = ["serde"] }
