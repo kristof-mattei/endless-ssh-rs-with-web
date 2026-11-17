@@ -6,11 +6,12 @@ use std::net::IpAddr;
 
 use color_eyre::eyre::{self, Context as _};
 use futures::TryStreamExt as _;
+use jiff::SignedDuration;
+use jiff_sqlx::ToSqlx as _;
 use serde::Serialize;
 use sqlx::migrate::MigrateError;
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions, PgRow};
 use sqlx::{AssertSqlSafe, PgExecutor, PgPool, Row as _};
-use time::{OffsetDateTime, SignedDuration};
 use tracing::{Level, event};
 
 use crate::db::types::{AllTimeTotals, ConnectionRecord, DbDuration, DbIpAddr, DbPort};
@@ -30,8 +31,8 @@ pub(crate) async fn run_migrations(pool: &PgPool) -> Result<(), MigrateError> {
 
 /// A completed connection.
 struct NewConnection {
-    connected_at: OffsetDateTime,
-    disconnected_at: OffsetDateTime,
+    connected_at: jiff::Timestamp,
+    disconnected_at: jiff::Timestamp,
     time_spent: SignedDuration,
     bytes_sent: i64,
     ip_address: IpAddr,
@@ -48,8 +49,8 @@ pub(crate) async fn insert_connection(
     pool: &PgPool,
     ip_address: IpAddr,
     port: u16,
-    connected_at: OffsetDateTime,
-    disconnected_at: OffsetDateTime,
+    connected_at: jiff::Timestamp,
+    disconnected_at: jiff::Timestamp,
     time_spent: SignedDuration,
     bytes_sent: usize,
     geo: Option<&GeoInfo>,
@@ -138,8 +139,8 @@ async fn insert_feed_row(
             , $11
         ) RETURNING id
         "#,
-        row.connected_at,
-        row.disconnected_at,
+        row.connected_at.to_sqlx() as _,
+        row.disconnected_at.to_sqlx() as _,
         DbDuration(row.time_spent) as _,
         row.bytes_sent,
         DbIpAddr(row.ip_address) as _,
@@ -186,8 +187,8 @@ async fn insert_log_row(
             , $11
         )
         "#,
-        row.connected_at,
-        row.disconnected_at,
+        row.connected_at.to_sqlx() as _,
+        row.disconnected_at.to_sqlx() as _,
         DbDuration(row.time_spent) as _,
         row.bytes_sent,
         DbIpAddr(row.ip_address) as _,
@@ -240,8 +241,8 @@ where
             id
             , ip_address as "ip_address: DbIpAddr"
             , port as "port: DbPort"
-            , connected_at
-            , disconnected_at
+            , connected_at as "connected_at: jiff_sqlx::Timestamp"
+            , disconnected_at as "disconnected_at: jiff_sqlx::Timestamp"
             , time_spent as "time_spent: DbDuration"
             , bytes_sent
             , country_code
@@ -283,8 +284,8 @@ where
             id: row.id,
             ip_address: row.ip_address,
             port: row.port,
-            connected_at: row.connected_at,
-            disconnected_at: row.disconnected_at,
+            connected_at: row.connected_at.to_jiff(),
+            disconnected_at: row.disconnected_at.to_jiff(),
             time_spent: row.time_spent,
             bytes_sent: row.bytes_sent,
             country: row.country_code.map(|code| Country {
@@ -352,7 +353,7 @@ impl TryFrom<PgRow> for StatsRow {
         let name: Option<String> = row.try_get("country_name")?;
 
         Ok(Self {
-            bucket: Timestamp(row.try_get("bucket")?),
+            bucket: Timestamp(row.try_get::<jiff_sqlx::Timestamp, _>("bucket")?.to_jiff()),
             country: code.map(|code| Country {
                 name: name.unwrap_or_else(|| code.clone()),
                 code,
@@ -406,20 +407,20 @@ const TIERS: [Tier; 4] = [
     Tier {
         table: "connections_1min",
         bucket_seconds: 60,
-        max_span: Some(SignedDuration::hours(24)),
-        retention: Some(SignedDuration::hours(48)),
+        max_span: Some(SignedDuration::from_hours(24)),
+        retention: Some(SignedDuration::from_hours(48)),
     },
     Tier {
         table: "connections_5min",
         bucket_seconds: 300,
-        max_span: Some(SignedDuration::days(7)),
-        retention: Some(SignedDuration::days(7)),
+        max_span: Some(SignedDuration::from_hours(7 * 24)),
+        retention: Some(SignedDuration::from_hours(7 * 24)),
     },
     Tier {
         table: "connections_1h",
         bucket_seconds: 3600,
-        max_span: Some(SignedDuration::days(30)),
-        retention: Some(SignedDuration::days(40)),
+        max_span: Some(SignedDuration::from_hours(30 * 24)),
+        retention: Some(SignedDuration::from_hours(40 * 24)),
     },
     Tier {
         table: "connections_1day",
@@ -440,10 +441,10 @@ pub(crate) struct StatsResponse {
 /// Pick the finest tier whose retention still covers `from`, coarsened by span, and return rows for [from, to).
 async fn get_stats_ranged(
     pool: &PgPool,
-    (from, to): (OffsetDateTime, OffsetDateTime),
+    (from, to): (jiff::Timestamp, jiff::Timestamp),
 ) -> Result<StatsResponse, sqlx::Error> {
     let span = to - from;
-    let age = OffsetDateTime::now_utc() - from;
+    let age = jiff::Timestamp::now() - from;
 
     // coarsen for long spans to keep the row count bounded
     let by_span = Tier::finest(|tier| tier.max_span.is_none_or(|max_span| span <= max_span));
@@ -476,8 +477,8 @@ async fn get_stats_ranged(
     let safe_sql = AssertSqlSafe(sql);
 
     let rows = sqlx::query(safe_sql)
-        .bind(from)
-        .bind(to)
+        .bind(from.to_sqlx())
+        .bind(to.to_sqlx())
         .fetch_all(pool)
         .await?
         .into_iter()
@@ -493,13 +494,14 @@ async fn get_stats_ranged(
 /// Return every `connections_1day` row.
 async fn get_stats_all(pool: &PgPool) -> Result<StatsResponse, sqlx::Error> {
     // the 1day tier grows forever, so past two years of history the open-ended query serves weeks to keep the row count bounded
-    let oldest: Option<OffsetDateTime> =
+    let oldest: Option<jiff_sqlx::Timestamp> =
         sqlx::query_scalar("SELECT MIN(bucket) FROM connections_1day")
             .fetch_one(pool)
             .await?;
 
-    let serve_weekly = oldest
-        .is_some_and(|oldest| OffsetDateTime::now_utc() - oldest > SignedDuration::days(2 * 365));
+    let serve_weekly = oldest.is_some_and(|oldest| {
+        jiff::Timestamp::now() - oldest.to_jiff() > SignedDuration::from_hours(2 * 365 * 24)
+    });
 
     if serve_weekly {
         let rows = sqlx::query(
@@ -565,7 +567,7 @@ async fn get_stats_all(pool: &PgPool) -> Result<StatsResponse, sqlx::Error> {
 /// Aggregated rows for [from, to), or the whole 1day tier when no range is given.
 pub(crate) async fn get_stats(
     pool: &PgPool,
-    from_to: Option<(OffsetDateTime, OffsetDateTime)>,
+    from_to: Option<(jiff::Timestamp, jiff::Timestamp)>,
 ) -> Result<StatsResponse, sqlx::Error> {
     match from_to {
         Some(from_to) => get_stats_ranged(pool, from_to).await,

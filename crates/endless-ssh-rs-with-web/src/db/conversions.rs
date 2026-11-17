@@ -1,8 +1,8 @@
 use std::net::IpAddr;
 
 use ipnet::{IpNet, Ipv4Net, Ipv6Net};
+use jiff::SignedDuration;
 use sqlx::postgres::types::PgInterval;
-use time::SignedDuration;
 
 /// Convert `IpAddr` to `IpNetwork` for `PostgreSQL` INET binding.
 /// Inserting an `IpAddr` works equally as well, but then we're not explicit.
@@ -16,7 +16,7 @@ pub(super) fn to_inet(ip: IpAddr) -> IpNet {
 pub(super) fn to_interval(duration: SignedDuration) -> PgInterval {
     // let's talk about this conversion for a moment:
     // our duration is never negative (we should encode this into the type system though!)
-    // now, let's talk about what it means for `whole_microseconds()` to exceed `i64::MAX`:
+    // now, let's talk about what it means for `as_micros()` to exceed `i64::MAX`:
     // that is 106_751_991 days, or 292_471 years.
     // What are the chances that someone is connected that long, considering we'd have at least one
     // * power outage
@@ -24,7 +24,7 @@ pub(super) fn to_interval(duration: SignedDuration) -> PgInterval {
     // * thermonuclear war?
     // Anyway, I watched Terminator 2 at least 10 times, and played a lot of Fallout (not to mention I rewatched the show 3 times), so I'm prepared for all possibilities.
     // And in case I'm wrong, we'll cap the value at `i64::MAX`, which is good enough for now.
-    let microseconds = duration.whole_microseconds().try_into().unwrap_or(i64::MAX);
+    let microseconds = duration.as_micros().try_into().unwrap_or(i64::MAX);
 
     PgInterval {
         months: 0,
@@ -36,5 +36,5 @@ pub(super) fn to_interval(duration: SignedDuration) -> PgInterval {
 pub(super) fn to_duration(interval: PgInterval) -> SignedDuration {
     let total_days = (i64::from(interval.months) * 30) + i64::from(interval.days);
 
-    SignedDuration::days(total_days) + SignedDuration::microseconds(interval.microseconds)
+    SignedDuration::from_hours(total_days * 24) + SignedDuration::from_micros(interval.microseconds)
 }

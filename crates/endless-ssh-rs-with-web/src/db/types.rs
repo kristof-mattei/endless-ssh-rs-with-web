@@ -1,12 +1,12 @@
 use std::net::IpAddr;
 
 use ipnet::IpNet;
+use jiff::{SignedDuration, Timestamp};
 use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
 use sqlx::postgres::types::PgInterval;
 use sqlx::postgres::{PgArgumentBuffer, PgTypeInfo, PgValueRef};
 use sqlx::{Decode, Encode, Postgres, Type};
-use time::{OffsetDateTime, SignedDuration};
 
 use crate::db::conversions::{to_duration, to_inet, to_interval};
 use crate::geoip::{Coordinates, Country};
@@ -103,8 +103,8 @@ pub(crate) struct ConnectionRecord {
     pub id: i64,
     pub ip_address: DbIpAddr,
     pub port: DbPort,
-    pub connected_at: OffsetDateTime,
-    pub disconnected_at: OffsetDateTime,
+    pub connected_at: Timestamp,
+    pub disconnected_at: Timestamp,
     pub time_spent: DbDuration,
     pub bytes_sent: i64,
     pub country: Option<Country>,

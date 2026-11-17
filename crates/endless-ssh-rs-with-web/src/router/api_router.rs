@@ -3,9 +3,8 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::{Json, Router};
+use jiff::{SignedDuration, Timestamp};
 use serde::Deserialize;
-use time::OffsetDateTime;
-use time::format_description::well_known::Rfc3339;
 use tracing::{Level, event};
 
 use crate::db;
@@ -33,18 +32,18 @@ async fn stats_handler(
     let from_to = if from.is_none() && to.is_none() {
         None
     } else {
-        let now = OffsetDateTime::now_utc();
+        let now = Timestamp::now();
 
         let to = to
             .as_deref()
-            .and_then(|s| OffsetDateTime::parse(s, &Rfc3339).ok())
+            .and_then(|s| s.parse::<Timestamp>().ok())
             .unwrap_or(now);
 
         // if no from provided, or invalid, fall back to 24 hours before `to`
         let from = from
             .as_deref()
-            .and_then(|s| OffsetDateTime::parse(s, &Rfc3339).ok())
-            .unwrap_or_else(|| to - time::SignedDuration::hours(24));
+            .and_then(|s| s.parse::<Timestamp>().ok())
+            .unwrap_or_else(|| to - SignedDuration::from_hours(24));
 
         if from > to {
             return (StatusCode::BAD_REQUEST, "`from` needs to be before `to`").into_response();
