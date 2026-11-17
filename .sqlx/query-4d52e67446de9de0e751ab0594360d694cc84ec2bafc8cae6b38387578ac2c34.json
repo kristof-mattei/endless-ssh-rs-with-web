@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n        SELECT\n            id\n            , ip_address as \"ip_address: DbIpAddr\"\n            , port as \"port: DbPort\"\n            , connected_at\n            , disconnected_at\n            , time_spent as \"time_spent: DbDuration\"\n            , bytes_sent\n            , country_code\n            , country_name\n            , city\n            , latitude\n            , longitude\n        FROM (\n            SELECT\n                id\n                , ip_address\n                , port\n                , connected_at\n                , disconnected_at\n                , time_spent\n                , bytes_sent\n                , country_code\n                , country_name\n                , city\n                , latitude\n                , longitude\n            FROM\n                connections\n            ORDER BY\n                id DESC\n            LIMIT $1\n        ) AS subquery\n        ORDER BY\n            id ASC\n        ",
+  "query": "\n        SELECT\n            id\n            , ip_address as \"ip_address: DbIpAddr\"\n            , port as \"port: DbPort\"\n            , connected_at as \"connected_at: jiff_sqlx::Timestamp\"\n            , disconnected_at as \"disconnected_at: jiff_sqlx::Timestamp\"\n            , time_spent as \"time_spent: DbDuration\"\n            , bytes_sent\n            , country_code\n            , country_name\n            , city\n            , latitude\n            , longitude\n        FROM (\n            SELECT\n                id\n                , ip_address\n                , port\n                , connected_at\n                , disconnected_at\n                , time_spent\n                , bytes_sent\n                , country_code\n                , country_name\n                , city\n                , latitude\n                , longitude\n            FROM\n                connections\n            ORDER BY\n                id DESC\n            LIMIT $1\n        ) AS subquery\n        ORDER BY\n            id ASC\n        ",
   "describe": {
     "columns": [
       {
@@ -38,7 +38,7 @@
       },
       {
         "ordinal": 3,
-        "name": "connected_at",
+        "name": "connected_at: jiff_sqlx::Timestamp",
         "type_info": "Timestamptz",
         "origin": {
           "Table": {
@@ -49,7 +49,7 @@
       },
       {
         "ordinal": 4,
-        "name": "disconnected_at",
+        "name": "disconnected_at: jiff_sqlx::Timestamp",
         "type_info": "Timestamptz",
         "origin": {
           "Table": {
@@ -156,5 +156,5 @@
       true
     ]
   },
-  "hash": "5fa30286cd024e3ff35e7896323b22810775645e6a0a332b06e9090988259e7a"
+  "hash": "4d52e67446de9de0e751ab0594360d694cc84ec2bafc8cae6b38387578ac2c34"
 }

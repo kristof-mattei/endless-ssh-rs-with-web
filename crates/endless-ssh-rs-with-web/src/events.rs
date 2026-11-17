@@ -2,8 +2,8 @@ use std::net::{IpAddr, SocketAddr};
 use std::sync::Arc;
 
 use axum::extract::ws::{Message, Utf8Bytes};
+use jiff::SignedDuration;
 use serde::Serialize;
-use time::{OffsetDateTime, SignedDuration};
 use tokio::sync::broadcast;
 use tracing::{Level, event};
 
@@ -13,8 +13,8 @@ use crate::utils::serde::{Elapsed, Timestamp};
 
 pub(crate) struct ClosedConnection {
     pub addr: SocketAddr,
-    pub connected_at: OffsetDateTime,
-    pub disconnected_at: OffsetDateTime,
+    pub connected_at: jiff::Timestamp,
+    pub disconnected_at: jiff::Timestamp,
     pub time_spent: SignedDuration,
     pub bytes_sent: usize,
 }
@@ -197,8 +197,8 @@ mod tests {
     use std::net::{IpAddr, Ipv4Addr};
 
     use axum::extract::ws::Utf8Bytes;
+    use jiff::SignedDuration;
     use pretty_assertions::assert_eq;
-    use time::{OffsetDateTime, SignedDuration};
 
     use super::{ConnectionEvent, ConnectionFrame};
     use crate::geoip::{Coordinates, Country};
@@ -215,7 +215,7 @@ mod tests {
         let connected = ConnectionEvent::Connected {
             ip: IP,
             port: 50000,
-            connected_at: Timestamp(OffsetDateTime::from_unix_timestamp(1_767_225_600).unwrap()),
+            connected_at: Timestamp(jiff::Timestamp::from_second(1_767_225_600).unwrap()),
             country: Some(Country {
                 code: String::from("NL"),
                 name: String::from("Netherlands"),
@@ -253,9 +253,9 @@ mod tests {
             sequence: 1,
             ip: IP,
             port: 50000,
-            connected_at: Timestamp(OffsetDateTime::from_unix_timestamp(1_767_225_600).unwrap()),
-            disconnected_at: Timestamp(OffsetDateTime::from_unix_timestamp(1_767_225_690).unwrap()),
-            time_spent: Elapsed(SignedDuration::seconds(90)),
+            connected_at: Timestamp(jiff::Timestamp::from_second(1_767_225_600).unwrap()),
+            disconnected_at: Timestamp(jiff::Timestamp::from_second(1_767_225_690).unwrap()),
+            time_spent: Elapsed(SignedDuration::from_secs(90)),
             bytes_sent: 100,
             country: None,
             city: None,

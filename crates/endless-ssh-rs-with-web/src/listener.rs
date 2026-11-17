@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use color_eyre::eyre::{self, Context as _};
-use time::OffsetDateTime;
+use jiff::Timestamp;
 use tokio::net::TcpListener;
 use tokio::sync::{Semaphore, TryAcquireError};
 use tokio_util::sync::CancellationToken;
@@ -94,7 +94,7 @@ impl Listener {
                     // at capacity the connection is dropped instead of queued
                     match Arc::clone(&self.semaphore).try_acquire_owned() {
                         Ok(permit) => {
-                            let connected_at = OffsetDateTime::now_utc();
+                            let connected_at = Timestamp::now();
 
                             self.client_task_tracker.spawn_with_name(
                                 &format!("client-{}", addr),

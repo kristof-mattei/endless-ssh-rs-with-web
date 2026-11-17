@@ -1,9 +1,10 @@
 use std::net::SocketAddr;
 use std::os::fd::{AsRawFd, FromRawFd as _, OwnedFd};
 use std::sync::Arc;
+use std::time::Duration;
 
 use dashmap::DashMap;
-use time::{OffsetDateTime, SignedDuration};
+use jiff::SignedDuration;
 use tokio::io::Interest;
 use tokio::io::unix::{AsyncFd, AsyncFdReadyGuard};
 use tokio::net::TcpStream;
@@ -92,14 +93,14 @@ where
 async fn listen_forever(
     mut stream: TcpStream,
     addr: SocketAddr,
-    connected_at: OffsetDateTime,
+    connected_at: jiff::Timestamp,
     config: &Config,
     context: &ClientContext,
-) -> (SignedDuration, usize) {
+) -> (Duration, usize) {
     // use monotonic time to measure elapsed time of how long client is connected
     let connected_instant = Instant::now();
     let mut send_next = connected_instant + config.delay;
-    let mut time_spent = SignedDuration::ZERO;
+    let mut time_spent = Duration::ZERO;
     let mut bytes_sent = 0_usize;
 
     // register the stream for disconnect events only, failures are non-fatal and disable disconnect detection for this client (i.e. falls back to send-based detection)
@@ -163,7 +164,7 @@ async fn listen_forever(
 
                     time_spent += partial;
 
-                    event!(Level::TRACE, %addr, %connected_at, %time_spent, bytes_sent, send_next = %(connected_at + time_spent + config.delay), "Client gone");
+                    event!(Level::TRACE, %addr, %connected_at, ?time_spent, bytes_sent, send_next = %(connected_at + time_spent + config.delay), "Client gone");
 
                     return (time_spent, bytes_sent);
                 }
@@ -209,7 +210,7 @@ async fn listen_forever(
                 time_spent += config.delay;
             }
 
-            event!(Level::TRACE, %addr, %time_spent, bytes_sent, "Client gone");
+            event!(Level::TRACE, %addr, ?time_spent, bytes_sent, "Client gone");
 
             return (time_spent, bytes_sent);
         }
@@ -219,7 +220,7 @@ async fn listen_forever(
 pub(crate) async fn handle_client(
     stream: TcpStream,
     addr: SocketAddr,
-    connected_at: OffsetDateTime,
+    connected_at: jiff::Timestamp,
     permit: OwnedSemaphorePermit,
     config: Arc<Config>,
     context: ClientContext,
@@ -232,12 +233,12 @@ pub(crate) async fn handle_client(
     event!(
         Level::INFO,
         %addr,
-        %time_spent,
+        ?time_spent,
         bytes_sent,
         "Dropping client...",
     );
 
-    let disconnected_at = OffsetDateTime::now_utc();
+    let disconnected_at = jiff::Timestamp::now();
 
     let available_slots = permit.semaphore().available_permits();
 
@@ -254,7 +255,7 @@ pub(crate) async fn handle_client(
         addr,
         connected_at,
         disconnected_at,
-        time_spent,
+        time_spent: SignedDuration::try_from(time_spent).unwrap_or(SignedDuration::MAX),
         bytes_sent,
     };
 
@@ -270,7 +271,7 @@ pub(crate) async fn handle_client(
 
 fn register_active_connection(
     addr: SocketAddr,
-    connected_at: OffsetDateTime,
+    connected_at: jiff::Timestamp,
     context: &ClientContext,
 ) {
     let mut geo = context.geo_ip_reader.lookup(addr.ip());

@@ -1,12 +1,12 @@
 use std::fmt;
 
+use jiff::SignedDuration;
 use serde::{Serialize, Serializer};
-use time::{OffsetDateTime, SignedDuration};
 
 /// Wire timestamp, `{"$instant": "<RFC 3339>"}`. The front-end reviver turns the wrapper into a `Temporal.Instant`.
 #[derive(Clone, Copy, Debug)]
 #[cfg_attr(test, derive(ts_rs::TS), ts(export))]
-pub(crate) struct Timestamp(#[cfg_attr(test, ts(type = "Temporal.Instant"))] pub OffsetDateTime);
+pub(crate) struct Timestamp(#[cfg_attr(test, ts(type = "Temporal.Instant"))] pub jiff::Timestamp);
 
 impl Serialize for Timestamp {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -15,11 +15,8 @@ impl Serialize for Timestamp {
     {
         #[derive(Serialize)]
         struct Tagged {
-            #[serde(
-                rename = "$instant",
-                serialize_with = "time::serde::rfc3339::serialize"
-            )]
-            instant: OffsetDateTime,
+            #[serde(rename = "$instant")]
+            instant: jiff::Timestamp,
         }
 
         Tagged { instant: self.0 }.serialize(serializer)
@@ -42,7 +39,7 @@ impl Serialize for Elapsed {
             duration: fmt::Arguments<'a>,
         }
 
-        let seconds = self.0.whole_seconds();
+        let seconds = self.0.as_secs();
         // ISO 8601 signs the whole duration, not the seconds field
         let sign = if seconds < 0 { "-" } else { "" };
 
@@ -55,18 +52,17 @@ impl Serialize for Elapsed {
 
 #[cfg(test)]
 mod tests {
+    use jiff::SignedDuration;
     use pretty_assertions::assert_eq;
-    use time::{OffsetDateTime, SignedDuration};
 
     use super::{Elapsed, Timestamp};
 
     // `front-end/src/lib/wire.test.ts` parses these same literals
     #[test]
     fn serializes_as_tagged_rfc3339_with_z() {
-        let whole_second = Timestamp(OffsetDateTime::from_unix_timestamp(1_767_225_600).unwrap());
-        let with_millis = Timestamp(
-            OffsetDateTime::from_unix_timestamp_nanos(1_767_225_600_184_000_000).unwrap(),
-        );
+        let whole_second = Timestamp(jiff::Timestamp::from_second(1_767_225_600).unwrap());
+        let with_millis =
+            Timestamp(jiff::Timestamp::from_nanosecond(1_767_225_600_184_000_000).unwrap());
 
         assert_eq!(
             serde_json::to_string(&whole_second).unwrap(),

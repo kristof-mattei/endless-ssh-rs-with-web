@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
+use jiff::SignedDuration;
 use libc::timespec;
-use time::SignedDuration;
 
 pub(crate) enum Timeout {
     Infinite,
@@ -19,10 +19,10 @@ impl std::fmt::Debug for Timeout {
 
 impl Timeout {
     pub(crate) fn as_c_timeout(&self) -> i32 {
-        // `whole_milliseconds` truncates, the + 1 keeps the timeout from ending before the duration has passed
+        // `as_millis` truncates, the + 1 keeps the timeout from ending before the duration has passed
         match *self {
             Timeout::Infinite => -1,
-            Timeout::Duration(m) => i32::try_from(m.whole_milliseconds() + 1).unwrap_or(i32::MAX),
+            Timeout::Duration(m) => i32::try_from(m.as_millis() + 1).unwrap_or(i32::MAX),
         }
     }
 
@@ -31,8 +31,8 @@ impl Timeout {
         match *self {
             Timeout::Infinite => None,
             Timeout::Duration(m) => Some(timespec {
-                tv_sec: m.whole_seconds(),
-                tv_nsec: m.subsec_nanoseconds().into(),
+                tv_sec: m.as_secs(),
+                tv_nsec: m.subsec_nanos().into(),
             }),
         }
     }
