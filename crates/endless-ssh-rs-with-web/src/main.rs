@@ -23,7 +23,6 @@ mod test_utils;
 mod timeout;
 mod utils;
 
-use std::convert::Infallible;
 use std::env::{self, VarError};
 use std::net::SocketAddr;
 use std::process::ExitCode;
@@ -174,7 +173,7 @@ fn print_header() {
 /// starts all the tasks, such as the web server, the geoip refresh, ...
 /// ensures all tasks are gracefully shutdown in case of error, `CTRL+c` or `SIGTERM`.
 #[expect(clippy::too_many_lines, reason = "Entrypoint")]
-async fn start_tasks(config: Config, services: Services) -> Result<Infallible, Shutdown> {
+async fn start_tasks(config: Config, services: Services) -> Result<!, Shutdown> {
     // when running as PID 1, a signal before this registration is discarded
     let mut signal_listeners = SignalListeners::register()?;
 
