@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { codecovVitePlugin } from "@codecov/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import type { Plugin, UserConfig } from "vite";
+import type { HtmlTagDescriptor, Plugin, UserConfig } from "vite";
 import { build, loadEnv } from "vite";
 import { checker } from "vite-plugin-checker";
 import svgr from "vite-plugin-svgr";
@@ -23,7 +23,7 @@ function resolvePort(environmentValue: string | undefined, fallback: number): nu
 function emitBuildId(buildId: string): Plugin {
     return {
         name: "emit-build-id",
-        generateBundle() {
+        generateBundle(): void {
             // must match `BUILD_ID_FILE` in `crates/endless-ssh-rs-with-web/src/router/html_router.rs`
             this.emitFile({ type: "asset", fileName: "build-id", source: buildId });
         },
@@ -34,7 +34,7 @@ function emitBuildId(buildId: string): Plugin {
 function inlineHeadScript(entry: string): Plugin {
     return {
         name: "inline-head-script",
-        async transformIndexHtml() {
+        async transformIndexHtml(): Promise<HtmlTagDescriptor[]> {
             const result = await build({
                 configFile: false,
                 logLevel: "warn",
