@@ -1,4 +1,19 @@
 <!-- header goes here -->
+## [1.2.9](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.8..v1.2.9) - 2026-11-27
+
+### 🐛 Bug Fixes
+
+- *(deps)* Update rust crate sqlx to v0.9.1 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`029331c`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/029331c30e161df4e088e01370e806e8a4181c4e))
+- *(deps)* Update maplibre-gl (npm) to v6.19.0 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`2f928fe`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/2f928fec7b90959e12580d4d5769af2435c25463))
+- *(deps)* Update rust crate url to v2.5.9 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`821a178`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/821a1781d5204382b2bc8d6857a110a4da0bcc8f))
+- *(deps)* Update recharts (npm) to v3.11.1 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`ad4019a`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/ad4019a4586636b447af534a2d2ff59b24305e4d))
+- *(deps)* Update rust crate clap to v4.6.10 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`d589de5`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/d589de5b1fd499ebb4358500125a9c610a543c2d))
+- *(deps)* Update rust crate jiff to v1.0.3 by [renovate\[bot\]](https://github.com/renovate[bot]) ([`f0d08fd`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/f0d08fde4a42bbd2d41e6edcb2b58c203ff4ad08))
+- Use never type by [Kristof Mattei](https://github.com/kristof-mattei) ([`57af215`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/57af215746427b351d9f4a70ad6f014ce3a36fac))
+
+### ⚙️ Miscellaneous Tasks
+
+- Annotate return types of `generateBundle` and `transformIndexHtml` by [Kristof Mattei](https://github.com/kristof-mattei) ([`781e0b9`](https://github.com/kristof-mattei/endless-ssh-rs-with-web/commit/781e0b9dabfb8ab81616b1029776d9e1c0dc8535))
 ## [1.2.8](https://github.com/kristof-mattei/endless-ssh-rs-with-web/compare/v1.2.7..v1.2.8) - 2026-11-17
 
 ### 🐛 Bug Fixes
